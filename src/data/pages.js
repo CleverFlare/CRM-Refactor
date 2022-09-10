@@ -8,7 +8,7 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import ApartmentIcon from "@mui/icons-material/Apartment";
 
 import Home from "../pages/Home";
-import AddClients from "../pages/client/AddClient";
+import AddClients from "../pages/client/AddClients";
 import ViewClients from "../pages/client/ViewClients";
 
 const pages = [
