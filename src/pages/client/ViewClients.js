@@ -7,6 +7,35 @@ import { useDispatch, useSelector } from "react-redux";
 import useRequest from "../../hooks/useRequest";
 import { CLIENTS } from "../../data/APIs";
 import { Button, Stack } from "@mui/material";
+import useAfterEffect from "../../hooks/useAfterEffect";
+import InputField from "../../features/form/components/InputField";
+
+const TestFilter = ({ placeholder, value, onChange }) => {
+  const handleChange = (e) => {
+    onChange({
+      filterValue: "Bruh",
+      renderedValue: "Normal",
+      value: e.target.value,
+    });
+  };
+  return (
+    <InputField
+      placeholder={placeholder}
+      value={value}
+      onChange={handleChange}
+    />
+  );
+};
+
+const template = [
+  {
+    name: "الإسم",
+    component: <TestFilter placeholder="الإسم" />,
+    output: {
+      query: "name",
+    },
+  },
+];
 
 const ViewClients = () => {
   //----store----
@@ -16,6 +45,7 @@ const ViewClients = () => {
 
   //----states----
   const [selected, setSelected] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
 
   //----request hooks----
   const [clientsGetRequest, clientsGetResponse] = useRequest({
@@ -32,6 +62,17 @@ const ViewClients = () => {
   useEffect(() => {
     getClients();
   }, []);
+
+  useAfterEffect(() => {
+    clientsGetRequest({
+      params: {
+        page: currentPage,
+      },
+      onSuccess: (res) => {
+        dispatch({ type: "clients/set", payload: res.data });
+      },
+    });
+  }, [currentPage]);
 
   //----functions----
   const getClients = () => {
@@ -52,18 +93,23 @@ const ViewClients = () => {
   };
 
   const handlePaginate = (params) => {
+    setCurrentPage(params.current);
+  };
+
+  const handleChecks = ({ checks }) => {
+    setSelected(checks);
+  };
+
+  const handleChangeAmount = ({ value }) => {
     clientsGetRequest({
       params: {
-        page: params.current,
+        size: value,
+        page: currentPage,
       },
       onSuccess: (res) => {
         dispatch({ type: "clients/set", payload: res.data });
       },
     });
-  };
-
-  const handleChecks = ({ checks }) => {
-    setSelected(checks);
   };
 
   return (
@@ -78,6 +124,8 @@ const ViewClients = () => {
         onDelete={deleteClient}
         onView={() => {}}
         onPaginate={handlePaginate}
+        onAmountChange={handleChangeAmount}
+        filters={template}
       />
       <Stack
         direction="row"
@@ -161,264 +209,5 @@ const columns = [
     field: "agent",
     headerName: "الموظف",
     customContent: ({ agent }) => `${agent.name}`,
-  },
-];
-
-const dummyRows = [
-  {
-    id: 24890,
-    user: {
-      id: 48317,
-      first_name: "hisham",
-      last_name: "fouad",
-      email: "",
-      country_code: "+20",
-      phone: "01153375735",
-      image:
-        "https://sadakatcdn.cyparta.com/media/media/DefaultPhotos/defult.png",
-    },
-    organization: 6,
-    bussiness: [
-      {
-        id: 157,
-        name: "El alamein",
-      },
-    ],
-    channel: "",
-    agent: {
-      id: 93,
-      name: "Ahmed",
-    },
-    max_budget: "0.00",
-    fav_contacts: "phone",
-    created_at: "2022-09-06T21:49:45.939560+02:00",
-    event: "",
-    comment: "",
-    followup: null,
-    created_by: "Ahmed",
-  },
-  {
-    id: 24888,
-    user: {
-      id: 48315,
-      first_name: "mohammad",
-      last_name: "salah kandil",
-      email: "",
-      country_code: "+20",
-      phone: "01116114068",
-      image:
-        "https://sadakatcdn.cyparta.com/media/media/DefaultPhotos/defult.png",
-    },
-    organization: 6,
-    bussiness: [
-      {
-        id: 157,
-        name: "El alamein",
-      },
-    ],
-    channel: "",
-    agent: {
-      id: 93,
-      name: "Ahmed",
-    },
-    max_budget: "0.00",
-    fav_contacts: "phone",
-    created_at: "2022-09-06T21:49:45.710312+02:00",
-    event: "",
-    comment: "",
-    followup: null,
-    created_by: "Ahmed",
-  },
-  {
-    id: 24887,
-    user: {
-      id: 48314,
-      first_name: "ahmed",
-      last_name: "elkordi",
-      email: "",
-      country_code: "+20",
-      phone: "01012224387",
-      image:
-        "https://sadakatcdn.cyparta.com/media/media/DefaultPhotos/defult.png",
-    },
-    organization: 6,
-    bussiness: [
-      {
-        id: 157,
-        name: "El alamein",
-      },
-    ],
-    channel: "",
-    agent: {
-      id: 93,
-      name: "Ahmed",
-    },
-    max_budget: "0.00",
-    fav_contacts: "phone",
-    created_at: "2022-09-06T21:49:45.601893+02:00",
-    event: "",
-    comment: "",
-    followup: null,
-    created_by: "Ahmed",
-  },
-  {
-    id: 24886,
-    user: {
-      id: 48313,
-      first_name: "lulu",
-      last_name: "khaled",
-      email: "",
-      country_code: "+20",
-      phone: "01159603519",
-      image:
-        "https://sadakatcdn.cyparta.com/media/media/DefaultPhotos/defult.png",
-    },
-    organization: 6,
-    bussiness: [
-      {
-        id: 157,
-        name: "El alamein",
-      },
-    ],
-    channel: "",
-    agent: {
-      id: 93,
-      name: "Ahmed",
-    },
-    max_budget: "0.00",
-    fav_contacts: "phone",
-    created_at: "2022-09-06T21:49:45.501670+02:00",
-    event: "",
-    comment: "",
-    followup: null,
-    created_by: "Ahmed",
-  },
-  {
-    id: 24885,
-    user: {
-      id: 48312,
-      first_name: "mohamed",
-      last_name: "salem hassan",
-      email: "",
-      country_code: "+20",
-      phone: "01114134284",
-      image:
-        "https://sadakatcdn.cyparta.com/media/media/DefaultPhotos/defult.png",
-    },
-    organization: 6,
-    bussiness: [
-      {
-        id: 157,
-        name: "El alamein",
-      },
-    ],
-    channel: "",
-    agent: {
-      id: 93,
-      name: "Ahmed",
-    },
-    max_budget: "0.00",
-    fav_contacts: "phone",
-    created_at: "2022-09-06T21:49:45.404422+02:00",
-    event: "",
-    comment: "",
-    followup: null,
-    created_by: "Ahmed",
-  },
-  {
-    id: 24884,
-    user: {
-      id: 48311,
-      first_name: "mohamed",
-      last_name: "farahat",
-      email: "",
-      country_code: "+20",
-      phone: "01066962626",
-      image:
-        "https://sadakatcdn.cyparta.com/media/media/DefaultPhotos/defult.png",
-    },
-    organization: 6,
-    bussiness: [
-      {
-        id: 157,
-        name: "El alamein",
-      },
-    ],
-    channel: "",
-    agent: {
-      id: 93,
-      name: "Ahmed",
-    },
-    max_budget: "0.00",
-    fav_contacts: "phone",
-    created_at: "2022-09-06T21:49:45.296132+02:00",
-    event: "",
-    comment: "",
-    followup: null,
-    created_by: "Ahmed",
-  },
-  {
-    id: 24883,
-    user: {
-      id: 48310,
-      first_name: "mahmoud",
-      last_name: "fashlom",
-      email: "",
-      country_code: "+20",
-      phone: "01224000150",
-      image:
-        "https://sadakatcdn.cyparta.com/media/media/DefaultPhotos/defult.png",
-    },
-    organization: 6,
-    bussiness: [
-      {
-        id: 157,
-        name: "El alamein",
-      },
-    ],
-    channel: "",
-    agent: {
-      id: 93,
-      name: "Ahmed",
-    },
-    max_budget: "0.00",
-    fav_contacts: "phone",
-    created_at: "2022-09-06T21:49:45.202780+02:00",
-    event: "",
-    comment: "",
-    followup: null,
-    created_by: "Ahmed",
-  },
-  {
-    id: 24882,
-    user: {
-      id: 48309,
-      first_name: "mido",
-      last_name: "mohamed",
-      email: "",
-      country_code: "+20",
-      phone: "01288442660",
-      image:
-        "https://sadakatcdn.cyparta.com/media/media/DefaultPhotos/defult.png",
-    },
-    organization: 6,
-    bussiness: [
-      {
-        id: 157,
-        name: "El alamein",
-      },
-    ],
-    channel: "",
-    agent: {
-      id: 93,
-      name: "Ahmed",
-    },
-    max_budget: "0.00",
-    fav_contacts: "phone",
-    created_at: "2022-09-06T21:49:45.107056+02:00",
-    event: "",
-    comment: "",
-    followup: null,
-    created_by: "Ahmed",
   },
 ];

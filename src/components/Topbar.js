@@ -80,6 +80,7 @@ const Topbar = ({ showBurger, onBurgerClick, onClear, notifications = [] }) => {
       position="static"
       sx={{
         boxShadow: "0px 3px 10px -1px rgb(35 57 117)",
+        zIndex: 1,
       }}
     >
       <Toolbar>
