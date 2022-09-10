@@ -274,7 +274,15 @@ const DataGrid = ({
                                         ...row,
                                         columnIndex: columnIndex,
                                         rowIndex: rowIndex,
-                                      })}
+                                      })
+                                        ? column.customContent({
+                                            ...row,
+                                            columnIndex: columnIndex,
+                                            rowIndex: rowIndex,
+                                          })
+                                        : column.customEmpty
+                                        ? column.customEmpty
+                                        : "غير معروف"}
                                     </TableCell>
                                   );
                                 }

@@ -154,6 +154,8 @@ const columns = [
   {
     field: "followup",
     headerName: "تاريخ المعاينة",
+    customContent: ({ followup }) => (followup ? format(followup) : null),
+    customEmpty: "لا يوجد",
   },
   {
     field: "agent",
