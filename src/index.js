@@ -6,7 +6,7 @@ import { CacheProvider } from "@emotion/react";
 import { ThemeProvider } from "@mui/material";
 import theme, { cacheRtl } from "./Theme";
 import { Provider } from "react-redux";
-import store from "./Redux";
+import store from "./store";
 
 //this is a simple mathematical method that takes a number and returns 0 if it's less than 0
 Math.minimumZero = (number) => {
