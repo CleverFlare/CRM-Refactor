@@ -89,7 +89,7 @@ const DialogTable = ({
         {...props}
       >
         {isPending && <PendingBackdrop />}
-        <Box sx={{ maxHeight: "200px", overflowY: "auto" }}>
+        <Box sx={{ maxHeight: "200px", height: "100vmax", overflowY: "auto" }}>
           <Table>
             <TableHead>
               <TableRow>
@@ -115,13 +115,26 @@ const DialogTable = ({
                 <TableRow key={`row ${index}`}>
                   {columns.map((columnData, index) => {
                     if (columnData.customContent) {
-                      return columnData.customContent({
-                        rowData,
-                      });
+                      return (
+                        <TableCell
+                          sx={{ color: "white" }}
+                          key={`cell ${index}`}
+                        >
+                          {columnData.customContent({
+                            rowData,
+                          })
+                            ? columnData.customContent({
+                                rowData,
+                              })
+                            : "غير معروف"}
+                        </TableCell>
+                      );
                     }
                     return (
                       <TableCell sx={{ color: "white" }} key={`cell ${index}`}>
-                        {rowData[columnData.field]}
+                        {rowData[columnData.field]
+                          ? rowData[columnData.field]
+                          : "غير معروف"}
                       </TableCell>
                     );
                   })}
@@ -139,6 +152,6 @@ export default DialogTable;
 
 DialogTable.propTypes = {
   rows: PropTypes.array,
-  columns: PropTypes.array,
+  columns: PropTypes.arrayOf(PropTypes.object).isRequired,
   isPending: PropTypes.bool,
 };

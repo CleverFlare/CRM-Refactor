@@ -31,7 +31,7 @@ const DialogInfoWindow = ({
             spacing={2}
           >
             <Typography>
-              {piece.name} : {piece.value}
+              {piece.name} : {Boolean(piece.value) ? piece.value : "غير معروف"}
             </Typography>
             {piece?.addition}
           </Stack>
@@ -44,6 +44,6 @@ const DialogInfoWindow = ({
 export default DialogInfoWindow;
 
 DialogInfoWindow.propTypes = {
-  information: PropTypes.object.isRequired,
+  information: PropTypes.arrayOf(PropTypes.object).isRequired,
   isPending: PropTypes.bool,
 };

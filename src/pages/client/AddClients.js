@@ -19,7 +19,7 @@ import filter from "../../utils/ClearNull";
 const AddClients = () => {
   //----store----
   const projectsStore = useSelector((state) => state.projects.value);
-  const employeesStore = useSelector((state) => state.employess.value);
+  const employeesStore = useSelector((state) => state.employees.value);
   const channelsStore = useSelector((state) => state.channels.value);
 
   const dispatch = useDispatch();

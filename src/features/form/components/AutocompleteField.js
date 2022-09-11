@@ -11,7 +11,6 @@ import {
   TextField,
 } from "@mui/material";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import React from "react";
 
 const AutocompleteField = ({
   variant = null,
