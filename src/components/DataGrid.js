@@ -18,6 +18,8 @@ import {
   Menu,
   CircularProgress,
   Button,
+  Grow,
+  Collapse,
 } from "@mui/material";
 import { NumericFormat } from "react-number-format";
 import KeyIcon from "@mui/icons-material/Key";
@@ -33,7 +35,6 @@ import PropTypes from "prop-types";
 import useAfterEffect from "../hooks/useAfterEffect";
 import EmptyBox from "../svg/EmptyBox";
 import { v4 as uuid } from "uuid";
-import InputField from "../features/form/components/InputField";
 
 const DataGrid = ({
   rows = [],
@@ -46,6 +47,7 @@ const DataGrid = ({
   onBlock = null,
   onEdit = null,
   isPending = false,
+  onFilter = null,
   total = 1,
   amount = 8,
   onAmountChange = () => {},
@@ -84,6 +86,10 @@ const DataGrid = ({
   useAfterEffect(() => {
     onCheck && onCheck(checked);
   }, [checked]);
+
+  useAfterEffect(() => {
+    onFilter && onFilter(filtersList);
+  }, [filtersList]);
 
   //----functions----
   const handleRootCheckboxChange = (e) => {
@@ -133,30 +139,34 @@ const DataGrid = ({
             availableAmounts={availableAmounts}
             onChange={onAmountChange}
           />
-          {filtersList.map((filter, index) => (
-            <ChipsFilterItem
-              key={`filter ${index}`}
-              name={filter.name}
-              value={filter.renderedValue}
-              id={filter.id}
-              onRemove={() =>
-                setFiltersList((old) =>
-                  old.filter((item) => item.id !== filter.id)
-                )
-              }
-              component={filter.component}
-              onSubmit={(params) =>
-                setFiltersList((old) =>
-                  old.map((item) => {
-                    if (item.id === filter.id) {
-                      return { ...item, ...params };
-                    }
-                    return item;
-                  })
-                )
-              }
-            />
-          ))}
+          <Stack direction="row" spacing={2}>
+            {filtersList.map((filter, index) => (
+              <ChipsFilterItem
+                key={`filter ${filter.id}`}
+                name={filter.name}
+                renderedValue={filter.renderedValue}
+                query={filter.query}
+                value={filter.value}
+                id={filter.id}
+                onRemove={() =>
+                  setFiltersList((old) =>
+                    old.filter((item) => item.id !== filter.id)
+                  )
+                }
+                component={filter.component}
+                onSubmit={(params) =>
+                  setFiltersList((old) =>
+                    old.map((item) => {
+                      if (item.id === filter.id) {
+                        return { ...item, ...params };
+                      }
+                      return item;
+                    })
+                  )
+                }
+              />
+            ))}
+          </Stack>
           {filters && (
             <ChipsFilter
               filters={filters}
@@ -619,6 +629,8 @@ const SelectAmount = ({ availableAmounts, onChange = () => {} }) => {
 
 const ChipsFilterItem = ({
   name,
+  renderedValue,
+  query,
   value,
   id,
   onRemove,
@@ -626,10 +638,17 @@ const ChipsFilterItem = ({
   onSubmit,
 }) => {
   //----states----
+  const [emerge, setEmerge] = useState(false);
+  const [grow, setGrow] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
 
   //----variables----
   const open = Boolean(anchorEl);
+
+  //----effects----
+  useEffect(() => {
+    setEmerge(true);
+  }, []);
 
   //----functions----
   const handleOpenMenu = (e) => {
@@ -640,42 +659,64 @@ const ChipsFilterItem = ({
     setAnchorEl(null);
   };
 
+  const handleGrow = () => {
+    setGrow(true);
+  };
+
+  const handleShrink = () => {
+    setEmerge(false);
+  };
+
+  const handleRemove = () => {
+    onRemove();
+  };
+
   const handleSubmit = (params) => {
     onSubmit({ ...params, id });
     setAnchorEl(null);
   };
 
   return (
-    <Box>
-      <Chip
-        label={
-          <Typography>
-            <b>{name}:</b> {value}
-          </Typography>
-        }
-        sx={{
-          height: "40px",
-          borderRadius: "100vmax",
-          p: 1,
-          direction: "rtl",
-          boxShadow: "0 3px 6px #0005",
-          "& .MuiChip-deleteIcon": {
-            marginLeft: 0,
-          },
-        }}
-        onDelete={(e) => onRemove(e)}
-        onClick={handleOpenMenu}
-      />
-      <Menu open={open} anchorEl={anchorEl} onClose={handleCloseMenu}>
-        <FilterTemplate
-          name={name}
-          component={component}
-          filterValue={value}
-          onSubmit={handleSubmit}
-          onClose={handleCloseMenu}
-        />
-      </Menu>
-    </Box>
+    <Collapse
+      in={emerge}
+      orientation="horizontal"
+      timeout={300}
+      onEntered={() => handleGrow()}
+      onExited={() => handleRemove()}
+    >
+      <Grow in={grow} timeout={200} onExited={() => handleShrink()}>
+        <Box>
+          <Chip
+            label={
+              <Typography>
+                <b>{name}:</b> {renderedValue}
+              </Typography>
+            }
+            sx={{
+              height: "40px",
+              borderRadius: "100vmax",
+              p: 1,
+              direction: "rtl",
+              boxShadow: "0 3px 6px #0005",
+              "& .MuiChip-deleteIcon": {
+                marginLeft: 0,
+              },
+            }}
+            onDelete={(e) => setGrow(false)}
+            onClick={handleOpenMenu}
+          />
+          <Menu open={open} anchorEl={anchorEl} onClose={handleCloseMenu}>
+            <FilterTemplate
+              name={name}
+              component={component}
+              value={value}
+              onSubmit={handleSubmit}
+              onClose={handleCloseMenu}
+            />
+          </Menu>
+        </Box>
+      </Grow>
+    </Collapse>
   );
 };
 
@@ -767,31 +808,34 @@ const FilterTemplate = ({
   onSubmit,
   name,
   renderedValue = "",
-  filterValue = "",
+  query = [],
+  value = "",
   component,
   onClose,
 }) => {
   //----states----
-  const [value, setValue] = useState("");
+  const [valueState, setValueState] = useState("");
   const [renderedValueState, setRenderedValueState] = useState("");
-  const [filterValueState, setFilterValueState] = useState("");
+  const [queryState, setQueryState] = useState([]);
 
   useEffect(() => {
     setRenderedValueState(renderedValue);
-    setFilterValueState(filterValue);
+    setQueryState(query);
+    setValueState(value);
   }, []);
 
   //----functions----
-  const handleChange = ({ renderedValue, filterValue, value }) => {
+  const handleChange = ({ renderedValue, query, value }) => {
     setRenderedValueState(renderedValue);
-    setFilterValueState(filterValue);
-    setValue(value);
+    setQueryState(query);
+    setValueState(value);
   };
 
   const handleSubmit = () => {
     onSubmit({
       renderedValue: renderedValueState,
-      filterValue: filterValueState,
+      query: queryState,
+      value: valueState,
       id: uuid(),
     });
   };
@@ -810,8 +854,8 @@ const FilterTemplate = ({
     >
       <Typography variant="body2">{name}</Typography>
       {React.cloneElement(component, {
+        value: valueState,
         onChange: handleChange,
-        value: value,
       })}
       <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1 }}>
         <Button color="error" onClick={onClose}>
@@ -840,4 +884,5 @@ DataGrid.propTypes = {
   onChangePassword: PropTypes.func,
   onBlock: PropTypes.func,
   onEdit: PropTypes.func,
+  onFilter: PropTypes.func,
 };

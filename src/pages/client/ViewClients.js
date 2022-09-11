@@ -13,8 +13,8 @@ import InputField from "../../features/form/components/InputField";
 const TestFilter = ({ placeholder, value, onChange }) => {
   const handleChange = (e) => {
     onChange({
-      filterValue: "Bruh",
-      renderedValue: "Normal",
+      query: ["name", e.target.value],
+      renderedValue: e.target.value,
       value: e.target.value,
     });
   };
@@ -31,9 +31,6 @@ const template = [
   {
     name: "الإسم",
     component: <TestFilter placeholder="الإسم" />,
-    output: {
-      query: "name",
-    },
   },
 ];
 
@@ -45,7 +42,14 @@ const ViewClients = () => {
 
   //----states----
   const [selected, setSelected] = useState([]);
+  const [requestParams, setRequestParams] = useState({
+    currentPage: {
+      page: 1,
+    },
+  });
   const [currentPage, setCurrentPage] = useState(1);
+  const [amount, setAmount] = useState();
+  const [filters, setFilters] = useState([]);
 
   //----request hooks----
   const [clientsGetRequest, clientsGetResponse] = useRequest({
@@ -66,13 +70,17 @@ const ViewClients = () => {
   useAfterEffect(() => {
     clientsGetRequest({
       params: {
-        page: currentPage,
+        ...Object.fromEntries(
+          Object.values(requestParams).map((item) =>
+            Object.entries(item).flat()
+          )
+        ),
       },
       onSuccess: (res) => {
         dispatch({ type: "clients/set", payload: res.data });
       },
     });
-  }, [currentPage]);
+  }, [requestParams]);
 
   //----functions----
   const getClients = () => {
@@ -93,7 +101,12 @@ const ViewClients = () => {
   };
 
   const handlePaginate = (params) => {
-    setCurrentPage(params.current);
+    setRequestParams((old) => ({
+      ...old,
+      currentPage: {
+        page: params.current,
+      },
+    }));
   };
 
   const handleChecks = ({ checks }) => {
@@ -101,15 +114,21 @@ const ViewClients = () => {
   };
 
   const handleChangeAmount = ({ value }) => {
-    clientsGetRequest({
-      params: {
+    setRequestParams((old) => ({
+      ...old,
+      amount: {
         size: value,
-        page: currentPage,
       },
-      onSuccess: (res) => {
-        dispatch({ type: "clients/set", payload: res.data });
+    }));
+  };
+
+  const handleFilter = (filters) => {
+    setRequestParams((old) => ({
+      ...old,
+      filters: {
+        ...Object.fromEntries(filters.map(({ query }) => query)),
       },
-    });
+    }));
   };
 
   return (
@@ -125,6 +144,7 @@ const ViewClients = () => {
         onView={() => {}}
         onPaginate={handlePaginate}
         onAmountChange={handleChangeAmount}
+        onFilter={handleFilter}
         filters={template}
       />
       <Stack
