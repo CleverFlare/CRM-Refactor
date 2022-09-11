@@ -43,9 +43,7 @@ const ViewClients = () => {
   //----states----
   const [selected, setSelected] = useState([]);
   const [requestParams, setRequestParams] = useState({
-    currentPage: {
-      page: 1,
-    },
+    currentPage: [["page", 1]],
   });
   const [currentPage, setCurrentPage] = useState(1);
   const [amount, setAmount] = useState();
@@ -68,14 +66,14 @@ const ViewClients = () => {
   }, []);
 
   useAfterEffect(() => {
+    const urlParams = new URLSearchParams();
+
+    Object.values(requestParams).map((item) =>
+      item.map(([key, value]) => urlParams.append(key, value))
+    );
+
     clientsGetRequest({
-      params: {
-        ...Object.fromEntries(
-          Object.values(requestParams).map((item) =>
-            Object.entries(item).flat()
-          )
-        ),
-      },
+      params: urlParams,
       onSuccess: (res) => {
         dispatch({ type: "clients/set", payload: res.data });
       },
@@ -103,9 +101,7 @@ const ViewClients = () => {
   const handlePaginate = (params) => {
     setRequestParams((old) => ({
       ...old,
-      currentPage: {
-        page: params.current,
-      },
+      currentPage: [["page", params.current]],
     }));
   };
 
@@ -116,18 +112,14 @@ const ViewClients = () => {
   const handleChangeAmount = ({ value }) => {
     setRequestParams((old) => ({
       ...old,
-      amount: {
-        size: value,
-      },
+      amount: [["size", value]],
     }));
   };
 
   const handleFilter = (filters) => {
     setRequestParams((old) => ({
       ...old,
-      filters: {
-        ...Object.fromEntries(filters.map(({ query }) => query)),
-      },
+      filters: filters.map(({ query }) => query),
     }));
   };
 
@@ -138,6 +130,7 @@ const ViewClients = () => {
         columns={columns}
         rows={clientsStore.results}
         isPending={clientsGetResponse.isPending}
+        total={clientsStore.count ? clientsStore.count : 1}
         onCheck={handleChecks}
         onEdit={() => {}}
         onDelete={deleteClient}

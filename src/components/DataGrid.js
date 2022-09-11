@@ -49,7 +49,6 @@ const DataGrid = ({
   isPending = false,
   onFilter = null,
   total = 1,
-  amount = 8,
   onAmountChange = () => {},
   onPaginate = () => {},
   availableAmounts = [8, 10, 50, 100, 200],
@@ -59,6 +58,7 @@ const DataGrid = ({
   const [rowsState, setRowsState] = useState(rows);
   const [columnsState, setColumnsState] = useState(columns);
   const [filtersList, setFiltersList] = useState([]);
+  const [amount, setAmount] = useState(availableAmounts[0]);
   const [checked, setChecked] = useState({
     type: "",
     checks: [],
@@ -117,6 +117,11 @@ const DataGrid = ({
     }
   };
 
+  const handleAmountChange = (params) => {
+    setAmount(params.value);
+    onAmountChange(params);
+  };
+
   return (
     <Paper sx={{ overflowX: "auto", marginBlock: 5 }} elevation={2}>
       <Paper
@@ -137,7 +142,7 @@ const DataGrid = ({
         >
           <SelectAmount
             availableAmounts={availableAmounts}
-            onChange={onAmountChange}
+            onChange={handleAmountChange}
           />
           <Stack direction="row" spacing={2}>
             {filtersList.map((filter, index) => (
@@ -433,7 +438,7 @@ const DataGrid = ({
           sx={{ direction: "rtl", paddingBlock: 1, position: "relative" }}
         >
           <TablePagination
-            limit={Math.ceil(amount / total)}
+            limit={Math.ceil(total / amount)}
             onChange={onPaginate}
           />
         </Stack>
@@ -818,6 +823,12 @@ const FilterTemplate = ({
   const [renderedValueState, setRenderedValueState] = useState("");
   const [queryState, setQueryState] = useState([]);
 
+  //----conditions----
+  const nullishValue =
+    !Boolean(valueState) ||
+    !Boolean(renderedValueState) ||
+    !Boolean(queryState.length);
+
   useEffect(() => {
     setRenderedValueState(renderedValue);
     setQueryState(query);
@@ -832,6 +843,7 @@ const FilterTemplate = ({
   };
 
   const handleSubmit = () => {
+    if (nullishValue) return;
     onSubmit({
       renderedValue: renderedValueState,
       query: queryState,
