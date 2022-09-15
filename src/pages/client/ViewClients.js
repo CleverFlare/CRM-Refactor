@@ -49,6 +49,30 @@ import ModeCommentIcon from "@mui/icons-material/ModeComment";
 
 import * as XLSX from "xlsx";
 
+const TestFilter = ({ placeholder, value, onChange }) => {
+  const handleChange = (e) => {
+    onChange({
+      query: ["name", e.target.value],
+      renderedValue: e.target.value,
+      value: e.target.value,
+    });
+  };
+  return (
+    <InputField
+      placeholder={placeholder}
+      value={value}
+      onChange={handleChange}
+    />
+  );
+};
+
+const template = [
+  {
+    name: "الإسم",
+    component: <TestFilter placeholder="الإسم" />,
+  },
+];
+
 const ViewClients = () => {
   //----store----
   const clientsStore = useSelector((state) => state.clients.value);
@@ -585,6 +609,7 @@ const ViewClients = () => {
         onPaginate={handlePaginate}
         onAmountChange={handleChangeAmount}
         onFilter={handleFilter}
+        filters={template}
       />
 
       <InfoDialog
@@ -658,23 +683,19 @@ const InfoDialog = ({
       value: `(${data?.user?.country_code})${data?.user?.phone}`,
       addition: (
         <Box sx={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
-          <IconButton sx={{ color: "white" }}>
+          <IconButton
+            sx={{ color: "white" }}
+            onClick={() =>
+              window.open(
+                "https://wa.me/" +
+                  `${data?.user?.country_code}${data?.user?.phone}`,
+                "_blank"
+              )
+            }
+          >
             <WhatsAppIcon
               fontSize="small"
               sx={{ color: "#5ef979" }}
-              onClick={() =>
-                window.open(
-                  "https://wa.me/" +
-                    `${data?.user?.country_code}${data?.user?.phone}`,
-                  "_blank"
-                )
-              }
-            />
-          </IconButton>
-          <IconButton sx={{ color: "white" }} onClick={onTransferAgentClick}>
-            <CallIcon
-              fontSize="small"
-              sx={{ color: "#127fff" }}
               onClick={() =>
                 window.open(
                   "https://www.truecaller.com/search/eg/" +
@@ -683,6 +704,9 @@ const InfoDialog = ({
                 )
               }
             />
+          </IconButton>
+          <IconButton sx={{ color: "white" }}>
+            <CallIcon fontSize="small" sx={{ color: "#127fff" }} />
           </IconButton>
         </Box>
       ),

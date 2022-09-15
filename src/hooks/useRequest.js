@@ -40,6 +40,8 @@ const useRequest = ({
   const request = async ({
     customBaseUrl = null,
 
+    customMethod = null,
+
     customFullUrl = null,
 
     customPath = null,
@@ -70,11 +72,11 @@ const useRequest = ({
     if (!Boolean(userInfo.token) && !Boolean(customToken))
       throw Error("there is no token to send data");
 
-    if (!Boolean(method))
+    if (!Boolean(method) && !Boolean(customMethod))
       throw Error("you didn't specify a method for the request");
 
     return axios({
-      method: method,
+      method: customMethod ? customMethod : method,
       baseURL: customFullUrl ? "" : BASEURL ? BASEURL : customBaseUrl,
       url: customFullUrl
         ? customFullUrl

@@ -11,7 +11,13 @@ import { NOTIFICATIONS } from "./data/APIs";
 
 const sidebarWidth = 240;
 
-const Layout = ({ children, permissions, notifications, userInfo = {} }) => {
+const Layout = ({
+  children,
+  permissions,
+  notifications,
+  onRemoveNotifications = () => {},
+  userInfo = {},
+}) => {
   //----hooks----
   const sm = useMediaQuery("(max-width:712px)");
   const [openSidebar, toggleOpenSidebar] = useToggle(false);
@@ -39,7 +45,7 @@ const Layout = ({ children, permissions, notifications, userInfo = {} }) => {
         showBurger={sm}
         onBurgerClick={() => toggleOpenSidebar()}
         notifications={notifications}
-        onClear={() => {}}
+        onClear={onRemoveNotifications}
       />
       <Sidebar
         permanent={!sm}
@@ -94,11 +100,21 @@ const App = () => {
     };
   }, []);
 
+  const handleRemoveNotifications = () => {
+    missedNotificationsGetRequest({
+      customMethod: "delete",
+      onSuccess: () => {
+        setNotifications([]);
+      },
+    });
+  };
+
   return (
     <Router>
       <Layout
         permissions={dummyPermissions}
         notifications={notifications}
+        onRemoveNotifications={handleRemoveNotifications}
         userInfo={{
           name: `${userInfo.first_name} ${userInfo.last_name}`,
           role: userInfo.job_title,
