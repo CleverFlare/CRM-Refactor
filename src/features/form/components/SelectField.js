@@ -18,10 +18,6 @@ const SelectField = ({
   placeholder = "",
   ...rest
 }) => {
-  useEffect(() => {
-    console.log(children);
-  }, [children]);
-
   return (
     <TextField
       variant={Boolean(variant) ? variant : "standard"}
