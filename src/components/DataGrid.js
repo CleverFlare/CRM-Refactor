@@ -829,6 +829,7 @@ const FilterTemplate = ({
     !Boolean(renderedValueState) ||
     !Boolean(queryState.length);
 
+  //***** this is an antipattern but I had no choice :( *****
   useEffect(() => {
     setRenderedValueState(renderedValue);
     setQueryState(query);

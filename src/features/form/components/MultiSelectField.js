@@ -47,14 +47,12 @@ const MultiSelectField = ({
       }}
       {...rest}
     >
-      {children ? (
-        Boolean(isPending) ? (
-          <Stack justifyContent="center" alignItems="center" sx={{ p: 1 }}>
-            <CircularProgress size="30px" sx={{ color: "gray" }} />
-          </Stack>
-        ) : (
-          children
-        )
+      {Boolean(isPending) ? (
+        <Stack justifyContent="center" alignItems="center" sx={{ p: 1 }}>
+          <CircularProgress size="30px" sx={{ color: "gray" }} />
+        </Stack>
+      ) : Boolean(children?.length) ? (
+        children
       ) : (
         <MenuItem disabled>فارغ</MenuItem>
       )}

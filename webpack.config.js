@@ -2,6 +2,7 @@ const path = require("path");
 const HtmlWebPackPlugin = require("html-webpack-plugin");
 
 module.exports = {
+  devtool: "source-map",
   output: {
     path: path.resolve(__dirname, "build"),
     filename: "bundle.js",
@@ -43,6 +44,14 @@ module.exports = {
       {
         test: /\.json$/,
         loader: "json-loader",
+      },
+      {
+        test: /\.(png|jpe?g|gif|mp3|wav)$/i,
+        use: [
+          {
+            loader: "file-loader",
+          },
+        ],
       },
     ],
   },

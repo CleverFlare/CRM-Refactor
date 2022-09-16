@@ -41,7 +41,6 @@ import Dialog, {
   DialogTable,
 } from "../../features/dialog";
 
-import TelegramIcon from "@mui/icons-material/Telegram";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import CallIcon from "@mui/icons-material/Call";
 import ChangeCircleIcon from "@mui/icons-material/ChangeCircle";

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   CircularProgress,
   MenuItem,
@@ -18,6 +18,10 @@ const SelectField = ({
   placeholder = "",
   ...rest
 }) => {
+  useEffect(() => {
+    console.log(children);
+  }, [children]);
+
   return (
     <TextField
       variant={Boolean(variant) ? variant : "standard"}

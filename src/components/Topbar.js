@@ -19,6 +19,8 @@ import {
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import MenuIcon from "@mui/icons-material/Menu";
 import format from "../utils/ISOToReadable";
+import notificationSfx from "../assets/notification sfx.wav";
+import playSoundEffect from "../utils/playSoundEffect";
 
 const NotificationItem = ({ onClick, content, time, unread = false }) => {
   return (
@@ -47,6 +49,10 @@ const Topbar = ({ showBurger, onBurgerClick, onClear, notifications = [] }) => {
       Math.minimumZero(notifications.length - parseInt(readNotif))
     );
     setNotificationsState(notifications);
+
+    if (Boolean(notifications.length)) {
+      playSoundEffect(notificationSfx);
+    }
   }, [notifications]);
 
   useEffect(() => {
