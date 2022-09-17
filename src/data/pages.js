@@ -8,8 +8,33 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import ApartmentIcon from "@mui/icons-material/Apartment";
 
 import Home from "../pages/Home";
+
 import AddClients from "../pages/client/AddClients";
+import AddStatus from "../pages/client/AddStatus";
+import DeletedClients from "../pages/client/DeletedClients";
+import ExportClients from "../pages/client/ExportClients";
+import ExportRegistry from "../pages/client/ExportRegistry";
+import ImportClients from "../pages/client/ImportClients";
+import ImportRegistry from "../pages/client/ImportRegistry";
+import Overview from "../pages/client/Overview";
 import ViewClients from "../pages/client/ViewClients";
+import ViewStatus from "../pages/client/ViewStatus";
+
+import AddProjects from "../pages/project/AddProjects";
+import ViewProjects from "../pages/project/ViewProjects";
+
+import AddEmployees from "../pages/employee/AddEmployees";
+import AddJobs from "../pages/employee/AddJobs";
+import ViewEmployees from "../pages/employee/ViewEmployees";
+import ViewJobs from "../pages/employee/ViewJobs";
+
+import AddChannels from "../pages/channel/AddChannels";
+import ViewChannels from "../pages/channel/ViewChannels";
+
+import AddUnits from "../pages/unit/AddUnits";
+import ViewUnits from "../pages/unit/ViewUnits";
+
+import ChangePassword from "../pages/setting/ChangePassword";
 
 const pages = [
   {
@@ -32,7 +57,7 @@ const pages = [
       {
         name: "الإحصائيات",
         path: "/overview",
-        element: <></>,
+        element: <Overview />,
         permitted: ["aqarstatistics"],
       },
       {
@@ -50,43 +75,43 @@ const pages = [
       {
         name: "العملاء الحذوفة",
         path: "/deleted-clients",
-        element: <></>,
+        element: <DeletedClients />,
         permitted: ["delete_aqarclient"],
       },
       {
         name: "إضافة حالة عميل",
         path: "/create-status",
-        element: <></>,
+        element: <AddStatus />,
         permitted: ["add_aqarevent"],
       },
       {
         name: "عرض حالات العملاء",
         path: "/view-status",
-        element: <></>,
+        element: <ViewStatus />,
         permitted: ["view_aqarevent"],
       },
       {
         name: "إستيراد عملاء",
         path: "/import-clients",
-        element: <></>,
+        element: <ImportClients />,
         permitted: ["aqarexport_file"],
       },
       {
         name: "تصدير عملاء",
         path: "/export-clients",
-        element: <></>,
+        element: <ExportClients />,
         permitted: ["aqarexport_file"],
       },
       {
         name: "سجل الإستيراد",
         path: "/import-records",
-        element: <></>,
+        element: <ImportRegistry />,
         permitted: ["view_aqarimportexportfiels"],
       },
       {
         name: "سجل التصدير",
         path: "/export-records",
-        element: <></>,
+        element: <ExportRegistry />,
         permitted: ["view_aqarimportexportfiels"],
       },
     ],
@@ -99,13 +124,13 @@ const pages = [
       {
         name: "إضافة مشروع",
         path: "/create-projects",
-        element: <></>,
+        element: <AddProjects />,
         permitted: ["add_aqarproject"],
       },
       {
         name: "عرض المشاريع",
         path: "/view-projects",
-        element: <></>,
+        element: <ViewProjects />,
         permitted: ["view_aqarproject"],
       },
     ],
@@ -118,25 +143,25 @@ const pages = [
       {
         name: "إضافة موظف",
         path: "/create-employees",
-        element: <></>,
+        element: <AddEmployees />,
         permitted: ["add_aqaremployee"],
       },
       {
         name: "عرض الموظفين",
         path: "/view-employees",
-        element: <></>,
+        element: <ViewEmployees />,
         permitted: ["view_aqaremployee"],
       },
       {
         name: "إضافة وظيفة موظف",
         path: "/create-jobs",
-        element: <></>,
+        element: <AddJobs />,
         permitted: ["add_aqarjob"],
       },
       {
         name: "عرض وظائف الموظفين",
         path: "/view-jobs",
-        element: <></>,
+        element: <ViewJobs />,
         permitted: ["view_aqarjob"],
       },
     ],
@@ -149,13 +174,13 @@ const pages = [
       {
         name: "إضافة قناة",
         path: "/create-channels",
-        element: <></>,
+        element: <AddChannels />,
         permitted: ["add_aqaremployee"],
       },
       {
         name: "عرض القنوات",
         path: "/view-channels",
-        element: <></>,
+        element: <ViewChannels />,
         permitted: ["view_aqaremployee"],
       },
     ],
@@ -168,13 +193,13 @@ const pages = [
       {
         name: "إضافة وحدة",
         path: "/create-units",
-        element: <></>,
+        element: <AddUnits />,
         permitted: ["add_aqaremployee"],
       },
       {
         name: "عرض الوحدات",
         path: "/view-units",
-        element: <></>,
+        element: <ViewUnits />,
         permitted: ["view_aqaremployee"],
       },
     ],
@@ -188,7 +213,7 @@ const pages = [
       {
         name: "تغيير الرقم السري",
         path: "/change-password",
-        element: <></>,
+        element: <ChangePassword />,
         permitted: ["add_aqaremployee"],
       },
     ],
