@@ -12,47 +12,41 @@ const Dialog = ({
   onClose = () => {},
   onOpen = () => {},
   open = false,
-  width = "90vw",
-  maxWidth = 1000,
   children,
   hideBackdrop = false,
   isPending = false,
+  paperProps = {},
+  sx = {},
 }) => {
-  const handleClose = (e) => onClose(e);
-  const handleOpen = (e) => onOpen(e);
-
   useAfterEffect(() => {
-    switch (open) {
-      case true:
-        handleOpen();
-        return;
-      case false:
-        handleClose();
-        return;
+    if (open) {
+      onOpen();
     }
   }, [open]);
 
   return (
     <MuiDialog
       open={open}
-      onClose={handleClose}
+      onClose={onClose}
       TransitionComponent={Transition}
       hideBackdrop={hideBackdrop}
       sx={{
         "& .MuiDialog-paper": {
           bgcolor: (theme) => theme.palette.primary.main,
           color: "white",
-          maxWidth: maxWidth,
-          width: width,
+          maxWidth: 1000,
+          width: "90vw",
           maxHeight: "95%",
           overflowY: isPending ? "hidden" : "auto",
           position: "relative",
+          ...paperProps,
         },
         ".MuiDialogContent-root": {
           height: "max-content",
           flex: "unset",
           overflow: "initial",
         },
+        ...sx,
       }}
       BackdropProps={{
         sx: {

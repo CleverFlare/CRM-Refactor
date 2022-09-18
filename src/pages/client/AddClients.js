@@ -155,6 +155,9 @@ const AddClients = () => {
       });
       clientPostRequest({
         body: requestBody,
+        onSuccess: () => {
+          resetControls();
+        },
       }).then((res) => {
         let response = res?.response?.data;
         const responseBody = filter({

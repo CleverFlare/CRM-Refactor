@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import PropTypes from "prop-types";
 import Wrapper from "../../components/Wrapper";
 import DataGrid from "../../components/DataGrid";
 import Breadcrumbs from "../../components/Breadcrumbs";
@@ -8,14 +9,15 @@ import useRequest from "../../hooks/useRequest";
 import {
   CHANNELS,
   CLIENTS,
+  CLIENTS_COMMENTS,
   CLIENTS_HISTORY,
+  CLIENTS_TRANSFER,
   EMPLOYEES,
   PROJECTS,
   STATUS,
 } from "../../data/APIs";
 import {
   Button,
-  FormControl,
   Stack,
   Box,
   FormControlLabel,
@@ -23,6 +25,9 @@ import {
   MenuItem,
   Checkbox,
   IconButton,
+  RadioGroup,
+  Radio,
+  FormGroup,
 } from "@mui/material";
 import useAfterEffect from "../../hooks/useAfterEffect";
 import InputField from "../../features/form/components/InputField";
@@ -31,11 +36,15 @@ import Form, {
   NumberField,
   PhoneField,
   SelectField,
+  TextareaField,
 } from "../../features/form";
 import { v4 as uuid } from "uuid";
 import filter from "../../utils/ClearNull";
 import AutocompleteField from "../../features/form/components/AutocompleteField";
 import Dialog, {
+  DialogButton,
+  DialogButtonsGroup,
+  DialogContent,
   DialogHeading,
   DialogInfoWindow,
   DialogTable,
@@ -47,34 +56,17 @@ import ChangeCircleIcon from "@mui/icons-material/ChangeCircle";
 import ModeCommentIcon from "@mui/icons-material/ModeComment";
 
 import * as XLSX from "xlsx";
-
-const TestFilter = ({ placeholder, value, onChange }) => {
-  const handleChange = (e) => {
-    onChange({
-      query: ["name", e.target.value],
-      renderedValue: e.target.value,
-      value: e.target.value,
-    });
-  };
-  return (
-    <InputField
-      placeholder={placeholder}
-      value={value}
-      onChange={handleChange}
-    />
-  );
-};
-
-const template = [
-  {
-    name: "الإسم",
-    component: <TestFilter placeholder="الإسم" />,
-  },
-];
+import DialogPeopleWindow, {
+  DialogSelectItem,
+} from "../../features/dialog/components/DialogPeopleWindow";
+import usePropState from "../../hooks/usePropState";
 
 const ViewClients = () => {
   //----store----
   const clientsStore = useSelector((state) => state.clients.value);
+  const clientCommentsStore = useSelector(
+    (state) => state.clientComments.value
+  );
   const employeesStore = useSelector((state) => state.employees.value);
   const projectsStore = useSelector((state) => state.projects.value);
   const channelsStore = useSelector((state) => state.channels.value);
@@ -92,6 +84,7 @@ const ViewClients = () => {
   const [requestParams, setRequestParams] = useState({
     currentPage: [["page", 1]],
   });
+
   const [{ controls }, { setControl, resetControls }] = useControls([
     {
       control: "name",
@@ -166,6 +159,11 @@ const ViewClients = () => {
     method: "get",
   });
 
+  const [clientCommentsGetRequest, clientCommentsGetResponse] = useRequest({
+    path: CLIENTS_COMMENTS,
+    method: "get",
+  });
+
   const [clientHistoryGetRequest, clientHistoryGetResponse] = useRequest({
     path: CLIENTS_HISTORY,
     method: "get",
@@ -194,6 +192,16 @@ const ViewClients = () => {
   const [clientDeleteRequest, clientDeleteResponse] = useRequest({
     path: CLIENTS,
     method: "delete",
+  });
+
+  const [clientCommentPostRequest, clientCommentPostResponse] = useRequest({
+    path: CLIENTS_COMMENTS,
+    method: "post",
+  });
+
+  const [clientTransferPostRequest, clientTransferPostResponse] = useRequest({
+    path: CLIENTS_TRANSFER,
+    method: "post",
   });
 
   //----effects----
@@ -377,6 +385,48 @@ const ViewClients = () => {
       },
       onSuccess: (res) => {
         dispatch({ type: "clientHistory/set", payload: res.data });
+      },
+    });
+  };
+
+  const getComments = () => {
+    clientCommentsGetRequest({
+      params: {
+        id: clientDetails.details.id,
+      },
+      onSuccess: (res) => {
+        dispatch({ type: "clientComments/set", payload: res.data });
+      },
+    });
+  };
+
+  const handleCloseDetailsDialog = () => {
+    console.log("closing");
+    setClientDetails((old) => ({ ...old, details: null, tab: "details" }));
+  };
+
+  const handleSubmitComment = (e) => {
+    const requestBody = filter({
+      obj: e,
+      output: "object",
+    });
+    clientCommentPostRequest({
+      body: requestBody,
+      onSuccess: (res) => {
+        dispatch({ type: "clientComments/addItem", payload: res.data });
+      },
+    });
+  };
+
+  const handleSubmitAgentTransfer = (e) => {
+    clientTransferPostRequest({
+      body: e,
+      onSuccess: (res) => {
+        dispatch({
+          type: "clients/patchItem",
+          payload: { id: res.data.id, item: { ...res.data } },
+        });
+        console.log(res.data);
       },
     });
   };
@@ -610,15 +660,69 @@ const ViewClients = () => {
         onPaginate={handlePaginate}
         onAmountChange={handleChangeAmount}
         onFilter={handleFilter}
-        filters={template}
+      />
+
+      <TransferDialog
+        open={Boolean(
+          clientDetails.details && clientDetails.tab === "transfer"
+        )}
+        onOpen={getEmployees}
+        onClose={handleCloseDetailsDialog}
+        onGoBack={() => setClientDetails((old) => ({ ...old, tab: "details" }))}
+        initSelected={clientDetails?.details?.agent?.id}
+        id={clientDetails.details?.id}
+        data={[
+          {
+            title: "الأدمن",
+            body: "الأدمن",
+            picture: "asdfsd",
+            id: null,
+          },
+          ...employeesStore.results.map((employee) => ({
+            title: `${employee.user.first_name} ${employee.user.last_name}`,
+            body: employee.job.title,
+            id: employee.id,
+            picture: employee.user.image,
+          })),
+        ]}
+        isPending={employeesGetResponse.isPending}
+        onSubmit={handleSubmitAgentTransfer}
+      />
+
+      <CommentDialog
+        open={Boolean(clientDetails.details && clientDetails.tab === "comment")}
+        onOpen={getComments}
+        onClose={handleCloseDetailsDialog}
+        onGoBack={() => setClientDetails((old) => ({ ...old, tab: "details" }))}
+        isPending={clientCommentsGetResponse.isPending}
+        data={clientCommentsStore.results.map((item) => ({
+          body: item.comment,
+          date: format(item.created_at),
+          title: item.commenter.fullname,
+          picture: item.commenter.image,
+        }))}
+        id={clientDetails.details?.id}
+        onStatusOpen={getStatus}
+        isStatusPending={statusGetResponse.isPending}
+        status={statusStore.results.map((item) => ({
+          name: item.name,
+          value: item.id,
+        }))}
+        onSubmit={handleSubmitComment}
       />
 
       <InfoDialog
         open={Boolean(clientDetails.details && clientDetails.tab === "details")}
         onOpen={getClientHistory}
-        onClose={() => setClientDetails((old) => ({ ...old, details: null }))}
+        onClose={handleCloseDetailsDialog}
         data={Boolean(clientDetails.details) && clientDetails.details}
         isHistoryPending={clientHistoryGetResponse.isPending}
+        onTransferAgentClick={() =>
+          setClientDetails((old) => ({ ...old, tab: "transfer" }))
+        }
+        onCommentsClick={() =>
+          setClientDetails((old) => ({ ...old, tab: "comment" }))
+        }
       />
 
       {/* buttons */}
@@ -694,19 +798,18 @@ const InfoDialog = ({
               )
             }
           >
-            <WhatsAppIcon
-              fontSize="small"
-              sx={{ color: "#5ef979" }}
-              onClick={() =>
-                window.open(
-                  "https://www.truecaller.com/search/eg/" +
-                    `${data?.user?.country_code}${data?.user?.phone}`,
-                  "_blank"
-                )
-              }
-            />
+            <WhatsAppIcon fontSize="small" sx={{ color: "#5ef979" }} />
           </IconButton>
-          <IconButton sx={{ color: "white" }}>
+          <IconButton
+            sx={{ color: "white" }}
+            onClick={() =>
+              window.open(
+                "https://www.truecaller.com/search/eg/" +
+                  `${data?.user?.country_code}${data?.user?.phone}`,
+                "_blank"
+              )
+            }
+          >
             <CallIcon fontSize="small" sx={{ color: "#127fff" }} />
           </IconButton>
         </Box>
@@ -756,11 +859,11 @@ const InfoDialog = ({
     },
     {
       field: "channel",
-      headerName: "المشروعات",
+      headerName: "القنوات",
     },
     {
       field: "agent",
-      headerName: "المشروعات",
+      headerName: "الموظف",
     },
     {
       field: "history_user",
@@ -772,15 +875,15 @@ const InfoDialog = ({
     },
     {
       field: "comment",
-      headerName: "المشروعات",
+      headerName: "التعليق",
     },
     {
       field: "event",
-      headerName: "المشروعات",
+      headerName: "الحالة",
     },
     {
       field: "history_date",
-      headerName: "المشروعات",
+      headerName: "تاريخ الإجراء",
       customContent: ({ rowData }) =>
         rowData.created_at ? format(rowData.created_at) : "",
     },
@@ -792,13 +895,8 @@ const InfoDialog = ({
     onOpen();
   }, [open]);
 
-  //----functions----
-  const handleClose = (e) => {
-    onClose(e);
-  };
-
   return (
-    <Dialog open={open} onClose={handleClose}>
+    <Dialog open={open} onClose={onClose}>
       <DialogHeading>تفاصيل العميل</DialogHeading>
       <DialogInfoWindow information={info} />
       <DialogHeading>سجل العميل</DialogHeading>
@@ -807,10 +905,14 @@ const InfoDialog = ({
         columns={columns}
         isPending={isHistoryPending}
       />
+      <DialogButtonsGroup>
+        <DialogButton variant="close" onClick={onClose}>
+          إلغاء
+        </DialogButton>
+      </DialogButtonsGroup>
     </Dialog>
   );
 };
-
 const columns = [
   {
     field: "name",
@@ -859,3 +961,247 @@ const columns = [
     customContent: ({ agent }) => `${agent.name}`,
   },
 ];
+
+const TransferDialog = ({
+  open,
+  onOpen = () => {},
+  onClose = () => {},
+  onGoBack = () => {},
+  isPending = false,
+  id,
+  data = [],
+  initSelected = null,
+  onSubmit = () => {},
+}) => {
+  const [selected, setSelected] = usePropState(initSelected);
+  const [searchValue, setSearchValue] = useState("");
+  const [method, setMethod] = useState(0);
+
+  const handleChangeSearchValue = (e) => {
+    setSearchValue(e.target.value);
+  };
+
+  const handleSubmit = () => {
+    onSubmit({
+      agent: selected,
+      client: id,
+      option: Boolean(parseInt(method)),
+    });
+  };
+  return (
+    <Dialog
+      open={open}
+      onClose={onClose}
+      onOpen={onOpen}
+      paperProps={{
+        maxWidth: 450,
+      }}
+    >
+      <DialogHeading onGoBack={onGoBack}>تحويل إلى موظف</DialogHeading>
+      <DialogPeopleWindow
+        isPending={isPending}
+        searchValue={searchValue}
+        onSearch={handleChangeSearchValue}
+        sx={{ height: 400 }}
+      >
+        {data
+          ?.filter(
+            (item) =>
+              item.title.includes(searchValue) ||
+              item.body.includes(searchValue)
+          )
+          ?.map((item, index) => (
+            <DialogSelectItem
+              key={`selectEmployeeItem ${index}`}
+              selected={item.id === selected}
+              picture={item.picture}
+              title={item.title}
+              body={item.body}
+              onClick={() => setSelected(item.id)}
+            />
+          ))}
+      </DialogPeopleWindow>
+      <DialogContent>
+        <FormGroup>
+          <RadioGroup
+            name="transfer-method"
+            value={method}
+            onChange={(e) => setMethod(e.target.value)}
+          >
+            <FormControlLabel
+              control={
+                <Radio
+                  sx={{
+                    color: "white",
+                    "& *": {
+                      color: "white",
+                    },
+                  }}
+                />
+              }
+              label="نفس المرحلة"
+              value={1}
+            />
+            <FormControlLabel
+              control={
+                <Radio
+                  sx={{
+                    color: "white",
+                    "& *": {
+                      color: "white",
+                    },
+                  }}
+                />
+              }
+              label="حذف السجلات"
+              value={0}
+            />
+          </RadioGroup>
+        </FormGroup>
+      </DialogContent>
+      <DialogButtonsGroup>
+        <DialogButton onClick={handleSubmit}>تنفيذ</DialogButton>
+        <DialogButton variant="close" onClick={onClose}>
+          إلغاء
+        </DialogButton>
+      </DialogButtonsGroup>
+    </Dialog>
+  );
+};
+
+TransferDialog.propTypes = {
+  open: PropTypes.bool,
+  isPending: PropTypes.bool,
+  onClose: PropTypes.func,
+  data: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number,
+      picture: PropTypes.string,
+      title: PropTypes.string,
+      body: PropTypes.string,
+    })
+  ),
+};
+
+const CommentDialog = ({
+  open,
+  onOpen = () => {},
+  onClose = () => {},
+  onGoBack = () => {},
+  isPending = false,
+  isStatusPending = false,
+  onStatusOpen = () => {},
+  data = [],
+  id = null,
+  status = [],
+  onSubmit = () => {},
+}) => {
+  const [
+    { controls, required, invalid },
+    { setControl, validate, resetControls },
+  ] = useControls([
+    {
+      control: "comment",
+      value: "",
+      isRequired: true,
+    },
+    {
+      control: "status",
+      value: "",
+      isRequired: true,
+    },
+  ]);
+
+  const handleSubmit = () => {
+    validate().then((output) => {
+      if (!output.isOk) return;
+      onSubmit({
+        event: controls.status,
+        comment: controls.comment,
+        client: id,
+      });
+      resetControls();
+    });
+  };
+
+  return (
+    <Dialog
+      open={open}
+      onClose={onClose}
+      onOpen={onOpen}
+      paperProps={{
+        maxWidth: 600,
+      }}
+    >
+      <DialogHeading onGoBack={onGoBack}>التعليقات</DialogHeading>
+      <DialogPeopleWindow isPending={isPending} sx={{ height: 400 }}>
+        {data.map((item, index) => (
+          <DialogSelectItem
+            key={`comment ${index}`}
+            title={item.title}
+            body={item.body}
+            subtitle={item.date}
+            picture={item.picture}
+          />
+        ))}
+      </DialogPeopleWindow>
+      <DialogContent>
+        <Stack spacing={2}>
+          <TextareaField
+            placeholder="تعليق"
+            sx={{
+              "& .MuiInput-root": {
+                bgcolor: "white",
+              },
+            }}
+            value={controls.comment}
+            required={required.includes("comment")}
+            error={Boolean(invalid?.comment)}
+            helperText={invalid?.comment}
+            onChange={(e) => setControl("comment", e.target.value)}
+          />
+          <SelectField
+            placeholder="الحالة"
+            isPending={isStatusPending}
+            onOpen={onStatusOpen}
+            sx={{
+              "& .MuiInput-root": {
+                bgcolor: "white",
+              },
+            }}
+            SelectProps={{
+              MenuProps: {
+                PaperProps: {
+                  sx: {
+                    maxHeight: 100,
+                    overflowY: "auto",
+                  },
+                },
+              },
+            }}
+            renderValue={(selected) =>
+              status.find((item) => item.value === selected).name
+            }
+            value={controls.status}
+            required={required.includes("status")}
+            error={Boolean(invalid?.status)}
+            helperText={invalid?.status}
+            onChange={(e) => setControl("status", e.target.value)}
+          >
+            {status.map((item, index) => (
+              <MenuItem key={`message status ${index}`} value={item.value}>
+                {item.name}
+              </MenuItem>
+            ))}
+          </SelectField>
+        </Stack>
+      </DialogContent>
+      <DialogButtonsGroup>
+        <DialogButton onClick={handleSubmit}>تنفيذ</DialogButton>
+        <DialogButton variant="close" onClick={onClose}>
+          إلغاء
+        </DialogButton>
+      </DialogButtonsGroup>
+    </Dialog>
+  );
+};

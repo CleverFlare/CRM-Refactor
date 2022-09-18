@@ -152,6 +152,6 @@ export default DialogTable;
 
 DialogTable.propTypes = {
   rows: PropTypes.array,
-  columns: PropTypes.arrayOf(PropTypes.object).isRequired,
+  columns: PropTypes.arrayOf(PropTypes.object),
   isPending: PropTypes.bool,
 };

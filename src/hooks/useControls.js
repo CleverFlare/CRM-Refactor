@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 const useControls = (controls = []) => {
   if (
@@ -49,26 +49,29 @@ const useControls = (controls = []) => {
     return { output, isOk: !Boolean(Object.keys(output).length) };
   };
 
-  const setControl = async (key, value) => {
-    if (controls.every((control) => control.control !== key))
-      return console.warn("you have passed an invalid control");
+  const setControl = useCallback(
+    async (key, value) => {
+      if (controls.every((control) => control.control !== key))
+        return console.warn("you have passed an invalid control");
 
-    switch (typeof value) {
-      case "function":
-        setState((old) => ({ ...old, [key]: value(old[key]) }));
-        break;
-      default:
-        setState((old) => ({ ...old, [key]: value }));
-    }
-  };
+      switch (typeof value) {
+        case "function":
+          setState((old) => ({ ...old, [key]: value(old[key]) }));
+          break;
+        default:
+          setState((old) => ({ ...old, [key]: value }));
+      }
+    },
+    [controls, state]
+  );
 
-  const resetControls = () => {
+  const resetControls = useCallback(() => {
     let result = {};
     controls.map(
       (control) => (result = { ...result, [control?.control]: control?.value })
     );
     setState({ ...result });
-  };
+  }, [controls, state]);
 
   return [
     {

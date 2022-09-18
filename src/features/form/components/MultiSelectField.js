@@ -43,6 +43,14 @@ const MultiSelectField = ({
               : selected.join(", ");
           }
         },
+        MenuProps: {
+          PaperProps: {
+            sx: {
+              maxHeight: "200px",
+              overflowY: "auto",
+            },
+          },
+        },
         IconComponent: KeyboardArrowDownIcon,
       }}
       {...rest}

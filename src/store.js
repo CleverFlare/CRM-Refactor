@@ -7,6 +7,7 @@ import ChannelsSlice from "./store/pages/ChannelsSlice";
 import ClientsSlice from "./store/pages/ClientsSlice";
 import StatusSlice from "./store/pages/StatusSlice";
 import ClientHistorySlice from "./store/pages/ClientHistorySlice";
+import ClientCommentsSlice from "./store/pages/ClientCommentsSlice";
 
 export default configureStore({
   reducer: {
@@ -18,5 +19,6 @@ export default configureStore({
     clients: ClientsSlice,
     status: StatusSlice,
     clientHistory: ClientHistorySlice,
+    clientComments: ClientCommentsSlice,
   },
 });

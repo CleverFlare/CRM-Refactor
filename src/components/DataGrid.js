@@ -35,6 +35,7 @@ import PropTypes from "prop-types";
 import useAfterEffect from "../hooks/useAfterEffect";
 import EmptyBox from "../svg/EmptyBox";
 import { v4 as uuid } from "uuid";
+import usePropState from "../hooks/usePropState";
 
 const DataGrid = ({
   rows = [],
@@ -217,7 +218,7 @@ const DataGrid = ({
                     alignItems: "center",
                   }}
                 >
-                  <EmptyBox style={{ opacity: 0.2, width: 200, height: 200 }} />
+                  <EmptyBox sx={{ opacity: 0.2, width: 200, height: 200 }} />
                 </Box>
               )}
               {isPending && (
@@ -481,7 +482,7 @@ const TablePagination = ({ current = 1, limit, onChange = () => {} }) => {
 
   //----conditions----
   const disableRight = Boolean(page >= limit);
-  const disableLeft = Boolean(page <= 1);
+  const disableLeft = Boolean(page <= 1) || Boolean(page >= limit);
 
   //----effects----
   useEffect(() => {
@@ -635,7 +636,6 @@ const SelectAmount = ({ availableAmounts, onChange = () => {} }) => {
 const ChipsFilterItem = ({
   name,
   renderedValue,
-  query,
   value,
   id,
   onRemove,
@@ -819,22 +819,16 @@ const FilterTemplate = ({
   onClose,
 }) => {
   //----states----
-  const [valueState, setValueState] = useState("");
-  const [renderedValueState, setRenderedValueState] = useState("");
-  const [queryState, setQueryState] = useState([]);
+  const [valueState, setValueState] = usePropState(value);
+  const [renderedValueState, setRenderedValueState] =
+    usePropState(renderedValue);
+  const [queryState, setQueryState] = usePropState(query);
 
   //----conditions----
   const nullishValue =
     !Boolean(valueState) ||
     !Boolean(renderedValueState) ||
     !Boolean(queryState.length);
-
-  //***** this is an antipattern but I had no choice :( *****
-  useEffect(() => {
-    setRenderedValueState(renderedValue);
-    setQueryState(query);
-    setValueState(value);
-  }, []);
 
   //----functions----
   const handleChange = ({ renderedValue, query, value }) => {

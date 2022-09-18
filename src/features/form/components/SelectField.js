@@ -16,6 +16,7 @@ const SelectField = ({
   renderValue = null,
   children,
   placeholder = "",
+  SelectProps = {},
   ...rest
 }) => {
   return (
@@ -49,6 +50,7 @@ const SelectField = ({
           },
         },
         IconComponent: KeyboardArrowDownIcon,
+        ...SelectProps,
       }}
       {...rest}
     >

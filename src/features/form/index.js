@@ -7,6 +7,7 @@ import NumberField from "./components/NumberField";
 import PhoneField from "./components/PhoneField";
 import SelectField from "./components/SelectField";
 import PasswordField from "./components/PasswordField";
+import TextareaField from "./components/TextareaField";
 
 export default Form;
 export {
@@ -17,4 +18,5 @@ export {
   PhoneField,
   SelectField,
   PasswordField,
+  TextareaField,
 };

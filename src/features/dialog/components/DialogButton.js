@@ -12,6 +12,7 @@ const DialogButton = ({ variant = "save", children, ...props }) => {
         width: "100vmax",
         height: "50px",
         bgcolor: "white",
+        fontWeight: "bold",
         color: (theme) => theme.palette.primary.main,
         "&:hover": {
           bgcolor: "white",
@@ -27,6 +28,7 @@ const DialogButton = ({ variant = "save", children, ...props }) => {
         height: "50px",
         bgcolor: "#f54242",
         color: "#fff",
+        fontWeight: "bold",
         "&:hover": {
           bgcolor: "#f54242",
           color: "#fff",
