@@ -12,6 +12,7 @@ import {
   CLIENTS_COMMENTS,
   CLIENTS_HISTORY,
   CLIENTS_TRANSFER,
+  CLIENTS_TRANSFER_PROJECT,
   EMPLOYEES,
   PROJECTS,
   STATUS,
@@ -209,10 +210,24 @@ const ViewClients = () => {
     method: "post",
   });
 
+  const [clientTransferProjectPostRequest, clientTransferProjectPostResponse] =
+    useRequest({
+      path: CLIENTS_TRANSFER_PROJECT,
+      method: "post",
+    });
+
   //----effects----
   useEffect(() => {
     getClients();
   }, []);
+
+  useAfterEffect(() => {
+    if (!clientDetails.details) return;
+    setClientDetails((old) => ({
+      ...old,
+      details: clientsStore.results.find((item) => item.id === old.details.id),
+    }));
+  }, [clientsStore]);
 
   useAfterEffect(() => {
     console.log("Hi Guys");
@@ -410,28 +425,65 @@ const ViewClients = () => {
     setClientDetails((old) => ({ ...old, details: null, tab: "details" }));
   };
 
-  const handleSubmitComment = (e) => {
+  const handleSubmitComment = async (e) => {
     const requestBody = filter({
       obj: e,
       output: "object",
     });
-    clientCommentPostRequest({
+
+    return clientCommentPostRequest({
       body: requestBody,
       onSuccess: (res) => {
         dispatch({ type: "clientComments/addItem", payload: res.data });
+        dispatch({
+          type: "clients/patchItem",
+          payload: {
+            id: res.data.client_id,
+            item: { comment: res.data.comment },
+          },
+        });
       },
     });
   };
 
-  const handleSubmitAgentTransfer = (e) => {
+  const handleSubmitEmployeeTransfer = (e) => {
     clientTransferPostRequest({
       body: e,
       onSuccess: (res) => {
-        dispatch({
-          type: "clients/patchItem",
-          payload: { id: res.data.id, item: { ...res.data } },
-        });
-        console.log(res.data);
+        if (res.data.hasOwnProperty("clients")) {
+          res.data.clients.map((client) => {
+            dispatch({
+              type: "clients/patchItem",
+              payload: { id: client.id, item: { ...client } },
+            });
+          });
+        } else {
+          dispatch({
+            type: "clients/patchItem",
+            payload: { id: res.data.id, item: { ...res.data } },
+          });
+        }
+      },
+    });
+  };
+
+  const handleSubmitProjectTransfer = (e) => {
+    clientTransferProjectPostRequest({
+      body: e,
+      onSuccess: (res) => {
+        if (res.data.hasOwnProperty("clients")) {
+          res.data.clients.map((client) => {
+            dispatch({
+              type: "clients/patchItem",
+              payload: { id: client.id, item: { ...client } },
+            });
+          });
+        } else {
+          dispatch({
+            type: "clients/patchItem",
+            payload: { id: res.data.id, item: { ...res.data } },
+          });
+        }
       },
     });
   };
@@ -703,7 +755,7 @@ const ViewClients = () => {
           })),
         ]}
         isPending={employeesGetResponse.isPending}
-        onSubmit={handleSubmitAgentTransfer}
+        onSubmit={handleSubmitEmployeeTransfer}
       />
 
       <CommentDialog
@@ -717,6 +769,7 @@ const ViewClients = () => {
           date: format(item.created_at),
           title: item.commenter.fullname,
           picture: item.commenter.image,
+          status: item.event,
         }))}
         id={clientDetails.details?.id}
         onStatusOpen={getStatus}
@@ -745,11 +798,38 @@ const ViewClients = () => {
       <TransferToEmployeeDialog
         open={openTransferMultipleClientsToEmployee}
         onClose={() => setOpenTransferMultipleClientsToEmployee(false)}
+        onOpen={getEmployees}
+        id={selected.map((item) => item.id)}
+        data={[
+          {
+            title: "الأدمن",
+            body: "الأدمن",
+            picture: "asdfsd",
+            id: null,
+          },
+          ...employeesStore.results.map((employee) => ({
+            title: `${employee.user.first_name} ${employee.user.last_name}`,
+            body: employee.job.title,
+            id: employee.id,
+            picture: employee.user.image,
+          })),
+        ]}
+        isPending={employeesGetResponse.isPending}
+        onSubmit={handleSubmitEmployeeTransfer}
       />
 
       <TransferToProjectDialog
         open={openTransferProject}
         onClose={() => setOpenTransferProject(false)}
+        onOpen={getProjects}
+        isPending={projectsGetResponse.isPending}
+        id={selected.map((item) => item.id)}
+        data={projectsStore.results.map((item) => ({
+          name: item.name,
+          picture: item.logo,
+          id: item.id,
+        }))}
+        onSubmit={handleSubmitProjectTransfer}
       />
 
       {/* buttons */}
@@ -1036,8 +1116,8 @@ const TransferToEmployeeDialog = ({
         {data
           ?.filter(
             (item) =>
-              item.title.includes(searchValue) ||
-              item.body.includes(searchValue)
+              item.title.toLowerCase().includes(searchValue) ||
+              item.body.toLowerCase().includes(searchValue)
           )
           ?.map((item, index) => (
             <DialogSelectItem
@@ -1148,8 +1228,10 @@ const CommentDialog = ({
         event: controls.status,
         comment: controls.comment,
         client: id,
+      }).then((e) => {
+        console.log(e);
+        resetControls();
       });
-      resetControls();
     });
   };
 
@@ -1168,7 +1250,7 @@ const CommentDialog = ({
           <DialogSelectItem
             key={`comment ${index}`}
             title={item.title}
-            body={item.body}
+            body={`${item.body} [${item.status}]`}
             subtitle={item.date}
             picture={item.picture}
           />
@@ -1254,11 +1336,24 @@ const TransferToProjectDialog = ({
 
   const handleSubmit = () => {
     onSubmit({
-      agent: selected,
+      bussiness: selected,
       client: id,
-      option: Boolean(parseInt(method)),
     });
   };
+
+  const handleToggleSelect = (selectedItem) => {
+    switch (selected.includes(selectedItem)) {
+      case true:
+        setSelected((old) => old.filter((item) => item !== selectedItem));
+        break;
+      case false:
+        setSelected((old) => [...old, selectedItem]);
+        break;
+      default:
+        setSelected((old) => old);
+    }
+  };
+
   return (
     <Dialog
       open={open}
@@ -1268,14 +1363,24 @@ const TransferToProjectDialog = ({
         maxWidth: 450,
       }}
     >
-      <DialogHeading onGoBack={onGoBack}>تحويل إلى موظف</DialogHeading>
+      <DialogHeading onGoBack={onGoBack}>تغيير مشاريع المحدد</DialogHeading>
       <DialogPeopleWindow
         isPending={isPending}
         searchValue={searchValue}
         onSearch={handleChangeSearchValue}
         sx={{ height: 400 }}
       >
-        {[]}
+        {data
+          ?.filter((item) => item.name.toLowerCase().includes(searchValue))
+          ?.map((item, index) => (
+            <DialogSelectItem
+              key={`selectProjectItem ${index}`}
+              selected={selected.includes(item.id)}
+              picture={item.picture}
+              body={item.name}
+              onClick={() => handleToggleSelect(item.id)}
+            />
+          ))}
       </DialogPeopleWindow>
       <DialogButtonsGroup>
         <DialogButton onClick={handleSubmit}>تنفيذ</DialogButton>
@@ -1285,4 +1390,13 @@ const TransferToProjectDialog = ({
       </DialogButtonsGroup>
     </Dialog>
   );
+};
+
+TransferToProjectDialog.propTypes = {
+  data: PropTypes.arrayOf(
+    PropTypes.shape({
+      name: PropTypes.string,
+      picture: PropTypes.string,
+    })
+  ),
 };
