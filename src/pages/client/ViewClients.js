@@ -76,6 +76,11 @@ const ViewClients = () => {
 
   //----states----
   const [isCleared, setIsCleared] = useState(null);
+  const [openTransferProject, setOpenTransferProject] = useState(false);
+  const [
+    openTransferMultipleClientsToEmployee,
+    setOpenTransferMultipleClientsToEmployee,
+  ] = useState(false);
   const [clientDetails, setClientDetails] = useState({
     details: null,
     tab: "details",
@@ -580,6 +585,18 @@ const ViewClients = () => {
                   }}
                   value={controls.budgetType}
                   onChange={(e) => setControl("budgetType", e.target.value)}
+                  renderValue={(selected) => {
+                    switch (selected) {
+                      case "max_budget":
+                        return "يساوي";
+                      case "max_budget__gte":
+                        return "اكبر من";
+                      case "max_budget__lte":
+                        return "اصغر من";
+                      default:
+                        return "...";
+                    }
+                  }}
                 >
                   <MenuItem value="max_budget">يساوي</MenuItem>
                   <MenuItem value="max_budget__gte">اكبر من</MenuItem>
@@ -662,7 +679,7 @@ const ViewClients = () => {
         onFilter={handleFilter}
       />
 
-      <TransferDialog
+      <TransferToEmployeeDialog
         open={Boolean(
           clientDetails.details && clientDetails.tab === "transfer"
         )}
@@ -725,6 +742,16 @@ const ViewClients = () => {
         }
       />
 
+      <TransferToEmployeeDialog
+        open={openTransferMultipleClientsToEmployee}
+        onClose={() => setOpenTransferMultipleClientsToEmployee(false)}
+      />
+
+      <TransferToProjectDialog
+        open={openTransferProject}
+        onClose={() => setOpenTransferProject(false)}
+      />
+
       {/* buttons */}
       <Stack
         direction="row"
@@ -744,6 +771,7 @@ const ViewClients = () => {
           variant="contained"
           disabled={!Boolean(selected.length)}
           sx={{ width: "200px", height: "50px" }}
+          onClick={() => setOpenTransferMultipleClientsToEmployee(true)}
         >
           تحويل المحدد
         </Button>
@@ -751,6 +779,7 @@ const ViewClients = () => {
           variant="contained"
           disabled={!Boolean(selected.length)}
           sx={{ width: "200px", height: "50px" }}
+          onClick={() => setOpenTransferProject(true)}
         >
           تغيير مشاريع المحدد
         </Button>
@@ -962,7 +991,7 @@ const columns = [
   },
 ];
 
-const TransferDialog = ({
+const TransferToEmployeeDialog = ({
   open,
   onOpen = () => {},
   onClose = () => {},
@@ -1069,7 +1098,7 @@ const TransferDialog = ({
   );
 };
 
-TransferDialog.propTypes = {
+TransferToEmployeeDialog.propTypes = {
   open: PropTypes.bool,
   isPending: PropTypes.bool,
   onClose: PropTypes.func,
@@ -1196,6 +1225,58 @@ const CommentDialog = ({
           </SelectField>
         </Stack>
       </DialogContent>
+      <DialogButtonsGroup>
+        <DialogButton onClick={handleSubmit}>تنفيذ</DialogButton>
+        <DialogButton variant="close" onClick={onClose}>
+          إلغاء
+        </DialogButton>
+      </DialogButtonsGroup>
+    </Dialog>
+  );
+};
+
+const TransferToProjectDialog = ({
+  open,
+  onOpen = () => {},
+  onClose = () => {},
+  onGoBack = () => {},
+  isPending = false,
+  id,
+  data = [],
+  onSubmit = () => {},
+}) => {
+  const [selected, setSelected] = useState([]);
+  const [searchValue, setSearchValue] = useState("");
+
+  const handleChangeSearchValue = (e) => {
+    setSearchValue(e.target.value);
+  };
+
+  const handleSubmit = () => {
+    onSubmit({
+      agent: selected,
+      client: id,
+      option: Boolean(parseInt(method)),
+    });
+  };
+  return (
+    <Dialog
+      open={open}
+      onClose={onClose}
+      onOpen={onOpen}
+      paperProps={{
+        maxWidth: 450,
+      }}
+    >
+      <DialogHeading onGoBack={onGoBack}>تحويل إلى موظف</DialogHeading>
+      <DialogPeopleWindow
+        isPending={isPending}
+        searchValue={searchValue}
+        onSearch={handleChangeSearchValue}
+        sx={{ height: 400 }}
+      >
+        {[]}
+      </DialogPeopleWindow>
       <DialogButtonsGroup>
         <DialogButton onClick={handleSubmit}>تنفيذ</DialogButton>
         <DialogButton variant="close" onClick={onClose}>

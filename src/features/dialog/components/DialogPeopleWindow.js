@@ -42,7 +42,7 @@ const DialogPeopleWindow = ({
         spacing={2}
         {...props}
       >
-        {hideSearch && (
+        {!hideSearch && (
           <TextField
             variant="standard"
             className="DialogPeopleWindow__searchInput"
