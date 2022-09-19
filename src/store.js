@@ -8,6 +8,7 @@ import ClientsSlice from "./store/pages/ClientsSlice";
 import StatusSlice from "./store/pages/StatusSlice";
 import ClientHistorySlice from "./store/pages/ClientHistorySlice";
 import ClientCommentsSlice from "./store/pages/ClientCommentsSlice";
+import DeletedClientsSlice from "./store/pages/DelectedClientsSlice";
 
 export default configureStore({
   reducer: {
@@ -17,6 +18,7 @@ export default configureStore({
     employees: EmployeesSlice,
     channels: ChannelsSlice,
     clients: ClientsSlice,
+    deletedClients: DeletedClientsSlice,
     status: StatusSlice,
     clientHistory: ClientHistorySlice,
     clientComments: ClientCommentsSlice,

@@ -1079,10 +1079,10 @@ const TransferToEmployeeDialog = ({
   isPending = false,
   id,
   data = [],
-  initSelected = null,
+  initSelected,
   onSubmit = () => {},
 }) => {
-  const [selected, setSelected] = usePropState(initSelected);
+  const [selected, setSelected] = usePropState(initSelected, true);
   const [searchValue, setSearchValue] = useState("");
   const [method, setMethod] = useState(0);
 
