@@ -186,6 +186,7 @@ const DeletedClients = () => {
         isPending={deletedClientsGetResponse.isPending}
         columns={columns}
         rows={deletedClientsStore.results}
+        total={deletedClientsStore.count ? deletedClientsStore.count : 1}
         onCheck={handleChecks}
         onPaginate={handlePaginate}
         onAmountChange={handleChangeAmount}

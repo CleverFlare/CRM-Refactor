@@ -519,7 +519,7 @@ const TablePagination = ({ current = 1, limit, onChange = () => {} }) => {
 
   //----conditions----
   const disableRight = Boolean(page >= limit);
-  const disableLeft = Boolean(page <= 1) || Boolean(page >= limit);
+  const disableLeft = Boolean(page <= 1) || Boolean(page > limit);
 
   //----effects----
   useEffect(() => {
@@ -579,7 +579,7 @@ const TablePagination = ({ current = 1, limit, onChange = () => {} }) => {
         <ArrowForwardIosIcon sx={{ width: 15, height: 15 }} color="primary" />
       </MuiIconButton>
       <Typography variant="caption" sx={{ fontWeight: "bold" }} color="primary">
-        {max.current}
+        {max.current > 0 ? max.current : 1}
       </Typography>
       <Typography variant="caption" sx={{ fontWeight: "bold" }} color="primary">
         من
