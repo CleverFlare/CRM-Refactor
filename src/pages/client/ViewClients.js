@@ -230,8 +230,6 @@ const ViewClients = () => {
   }, [clientsStore]);
 
   useAfterEffect(() => {
-    console.log("Hi Guys");
-
     const urlParams = new URLSearchParams();
 
     Object.values(requestParams).map((item) =>
