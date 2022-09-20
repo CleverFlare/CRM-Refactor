@@ -98,7 +98,7 @@ const Overview = () => {
         </Stack>
         <Stack
           direction="row"
-          flexWrap="wrap"
+          flexWrap="wrap-reverse"
           sx={{ marginTop: 10, maxWidth: "100%" }}
           gap={2}
         >
@@ -171,14 +171,34 @@ const Filters = ({
   ];
 
   return (
-    <Stack direction="row" gap={2}>
+    <Stack
+      direction="row-reverse"
+      flexWrap="wrap"
+      gap={2}
+      sx={{ width: "max-content" }}
+    >
+      <SelectField
+        value={`${period}`}
+        onChange={(e) => setPeriod(e.target.value)}
+        renderValue={(selected) => {
+          return periods.find((period) => period.value === selected).name;
+        }}
+        sx={{ maxWidth: 120, width: "100vmax", minWidth: 0 }}
+      >
+        {periods.length &&
+          periods.map((period, index) => (
+            <MenuItem value={period.value} key={`periodFilter ${index}`}>
+              {period.name}
+            </MenuItem>
+          ))}
+      </SelectField>
       <SelectField
         value={status}
         onChange={(e) => setStatus(e.target.value)}
         isPending={isStatusPending}
         onOpen={onStatusOpen}
         placeholder="الحالة"
-        sx={{ maxWidth: 120, width: "100vmax" }}
+        sx={{ maxWidth: 120, width: "100vmax", minWidth: 0 }}
         renderValue={(selected) => {
           return statusData.find((status) => status.value === selected).name;
         }}
@@ -187,21 +207,6 @@ const Filters = ({
           statusData.map((item, index) => (
             <MenuItem value={item.value} key={`dataTableStatusFilter ${index}`}>
               {item.name}
-            </MenuItem>
-          ))}
-      </SelectField>
-      <SelectField
-        value={`${period}`}
-        onChange={(e) => setPeriod(e.target.value)}
-        renderValue={(selected) => {
-          return periods.find((period) => period.value === selected).name;
-        }}
-        sx={{ maxWidth: 120, width: "100vmax" }}
-      >
-        {periods.length &&
-          periods.map((period, index) => (
-            <MenuItem value={period.value} key={`periodFilter ${index}`}>
-              {period.name}
             </MenuItem>
           ))}
       </SelectField>
