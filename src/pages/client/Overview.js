@@ -7,15 +7,18 @@ import StatisticsCard from "../../components/StatisticsCard";
 import DataTable from "../../components/DataTable";
 import { useDispatch, useSelector } from "react-redux";
 import useRequest from "../../hooks/useRequest";
-import { SUMMARY } from "../../data/APIs";
+import { STATUS, SUMMARY } from "../../data/APIs";
 import { useEffect } from "react";
-import { Avatar } from "@mui/material";
+import { Avatar, MenuItem } from "@mui/material";
 import { useState } from "react";
 import format from "../../utils/ISOToReadable";
+import { SelectField } from "../../features/form";
+import useAfterEffect from "../../hooks/useAfterEffect";
 
 const Overview = () => {
   //----store----
   const overviewStore = useSelector((state) => state.overview.value);
+  const statusStore = useSelector((state) => state.status.value);
 
   const dispatch = useDispatch();
 
@@ -28,6 +31,11 @@ const Overview = () => {
     method: "get",
   });
 
+  const [statusGetRequest, statusGetResponse] = useRequest({
+    path: STATUS,
+    method: "get",
+  });
+
   useEffect(() => {
     overviewGetRequest({
       onSuccess: (res) => {
@@ -36,6 +44,25 @@ const Overview = () => {
       },
     });
   }, []);
+
+  const handleFilterChange = (filters) => {
+    overviewGetRequest({
+      id: filters.period,
+      onSuccess: (res) => {
+        dispatch({ type: "overview/set", payload: res.data });
+        setSelectedClients(res.data.employees.best_employees[0].clients);
+      },
+    });
+  };
+
+  const getStatus = () => {
+    if (statusStore.results.length) return;
+    statusGetRequest({
+      onSuccess: (res) => {
+        dispatch({ type: "status/set", payload: res.data });
+      },
+    });
+  };
 
   return (
     <Box>
@@ -91,6 +118,17 @@ const Overview = () => {
             path="/"
             sx={{ flex: 1, maxWidth: "100%" }}
             onClick={(e, row) => setSelectedClients(row.clients)}
+            actions={
+              <Filters
+                onChange={handleFilterChange}
+                statusData={statusStore.results.map((status) => ({
+                  name: status.name,
+                  value: status.id,
+                }))}
+                isStatusPending={statusGetResponse.isPending}
+                onStatusOpen={getStatus}
+              />
+            }
           />
         </Stack>
       </Wrapper>
@@ -99,6 +137,77 @@ const Overview = () => {
 };
 
 export default Overview;
+
+const Filters = ({
+  onChange = () => {},
+  isStatusPending,
+  statusData = [],
+  onStatusOpen = () => {},
+}) => {
+  const [period, setPeriod] = useState("1");
+  const [status, setStatus] = useState("");
+
+  useAfterEffect(() => {
+    onChange({ period, status });
+  }, [period, status]);
+
+  const periods = [
+    {
+      name: "اليوم",
+      value: "1",
+    },
+    {
+      name: "الإسبوع",
+      value: "7",
+    },
+    {
+      name: "الشهر",
+      value: "30",
+    },
+    {
+      name: "السنة",
+      value: "360",
+    },
+  ];
+
+  return (
+    <Stack direction="row" gap={2}>
+      <SelectField
+        value={status}
+        onChange={(e) => setStatus(e.target.value)}
+        isPending={isStatusPending}
+        onOpen={onStatusOpen}
+        placeholder="الحالة"
+        sx={{ maxWidth: 120, width: "100vmax" }}
+        renderValue={(selected) => {
+          return statusData.find((status) => status.value === selected).name;
+        }}
+      >
+        {statusData.length &&
+          statusData.map((item, index) => (
+            <MenuItem value={item.value} key={`dataTableStatusFilter ${index}`}>
+              {item.name}
+            </MenuItem>
+          ))}
+      </SelectField>
+      <SelectField
+        value={`${period}`}
+        onChange={(e) => setPeriod(e.target.value)}
+        renderValue={(selected) => {
+          return periods.find((period) => period.value === selected).name;
+        }}
+        sx={{ maxWidth: 120, width: "100vmax" }}
+      >
+        {periods.length &&
+          periods.map((period, index) => (
+            <MenuItem value={period.value} key={`periodFilter ${index}`}>
+              {period.name}
+            </MenuItem>
+          ))}
+      </SelectField>
+    </Stack>
+  );
+};
 
 const clientStatusColumns = [
   {

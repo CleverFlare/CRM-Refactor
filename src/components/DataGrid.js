@@ -147,7 +147,7 @@ const DataGrid = ({
             onChange={handleAmountChange}
           />
           <Stack direction="row" spacing={2}>
-            {filtersList.map((filter, index) => (
+            {filtersList.map((filter) => (
               <ChipsFilterItem
                 key={`filter ${filter.id}`}
                 name={filter.name}
@@ -424,6 +424,7 @@ const DataGrid = ({
                                     aditionProceduresButtons.map(
                                       (item, index) => (
                                         <IconButton
+                                          key={`aditionalProceduralButton ${index}`}
                                           color={
                                             item.bgcolor
                                               ? item.bgcolor

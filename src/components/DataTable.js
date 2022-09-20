@@ -177,4 +177,17 @@ export default DataTable;
 
 DataTable.propTypes = {
   title: PropTypes.string,
+  sx: PropTypes.object,
+  columns: PropTypes.arrayOf(
+    PropTypes.shape({
+      field: PropTypes.string.isRequired,
+      headerName: PropTypes.string,
+      customContent: PropTypes.func,
+    })
+  ),
+  rows: PropTypes.array,
+  path: PropTypes.string,
+  onClick: PropTypes.func,
+  actions: PropTypes.node,
+  isPending: PropTypes.bool,
 };
