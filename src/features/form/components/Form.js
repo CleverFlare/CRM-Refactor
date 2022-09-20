@@ -24,10 +24,18 @@ const Form = ({
   },
   children,
   sx,
+  onSubmit = () => {},
+  ...props
 }) => {
   const sm = useMediaQuery("(max-width: 768px)");
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSubmit(e);
+  };
+
   return (
-    <Paper sx={sx}>
+    <Paper sx={sx} onSubmit={handleSubmit} noValidate {...props}>
       {!Boolean(hideHeader) && (
         <>
           <Stack sx={{ padding: 2, bgcolor: "#f8f8f9" }}>
