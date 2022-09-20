@@ -9,6 +9,7 @@ import StatusSlice from "./store/pages/StatusSlice";
 import ClientHistorySlice from "./store/pages/ClientHistorySlice";
 import ClientCommentsSlice from "./store/pages/ClientCommentsSlice";
 import DeletedClientsSlice from "./store/pages/DelectedClientsSlice";
+import OverviewSlice from "./store/pages/OverviewSlice";
 
 export default configureStore({
   reducer: {
@@ -22,5 +23,6 @@ export default configureStore({
     status: StatusSlice,
     clientHistory: ClientHistorySlice,
     clientComments: ClientCommentsSlice,
+    overview: OverviewSlice,
   },
 });

@@ -198,23 +198,23 @@ const ViewClients = () => {
   const [clientDeleteRequest, clientDeleteResponse] = useRequest({
     path: CLIENTS,
     method: "delete",
+    successMessage: "تم الحذف بنجاح",
   });
 
-  const [clientCommentPostRequest, clientCommentPostResponse] = useRequest({
+  const [clientCommentPostRequest] = useRequest({
     path: CLIENTS_COMMENTS,
     method: "post",
   });
 
-  const [clientTransferPostRequest, clientTransferPostResponse] = useRequest({
+  const [clientTransferPostRequest] = useRequest({
     path: CLIENTS_TRANSFER,
     method: "post",
   });
 
-  const [clientTransferProjectPostRequest, clientTransferProjectPostResponse] =
-    useRequest({
-      path: CLIENTS_TRANSFER_PROJECT,
-      method: "post",
-    });
+  const [clientTransferProjectPostRequest] = useRequest({
+    path: CLIENTS_TRANSFER_PROJECT,
+    method: "post",
+  });
 
   //----effects----
   useEffect(() => {
@@ -837,6 +837,14 @@ const ViewClients = () => {
         alignItems="center"
         spacing={2}
       >
+        <Button
+          variant="contained"
+          color="error"
+          disabled={!Boolean(selected.length)}
+          sx={{ width: "200px", height: "50px" }}
+        >
+          حذف المحدد
+        </Button>
         <Button
           variant="contained"
           disabled={!Boolean(selected.length)}

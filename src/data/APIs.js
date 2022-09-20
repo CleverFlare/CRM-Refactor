@@ -23,6 +23,7 @@ const CHANGE_PASSWORD = "api/ChangePassword/";
 const USER_INFO = "aqar/api/router/UserInfo/";
 const COMPANY = "aqar/api/router/Company/";
 const FILES_HISTORY = "aqar/api/router/HistoryFile/";
+const SUMMARY = "aqar/api/summary/30/";
 
 export default BASEURL;
 
@@ -50,4 +51,5 @@ export {
   USER_INFO,
   COMPANY,
   FILES_HISTORY,
+  SUMMARY,
 };

@@ -14,9 +14,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 });
 
 const useConfirmMessage = ({
-  onConfirm = () => {
-    console.log("it doesn't work");
-  },
+  onConfirm = () => {},
   text = "هل انت متأكد انك تريد المتابعة؟",
 }) => {
   const [open, setOpen] = useState(false);

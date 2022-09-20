@@ -53,6 +53,7 @@ const DataGrid = ({
   onAmountChange = () => {},
   onPaginate = () => {},
   availableAmounts = [8, 10, 50, 100, 200],
+  aditionProceduresButtons,
   filters,
 }) => {
   //----states----
@@ -419,6 +420,29 @@ const DataGrid = ({
                                       />
                                     </IconButton>
                                   )}
+                                  {aditionProceduresButtons &&
+                                    aditionProceduresButtons.map(
+                                      (item, index) => (
+                                        <IconButton
+                                          color={
+                                            item.bgcolor
+                                              ? item.bgcolor
+                                              : "#495f9b"
+                                          }
+                                          iconColor={
+                                            item.color ? item.color : "#fff"
+                                          }
+                                          onClick={(event) => {
+                                            event.stopPropagation();
+                                            item.callback(event, row);
+                                          }}
+                                        >
+                                          {React.cloneElement(item.icon, {
+                                            sx: { width: 20, height: 20 },
+                                          })}
+                                        </IconButton>
+                                      )
+                                    )}
                                 </Stack>
                               </TableCell>
                             )}
@@ -438,6 +462,18 @@ const DataGrid = ({
           alignItems="center"
           sx={{ direction: "rtl", paddingBlock: 1, position: "relative" }}
         >
+          <Typography
+            sx={{
+              position: "absolute",
+              left: 20,
+              top: "50%",
+              transform: "translateY(-50%)",
+            }}
+          >
+            {checked.checks.length ? "المحدد" : "العدد الكلي"}:{" "}
+            {(checked.checks.length ? `${checked.checks.length} من ` : "") +
+              total}
+          </Typography>
           <TablePagination
             limit={Math.ceil(total / amount)}
             onChange={onPaginate}

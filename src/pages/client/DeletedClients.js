@@ -20,6 +20,7 @@ import format from "../../utils/ISOToReadable";
 import { Box } from "@mui/system";
 import useAfterEffect from "../../hooks/useAfterEffect";
 import useConfirmMessage from "../../hooks/useConfirmMessage";
+import RestoreIcon from "@mui/icons-material/Restore";
 
 const DeletedClients = () => {
   //----store----
@@ -41,13 +42,20 @@ const DeletedClients = () => {
     method: "get",
   });
 
+  const [deletedClientsPostRequest, deletedClientsPostResponse] = useRequest({
+    path: DELETED_CLIENTS,
+    method: "post",
+    successMessage: "تم الإسترجاع بنجاح",
+  });
+
   const [deletedClientsDeleteRequest, deletedClientsDeleteResponse] =
     useRequest({
       path: DELETED_CLIENTS,
       method: "delete",
+      successMessage: "تم حذف العملاء بنجاح",
     });
 
-  const handleIndividualPermenantDelete = (e, row) => {
+  const handleIndividualPermanentDelete = (e, row) => {
     deletedClientsDeleteRequest({
       body: {
         id: [row.id],
@@ -61,10 +69,10 @@ const DeletedClients = () => {
     });
   };
 
-  const handleSelectedPermenantDelete = (e) => {
+  const handleSelectedPermanentDelete = (e) => {
     deletedClientsDeleteRequest({
       body: {
-        id: [...selected.map((employee) => employee.id)],
+        id: [...selected.map((client) => client.id)],
       },
       onSuccess: () => {
         dispatch({
@@ -76,13 +84,13 @@ const DeletedClients = () => {
   };
 
   const [handleDelete, deleteConfirmMessage] = useConfirmMessage({
-    onConfirm: handleIndividualPermenantDelete,
+    onConfirm: handleIndividualPermanentDelete,
     text: "هل انت متأكد من انك تريد الحذف هذا الموظف؟",
   });
 
   const [handleDeleteSelected, deleteSelectedConfirmMessage] =
     useConfirmMessage({
-      onConfirm: handleSelectedPermenantDelete,
+      onConfirm: handleSelectedPermanentDelete,
       text: "هل انت متأكد من انك تريد الحذف هؤلاء الموظفين؟",
     });
 
@@ -139,6 +147,38 @@ const DeletedClients = () => {
     }));
   };
 
+  const handleRestoreClients = () => {
+    deletedClientsPostRequest({
+      body: {
+        id: [...selected.map((client) => client.id)],
+      },
+      onSuccess: (res) => {
+        selected
+          .map((client) => client.id)
+          .map((clientId) => {
+            dispatch({
+              type: "deletedClients/deleteItem",
+              payload: { id: clientId },
+            });
+          });
+      },
+    });
+  };
+
+  const handleRestoreClient = (e, row) => {
+    deletedClientsPostRequest({
+      body: {
+        id: [row.id],
+      },
+      onSuccess: (res) => {
+        dispatch({
+          type: "deletedClients/deleteItem",
+          payload: { id: row.id },
+        });
+      },
+    });
+  };
+
   return (
     <Wrapper>
       <Breadcrumbs path={["العملاء", "العملاء المحذوفة"]} />
@@ -151,6 +191,12 @@ const DeletedClients = () => {
         onAmountChange={handleChangeAmount}
         onFilter={handleFilter}
         onDelete={handleDelete}
+        aditionProceduresButtons={[
+          {
+            icon: <RestoreIcon />,
+            callback: handleRestoreClient,
+          },
+        ]}
         filters={filters}
       />
 
@@ -162,6 +208,14 @@ const DeletedClients = () => {
       >
         <Button
           variant="contained"
+          disabled={!Boolean(selected.length)}
+          sx={{ width: "200px", height: "50px" }}
+          onClick={handleRestoreClients}
+        >
+          إسترجاع المحدد
+        </Button>
+        <Button
+          variant="contained"
           color="error"
           disabled={!Boolean(selected.length)}
           sx={{ width: "200px", height: "50px" }}
@@ -170,6 +224,10 @@ const DeletedClients = () => {
           حذف المحدد
         </Button>
       </Stack>
+      {deletedClientsPostResponse.successAlert}
+      {deletedClientsDeleteResponse.successAlert}
+      {deletedClientsPostResponse.failAlert}
+      {deletedClientsDeleteResponse.failAlert}
       {deleteConfirmMessage}
       {deleteSelectedConfirmMessage}
     </Wrapper>

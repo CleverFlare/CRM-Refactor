@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import {
+  Button,
+  CircularProgress,
   MenuItem,
   Paper,
   Stack,
@@ -14,16 +16,19 @@ import {
 import { Box } from "@mui/system";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
+import EmptyBox from "../svg/EmptyBox";
 
 const DataTable = ({
   title,
   sx = {},
-  columns,
-  rows,
+  columns = [],
+  rows = [],
   path = "",
   onClick = null,
-  onFilter = null,
+  actions = [],
+  isPending = false,
 }) => {
+  const [selected, setSelected] = useState(0);
   return (
     <Paper
       elevation={2}
@@ -36,35 +41,50 @@ const DataTable = ({
         ...sx,
       }}
     >
-      <Stack direction="column" sx={{ height: "100%" }}>
+      <Stack direction="column" sx={{ height: "100%", position: "relative" }}>
+        {!Boolean(rows.length) && (
+          <Box
+            sx={{
+              width: "100%",
+              height: "100%",
+              position: "absolute",
+              top: 0,
+              left: 0,
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <EmptyBox sx={{ opacity: 0.2, width: 200, height: 200 }} />
+          </Box>
+        )}
         <Stack
           direction="row"
           justifyContent="space-between"
           sx={{ p: 2, bgcolor: "#f9f9f9" }}
         >
           <Typography>{title}</Typography>
-          {Boolean(onFilter) && (
-            <TextField
-              variant="standard"
-              select
-              value={controls.filter}
-              onChange={(e) => {
-                setControl("filter", e.target.value);
-                onFilter(e, e.target.value);
+          {actions}
+        </Stack>
+        <Box sx={{ flex: 1, overflow: "auto", position: "relative" }}>
+          {isPending && (
+            <Box
+              sx={{
+                width: "100%",
+                height: "100%",
+                position: "absolute",
+                top: 0,
+                left: 0,
+                zIndex: 1,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                bgcolor: "white",
               }}
             >
-              {filters.map((filter, index) => (
-                <MenuItem
-                  value={filter.value}
-                  key={`${filter.value} + ${index}`}
-                >
-                  {filter.title}
-                </MenuItem>
-              ))}
-            </TextField>
+              <CircularProgress sx={{ color: "gray" }} />
+            </Box>
           )}
-        </Stack>
-        <Box sx={{ flex: 1, overflow: "auto" }}>
           <Table
             sx={{
               width: "100%",
@@ -140,12 +160,13 @@ const DataTable = ({
           </Table>
         </Box>
         <Box sx={{ display: "flex", flexDirection: "row-reverse", p: 2 }}>
-          <Link
+          <Button
+            component={Link}
             to={path}
-            style={{ textDecoration: "none", width: "max-content" }}
+            sx={{ textDecoration: "none", width: "max-content" }}
           >
             <Typography sx={{ color: "#6d5bc6" }}>عرض الجميع</Typography>
-          </Link>
+          </Button>
         </Box>
       </Stack>
     </Paper>
