@@ -53,7 +53,7 @@ const AddStatus = () => {
         onSubmit={handleSubmit}
         noValidate
         spacing={2}
-        sx={{ width: 770 }}
+        sx={{ maxWidth: 770 }}
         alignItems="center"
       >
         <Form

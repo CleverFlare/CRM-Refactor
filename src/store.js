@@ -10,6 +10,8 @@ import ClientHistorySlice from "./store/pages/ClientHistorySlice";
 import ClientCommentsSlice from "./store/pages/ClientCommentsSlice";
 import DeletedClientsSlice from "./store/pages/DelectedClientsSlice";
 import OverviewSlice from "./store/pages/OverviewSlice";
+import ImportRegistrySlice from "./store/pages/ImportRegistrySlice";
+import ExportRegistrySlice from "./store/pages/ExportRegistrySlice";
 
 export default configureStore({
   reducer: {
@@ -24,5 +26,7 @@ export default configureStore({
     clientHistory: ClientHistorySlice,
     clientComments: ClientCommentsSlice,
     overview: OverviewSlice,
+    importRegistry: ImportRegistrySlice,
+    exportRegistry: ExportRegistrySlice,
   },
 });
