@@ -104,20 +104,20 @@ const DateFilter = ({ value = { start: "", end: "" }, onChange } = {}) => {
   const [startPoint, setStartPoint] = useState("");
   const [endPoint, setEndPoint] = useState("");
 
+  const formatDate = (date) => {
+    return date?.split("-").reverse().join("/");
+  };
+
   useEffect(() => {
     if (!startPoint && !endPoint) return;
     onChange({
       query: [
         "created_at",
-        `${String(startPoint).split("-").reverse().join("/")}-${String(endPoint)
-          .split("-")
-          .reverse()
-          .join("/")}`,
+        `${formatDate(String(startPoint))}-${formatDate(String(endPoint))}`,
       ],
-      renderedValue: `من ${String(startPoint).replace(
-        /-/gi,
-        "/"
-      )} - إلى ${String(endPoint).replace(/-/gi, "/")}`,
+      renderedValue: `من ${formatDate(String(startPoint))} - إلى ${formatDate(
+        String(endPoint)
+      )}`,
       value: {
         start: startPoint,
         end: endPoint,
