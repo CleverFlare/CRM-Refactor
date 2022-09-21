@@ -90,8 +90,13 @@ const useRequest = ({
       responseType,
       onUploadProgress: (event) => {
         const { loaded, total } = event;
-        setTotal(total);
-        setLoaded(loaded);
+        setTotal(() => total);
+        setLoaded(() => loaded);
+      },
+      onDownloadProgress: (event) => {
+        const { loaded, total } = event;
+        setTotal(() => total);
+        setLoaded(() => loaded);
       },
     })
       .then((res) => {
