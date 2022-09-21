@@ -12,6 +12,7 @@ import DeletedClientsSlice from "./store/pages/DelectedClientsSlice";
 import OverviewSlice from "./store/pages/OverviewSlice";
 import ImportRegistrySlice from "./store/pages/ImportRegistrySlice";
 import ExportRegistrySlice from "./store/pages/ExportRegistrySlice";
+import JobsSlice from "./store/pages/JobsSlice";
 
 export default configureStore({
   reducer: {
@@ -28,5 +29,6 @@ export default configureStore({
     overview: OverviewSlice,
     importRegistry: ImportRegistrySlice,
     exportRegistry: ExportRegistrySlice,
+    jobs: JobsSlice,
   },
 });

@@ -26,6 +26,7 @@ export const ProjectsSlice = createSlice({
       state.value.results = state.value.results.filter(
         (item) => item.id !== action.payload.id
       );
+      state.value.count = state.value.count - 1;
     },
     addItem: (state, action) => {
       state.value.results = [action.payload, ...state.value.results];

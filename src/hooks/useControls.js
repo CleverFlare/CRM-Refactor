@@ -35,11 +35,21 @@ const useControls = (controls = []) => {
         state[control.control]
       ) {
         control.validations.forEach((validation) => {
-          if (!validation.test.test(value)) {
-            output = {
-              ...output,
-              [control.control]: validation.message,
-            };
+          switch (typeof validation.test) {
+            case "function":
+              if (!validation.test(state).test(value)) {
+                output = {
+                  ...output,
+                  [control.control]: validation.message,
+                };
+              }
+            default:
+              if (!validation.test.test(value)) {
+                output = {
+                  ...output,
+                  [control.control]: validation.message,
+                };
+              }
           }
         });
       }
