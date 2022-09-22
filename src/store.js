@@ -14,6 +14,7 @@ import ImportRegistrySlice from "./store/pages/ImportRegistrySlice";
 import ExportRegistrySlice from "./store/pages/ExportRegistrySlice";
 import JobsSlice from "./store/pages/JobsSlice";
 import allPermissionsSlice from "./store/allPermissionsSlice";
+import UnitsSlice from "./store/pages/UnitsSlice";
 
 export default configureStore({
   reducer: {
@@ -32,5 +33,6 @@ export default configureStore({
     importRegistry: ImportRegistrySlice,
     exportRegistry: ExportRegistrySlice,
     jobs: JobsSlice,
+    units: UnitsSlice,
   },
 });

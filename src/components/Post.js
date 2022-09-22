@@ -147,7 +147,7 @@ const Post = ({
       {images[0] && (
         <CardMedia
           component="img"
-          image={images[0]}
+          image={images[0].media}
           alt="posts image"
           sx={{
             bgcolor: "black",
