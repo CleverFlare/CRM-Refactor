@@ -248,7 +248,7 @@ const Sidebar = ({
                       </ListItemButton>
 
                       <Collapse
-                        in={controls[page.name]}
+                        in={Boolean(controls[page.name])}
                         timeout="auto"
                         unmountOnExit
                       >

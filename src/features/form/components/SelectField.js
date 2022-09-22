@@ -58,7 +58,7 @@ const SelectField = ({
         <Stack justifyContent="center" alignItems="center" sx={{ p: 1 }}>
           <CircularProgress size="30px" sx={{ color: "gray" }} />
         </Stack>
-      ) : Boolean(children?.length) ? (
+      ) : Boolean(Object.keys(children)?.length) ? (
         children
       ) : (
         <MenuItem disabled>فارغ</MenuItem>

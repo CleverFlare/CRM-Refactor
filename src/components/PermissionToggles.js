@@ -3,13 +3,15 @@ import { Box } from "@mui/system";
 import React from "react";
 import { useState } from "react";
 import useAfterEffect from "../hooks/useAfterEffect";
+import usePropState from "../hooks/usePropState";
 
 const PermissionToggles = ({
   permissions = [],
+  initialToggles = [],
   onToggle = () => {},
   ...props
 }) => {
-  const [toggles, setToggles] = useState([]);
+  const [toggles, setToggles] = usePropState(initialToggles, true);
 
   const handleToggle = (e) => {
     switch (e.target.checked) {

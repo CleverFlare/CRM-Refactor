@@ -2,7 +2,7 @@ import React from "react";
 import { Button } from "@mui/material";
 import PropTypes from "prop-types";
 
-const DialogButton = ({ variant = "save", children, ...props }) => {
+const DialogButton = ({ variant = "save", children, sx = {}, ...props }) => {
   let style = {};
 
   switch (variant) {
@@ -39,7 +39,7 @@ const DialogButton = ({ variant = "save", children, ...props }) => {
   }
 
   return (
-    <Button variant="contained" sx={style} {...props}>
+    <Button variant="contained" sx={{ ...style, sx }} {...props}>
       {children}
     </Button>
   );

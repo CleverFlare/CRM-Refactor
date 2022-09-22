@@ -46,6 +46,15 @@ export const EmployeesSlice = createSlice({
         ...action.payload.item,
       });
     },
+    blockItem: (state, action) => {
+      const index = state.value.results.findIndex(
+        (item) => item.id === action.payload.id
+      );
+      state.value.results[index] = {
+        ...state.value.results[index],
+        isblock: !state.value.results[index].isblock,
+      };
+    },
   },
 });
 

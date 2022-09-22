@@ -5,18 +5,20 @@ import PropTypes from "prop-types";
 const DialogButtonsGroup = ({
   children,
   justifyContent = "center",
-  alignItems = "center",
+  alignItems = "flex-end",
   spacing = 2,
   direction = "row",
+  sx = {},
   ...props
 }) => {
   return (
-    <DialogContent>
+    <DialogContent sx={{ height: "100% !important", ...sx }}>
       <Stack
         direction={direction}
         justifyContent={justifyContent}
         alignItems={alignItems}
         spacing={spacing}
+        sx={{ height: "100%" }}
         {...props}
       >
         {children}

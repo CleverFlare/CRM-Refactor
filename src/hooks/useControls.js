@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 
 const useControls = (controls = []) => {
   if (
@@ -11,10 +11,31 @@ const useControls = (controls = []) => {
   const [state, setState] = useState(() => {
     let result = {};
     controls.map(
-      (control) => (result = { ...result, [control?.control]: control?.value })
+      (control) =>
+        (result = {
+          ...result,
+          [control?.control]: Boolean(control?.value) ? control?.value : "",
+        })
     );
     return result;
   });
+
+  useEffect(
+    () => {
+      setState(() => {
+        let result = {};
+        controls.map(
+          (control) =>
+            (result = {
+              ...result,
+              [control?.control]: Boolean(control?.value) ? control?.value : "",
+            })
+        );
+        return result;
+      });
+    },
+    controls.map((control) => control.value)
+  );
 
   const [errors, setErrors] = useState({});
 

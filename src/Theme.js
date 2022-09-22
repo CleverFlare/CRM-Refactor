@@ -70,6 +70,11 @@ const theme = createTheme({
         },
       },
     },
+    MuiFilledInput: {
+      defaultProps: {
+        disableUnderline: true,
+      },
+    },
     MuiInput: {
       styleOverrides: {
         root: {
