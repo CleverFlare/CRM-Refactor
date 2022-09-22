@@ -13,6 +13,11 @@ import useRequest from "../../hooks/useRequest";
 import { useDispatch, useSelector } from "react-redux";
 import { InputAdornment, MenuItem } from "@mui/material";
 import PendingBackdrop from "../../../../CRM-Master/src/components/PendingBackdrop";
+import routeGate from "../../features/permissions/HOC/RouteGate";
+import PermissionToggles from "../../components/PermissionToggles";
+import { EMPLOYEES, JOB_PERMISSIONS } from "../../data/APIs";
+import useAfterEffect from "../../hooks/useAfterEffect";
+import filter from "../../utils/ClearNull";
 
 const AddEmployees = () => {
   const userInfo = useSelector((state) => state.userInfo.value);
@@ -20,62 +25,6 @@ const AddEmployees = () => {
   const jobsStore = useSelector((state) => state.jobs.value);
 
   const dispatch = useDispatch();
-
-  const [jobsGetRequest, jobsGetResponse] = useRequest({
-    path: "aqar/api/router/Job/",
-    method: "get",
-  });
-
-  const getJobs = () => {
-    if (Boolean(jobsStore.results.length)) return;
-    jobsGetRequest({
-      onSuccess: (res) => {
-        dispatch({ type: "jobs/set", payload: res.data });
-      },
-    });
-  };
-
-  const [employeesState, setEmployeesState] = useState([]);
-
-  const [employeesGetRequest, employeesGetResponse] = useRequest({
-    path: "aqar/api/router/Employee/",
-    method: "get",
-  });
-
-  const getEmployees = () => {
-    employeesGetRequest({
-      params: {
-        top: 1,
-        job: controls.job,
-      },
-      onSuccess: (res) => {
-        setEmployeesState(res.data);
-      },
-    });
-  };
-
-  const [jobsPermissionsGetRequest] = useRequest({
-    path: "aqar/api/router/JobPermission/?",
-    method: "get",
-  });
-
-  // const getJobPermissions = () => {
-  //   if (!controls.job) return;
-  //   jobsPermissionsGetRequest({
-  //     params: {
-  //       id: controls.job,
-  //     },
-  //     onSuccess: (res) => {
-  //       setPermissions(res.data);
-  //       setSelectedPermissions([]);
-  //     },
-  //   });
-  // };
-
-  const [employeePostRequest, employeePostResponse] = useRequest({
-    path: "aqar/api/router/Employee/",
-    method: "post",
-  });
 
   const [
     { controls, required, invalid },
@@ -122,7 +71,7 @@ const AddEmployees = () => {
       isRequired: true,
       validations: [
         {
-          test: (controls) => new RegExp(`${old.password}`),
+          test: (controls) => new RegExp(`^${controls.password}$`),
           message: "الرقم السري لا يطابق",
         },
       ],
@@ -140,16 +89,140 @@ const AddEmployees = () => {
     },
   ]);
 
+  const [jobsGetRequest, jobsGetResponse] = useRequest({
+    path: "aqar/api/router/Job/",
+    method: "get",
+  });
+
+  const getJobs = () => {
+    if (Boolean(jobsStore.results.length)) return;
+    jobsGetRequest({
+      onSuccess: (res) => {
+        dispatch({ type: "jobs/set", payload: res.data });
+      },
+    });
+  };
+
+  const [employeesState, setEmployeesState] = useState([]);
+
+  const [employeesGetRequest, employeesGetResponse] = useRequest({
+    path: "aqar/api/router/Employee/",
+    method: "get",
+  });
+
+  const getEmployees = () => {
+    employeesGetRequest({
+      params: {
+        top: 1,
+        job: controls.job,
+      },
+      onSuccess: (res) => {
+        setEmployeesState(res.data);
+      },
+    });
+  };
+
+  const [jobPermissionsGetRequest, jobPermissionsGetResponse] = useRequest({
+    path: JOB_PERMISSIONS,
+    method: "get",
+  });
+
+  const [selectedPerms, setSelectedPerms] = useState([]);
+
+  const [permissionsState, setPermissionsState] = useState([]);
+
+  const getJobPermissions = () => {
+    if (!controls.job) return;
+    jobPermissionsGetRequest({
+      params: {
+        id: controls.job,
+      },
+      onSuccess: (res) => {
+        setPermissionsState(res.data);
+      },
+    });
+  };
+
+  useAfterEffect(() => {
+    getJobPermissions();
+  }, [controls.job]);
+
+  const [employeePostRequest, employeePostResponse] = useRequest({
+    path: EMPLOYEES,
+    method: "post",
+    successMessage: "تم إضافة موظف جديد بنجاح",
+  });
+
+  const handleSubmit = () => {
+    validate().then((output) => {
+      if (!output.isOk) return;
+      const requestBody = filter({
+        obj: {
+          user: {
+            first_name: controls.name.split(/(?<=^\S+)\s/)[0],
+            last_name: controls.name.split(/(?<=^\S+)\s/)[1],
+            username: `${
+              controls.username
+            }@${userInfo?.organization?.name?.replace(/\s/gi, "")}.com`,
+            email: controls.email,
+            country_code: controls.code,
+            phone: controls.phone,
+            password: controls.password,
+            user_permissions: selectedPerms.map((perm) => ({
+              codename: perm,
+            })),
+          },
+          job: controls.job,
+          parent: controls.to,
+        },
+      });
+      employeePostRequest({
+        onSuccess: () => {
+          setPermissionsState([]);
+          resetControls();
+        },
+        body: requestBody,
+      }).then((res) => {
+        const response = res?.response?.data;
+        const responseBody = filter({
+          obj: {
+            name:
+              response?.user?.first_name?.join("-") ||
+              response?.user?.last_name?.join("-"),
+            email: response?.user?.email?.join("-"),
+            phone:
+              response?.user?.phone?.join("-") ||
+              response?.user?.country_code?.join("-"),
+            password: response?.user?.password?.join("-"),
+            job: response?.job?.join("-"),
+          },
+        });
+        setInvalid(responseBody);
+      });
+    });
+  };
+
   return (
     <Wrapper sx={{ position: "relative" }}>
-      {false && (
+      {jobPermissionsGetResponse.isPending && (
         <PendingBackdrop
           backdropColor="white"
           indicatorColor={(theme) => theme.palette.primary.main}
         />
       )}
       <Breadcrumbs path={["الموظفين", "إضافة موظف"]} />
-      <Form>
+      <Form
+        component="form"
+        onSubmit={() => handleSubmit()}
+        childrenProps={{
+          saveBtn: {
+            disabled: employeePostResponse.isPending,
+          },
+          closeBtn: {
+            disabled: employeePostResponse.isPending,
+          },
+        }}
+      >
         <InputField
           label="الإسم"
           placeholder="الإسم"
@@ -269,9 +342,16 @@ const AddEmployees = () => {
           error={Boolean(invalid.email)}
           helperText={invalid.email}
         />
+        <PermissionToggles
+          permissions={permissionsState}
+          sx={{ gridColumn: "1 / -1" }}
+          onToggle={({ toggles }) => setSelectedPerms(toggles)}
+        />
       </Form>
+      {employeePostResponse.successAlert}
+      {employeePostResponse.failAlert}
     </Wrapper>
   );
 };
 
-export default AddEmployees;
+export default routeGate(AddEmployees, ["add_aqaremployee"]);

@@ -23,7 +23,7 @@ const Form = ({
     closeBtn: {},
   },
   children,
-  sx,
+  sx = {},
   onSubmit = () => {},
   ...props
 }) => {
@@ -35,7 +35,7 @@ const Form = ({
   };
 
   return (
-    <Paper sx={sx} onSubmit={handleSubmit} noValidate {...props}>
+    <Paper sx={{ ...sx }} onSubmit={handleSubmit} noValidate {...props}>
       {!Boolean(hideHeader) && (
         <>
           <Stack sx={{ padding: 2, bgcolor: "#f8f8f9" }}>
@@ -70,6 +70,7 @@ const Form = ({
         >
           <Button
             variant="contained"
+            type="submit"
             color="primary"
             {...childrenProps.saveBtn}
           >

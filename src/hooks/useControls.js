@@ -43,6 +43,7 @@ const useControls = (controls = []) => {
                   [control.control]: validation.message,
                 };
               }
+              break;
             default:
               if (!validation.test.test(value)) {
                 output = {
