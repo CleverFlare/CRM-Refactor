@@ -148,7 +148,7 @@ const Filters = ({
   const [status, setStatus] = useState("");
 
   useAfterEffect(() => {
-    onChange({ period, status });
+    onChange({ period, event: status });
   }, [period, status]);
 
   const periods = [

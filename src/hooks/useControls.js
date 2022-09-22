@@ -22,6 +22,7 @@ const useControls = (controls = []) => {
 
   useEffect(
     () => {
+      if (!controls.every((control) => Boolean(control.value))) return;
       setState(() => {
         let result = {};
         controls.map(

@@ -13,9 +13,11 @@ import OverviewSlice from "./store/pages/OverviewSlice";
 import ImportRegistrySlice from "./store/pages/ImportRegistrySlice";
 import ExportRegistrySlice from "./store/pages/ExportRegistrySlice";
 import JobsSlice from "./store/pages/JobsSlice";
+import allPermissionsSlice from "./store/allPermissionsSlice";
 
 export default configureStore({
   reducer: {
+    allPermissions: allPermissionsSlice,
     userInfo: userInfoSlice,
     posts: PostsSlice,
     projects: ProjectsSlice,

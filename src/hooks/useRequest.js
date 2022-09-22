@@ -116,17 +116,6 @@ const useRequest = ({
         return res.data;
       })
       .catch((err) => {
-        switch (err?.response?.status) {
-          case 401:
-            Object.keys(states).map((state) =>
-              dispatch({ type: `${state}/reset` })
-            );
-            dispatch({ type: "token/remove" });
-            return;
-          default:
-            return err;
-        }
-
         setIsPending(false);
 
         setServerResponse(err);
@@ -145,8 +134,16 @@ const useRequest = ({
               ? getValues(err.response.data).join(" - ")
               : err.message,
         });
-
-        return err;
+        switch (err?.response?.status) {
+          case 401:
+            Object.keys(states).map((state) =>
+              dispatch({ type: `${state}/reset` })
+            );
+            dispatch({ type: "token/remove" });
+            return;
+          default:
+            return err;
+        }
       });
   };
 
