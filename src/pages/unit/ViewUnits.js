@@ -11,6 +11,11 @@ import useConfirmMessage from "../../hooks/useConfirmMessage";
 import Form, { InputField } from "../../features/form";
 import useControls from "../../hooks/useControls";
 import filter from "../../utils/ClearNull";
+import Dialog, {
+  DialogButton,
+  DialogButtonsGroup,
+  DialogForm,
+} from "../../features/dialog";
 
 const ViewUnits = () => {
   const unitsStore = useSelector((state) => state.units.value);
@@ -370,3 +375,15 @@ const columns = [
     },
   },
 ];
+
+const EditDialog = ({ open, onClose }) => {
+  return (
+    <Dialog opne={open} onClose={onClose}>
+      <DialogForm></DialogForm>
+      <DialogButtonsGroup>
+        <DialogButton>حفظ</DialogButton>
+        <DialogButton variant="close">إلغاء</DialogButton>
+      </DialogButtonsGroup>
+    </Dialog>
+  );
+};
