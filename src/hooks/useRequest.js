@@ -120,6 +120,8 @@ const useRequest = ({
 
         setServerResponse(err);
 
+        console.log(err);
+
         const getValues = (data, values = []) => {
           if (typeof data !== "object") {
             return [...values, data];
@@ -130,7 +132,7 @@ const useRequest = ({
         setFailAlert({
           open: true,
           message:
-            err.response.status === 400
+            err?.response?.status === 400
               ? getValues(err.response.data).join(" - ")
               : err.message,
         });

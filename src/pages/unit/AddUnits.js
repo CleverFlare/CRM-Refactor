@@ -118,7 +118,7 @@ const AddUnits = () => {
   ]);
 
   const [unitPostRequest, unitPostResponse] = useRequest({
-    path: UINTS,
+    path: UNITS,
     method: "post",
     successMessage: "تم إضافة وحدة جديدة بنجاح",
   });

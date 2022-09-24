@@ -38,19 +38,23 @@ const Overview = () => {
 
   useEffect(() => {
     overviewGetRequest({
+      id: 1,
       onSuccess: (res) => {
         dispatch({ type: "overview/set", payload: res.data });
-        setSelectedClients(res.data.employees.best_employees[0].clients);
+        setSelectedClients(res.data.employees.best_employees[0]?.clients);
       },
     });
   }, []);
 
   const handleFilterChange = (filters) => {
+    const params = {};
+    filters.event && (params.event = filters.event);
     overviewGetRequest({
       id: filters.period,
+      params,
       onSuccess: (res) => {
         dispatch({ type: "overview/set", payload: res.data });
-        setSelectedClients(res.data.employees.best_employees[0].clients);
+        setSelectedClients(res.data.employees.best_employees[0]?.clients);
       },
     });
   };

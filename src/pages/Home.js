@@ -68,7 +68,7 @@ const Home = () => {
       {
         control: "picture",
         value: null,
-        isRequired: true,
+        isRequired: false,
       },
     ]);
 
@@ -154,6 +154,7 @@ const Home = () => {
                 controls.content.slice(endIndex, controls.content.length + 1)
             );
           }}
+          isPending={postsPostResponse.isPending}
         />
 
         <Typography

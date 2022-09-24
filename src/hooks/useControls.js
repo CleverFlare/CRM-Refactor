@@ -1,7 +1,7 @@
 import { useCallback, useState, useEffect } from "react";
 import useAfterEffect from "./useAfterEffect";
 
-const useControls = (controls = []) => {
+const useControls = (controls = [], listen = false) => {
   if (
     (Boolean(controls.length) &&
       controls.every((control) => !control.hasOwnProperty("control"))) ||
@@ -23,6 +23,7 @@ const useControls = (controls = []) => {
 
   useAfterEffect(
     () => {
+      if (!listen) return;
       setState(() => {
         let result = {};
         controls.map(

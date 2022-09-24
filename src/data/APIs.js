@@ -23,7 +23,7 @@ const CHANGE_PASSWORD = "api/ChangePassword/";
 const USER_INFO = "aqar/api/router/UserInfo/";
 const COMPANY = "aqar/api/router/Company/";
 const FILES_HISTORY = "aqar/api/router/HistoryFile/";
-const SUMMARY = "aqar/api/summary/30/";
+const SUMMARY = "aqar/api/summary/";
 const EXPORT_CLIENTS = "aqar/api/import/";
 const IMPORT_CLIENTS = "aqar/api/export/";
 

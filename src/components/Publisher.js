@@ -26,6 +26,7 @@ const Publisher = ({
   onEmoji,
   onPickPicture,
   onSubmit,
+  isPending = false,
 }) => {
   //----states----
   const [emojisAnchorEl, setEmojisAnchorEl] = useState(null);
@@ -137,6 +138,7 @@ const Publisher = ({
           sx={{ minWidth: "min-content", width: 200 }}
           disableElevation
           onClick={handleSubmit}
+          disabled={isPending}
         >
           إضافة
         </Button>
