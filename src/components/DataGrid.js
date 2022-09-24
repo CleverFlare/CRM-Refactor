@@ -825,7 +825,9 @@ const ChipsFilter = ({ filters = [], sx, onFilter = () => {} }) => {
             filters.map((filter, index) => {
               return (
                 <MenuItem
-                  onClick={() => setSelectedFilter(filter)}
+                  onClick={() =>
+                    setSelectedFilter({ valueShape: "", ...filter })
+                  }
                   key={`filter ${index}`}
                   sx={{ minWidth: 150 }}
                 >
@@ -837,6 +839,7 @@ const ChipsFilter = ({ filters = [], sx, onFilter = () => {} }) => {
             <FilterTemplate
               name={selectedFilter.name}
               component={selectedFilter.component}
+              value={selectedFilter.valueShape}
               onSubmit={handleOnFilter}
               onClose={handleCloseMenu}
             />
@@ -856,7 +859,7 @@ const FilterTemplate = ({
   onClose,
 }) => {
   //----states----
-  const [valueState, setValueState] = usePropState(value);
+  const [valueState, setValueState] = usePropState(value, true);
   const [renderedValueState, setRenderedValueState] =
     usePropState(renderedValue);
   const [queryState, setQueryState] = usePropState(query);

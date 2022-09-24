@@ -16,7 +16,7 @@ const PROJECTS = "aqar/api/router/Project/";
 const CHANNELS = "aqar/api/router/Channel/";
 const JOBS = "aqar/api/router/Job/";
 const TEAMS = "aqar/api/router/Team/";
-const UINTS = "aqar/api/router/Unit/";
+const UNITS = "aqar/api/router/Unit/";
 const JOB_PERMISSIONS = "aqar/api/router/JobPermission/";
 const PERMISSIONS = "api/getpermissions/";
 const CHANGE_PASSWORD = "api/ChangePassword/";
@@ -46,7 +46,7 @@ export {
   CHANNELS,
   JOBS,
   TEAMS,
-  UINTS,
+  UNITS,
   JOB_PERMISSIONS,
   PERMISSIONS,
   CHANGE_PASSWORD,

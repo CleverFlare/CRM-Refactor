@@ -161,6 +161,10 @@ const filters = [
   {
     name: "تاريخ",
     component: <DateFilter />,
+    valueShape: {
+      start: "",
+      end: "",
+    },
   },
 ];
 

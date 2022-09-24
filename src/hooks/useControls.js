@@ -1,4 +1,5 @@
 import { useCallback, useState, useEffect } from "react";
+import useAfterEffect from "./useAfterEffect";
 
 const useControls = (controls = []) => {
   if (
@@ -20,9 +21,8 @@ const useControls = (controls = []) => {
     return result;
   });
 
-  useEffect(
+  useAfterEffect(
     () => {
-      if (!controls.every((control) => Boolean(control.value))) return;
       setState(() => {
         let result = {};
         controls.map(

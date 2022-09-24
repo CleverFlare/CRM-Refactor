@@ -12,7 +12,7 @@ import Form, {
 import useControls from "../../hooks/useControls";
 import { MenuItem } from "@mui/material";
 import useRequest from "../../hooks/useRequest";
-import { UINTS } from "../../data/APIs";
+import { UNITS } from "../../data/APIs";
 import filter from "../../utils/ClearNull";
 
 const AddUnits = () => {

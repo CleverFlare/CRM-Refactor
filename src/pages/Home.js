@@ -41,16 +41,19 @@ const Home = () => {
   const [postsDeleteRequest, postsDeleteResponse] = useRequest({
     path: POSTS,
     method: "delete",
+    successMessage: "تم حذف المنشور بنجاح",
   });
 
   const [postsPostRequest, postsPostResponse] = useRequest({
     path: POSTS,
     method: "post",
+    successMessage: "تم إضافة منشور بنجاح",
   });
 
   const [postsPatchRequest, postsPatchResponse] = useRequest({
     path: POSTS,
     method: "put",
+    successMessage: "تم تعديل المنشور بنجاح",
   });
 
   //----state----
@@ -166,7 +169,7 @@ const Home = () => {
           postsStore.results.map((post, index) => (
             <Post
               key={`post ${index}`}
-              name={post.user.username}
+              name={post.user.name}
               picture={post.user.image}
               createdAt={post.created_at}
               images={post.medias}
@@ -209,13 +212,13 @@ const PostEditDialog = ({ data, open, onClose, onSubmit }) => {
   const [{ controls, invalid }, { setControl, resetControls }] = useControls([
     {
       control: "content",
-      value: data.children,
+      value: "",
     },
     {
       control: "pictures",
       value: {
         files: null,
-        displayed: data.images?.[0],
+        displayed: "",
       },
     },
   ]);
@@ -233,7 +236,7 @@ const PostEditDialog = ({ data, open, onClose, onSubmit }) => {
     setControl("content", data.children);
     setControl("pictures", {
       files: null,
-      display: data.images?.[0],
+      display: data.images?.[0]?.media,
     });
   }, [data]);
 
