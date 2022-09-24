@@ -419,7 +419,6 @@ const ViewClients = () => {
   };
 
   const handleCloseDetailsDialog = () => {
-    console.log("closing");
     setClientDetails((old) => ({ ...old, details: null, tab: "details" }));
   };
 
@@ -1235,7 +1234,6 @@ const CommentDialog = ({
         comment: controls.comment,
         client: id,
       }).then((e) => {
-        console.log(e);
         resetControls();
       });
     });

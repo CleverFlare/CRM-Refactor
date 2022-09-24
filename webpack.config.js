@@ -43,7 +43,7 @@ module.exports = {
       },
       {
         test: /\.json$/,
-        loader: "json-loader",
+        type: "json",
       },
       {
         test: /\.(png|jpe?g|gif|mp3|wav)$/i,

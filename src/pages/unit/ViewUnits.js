@@ -491,7 +491,6 @@ const EditDialog = ({ open = false, onClose = () => {}, data = {} }) => {
 
   useAfterEffect(() => {
     if (!open) return;
-    console.log(data);
   }, [open]);
 
   const [unitPatchRequest, unitPatchResponse] = useRequest({
@@ -761,7 +760,6 @@ const InfoDialog = ({ open, onClose, data = {} }) => {
 
   useAfterEffect(() => {
     if (!open) return;
-    console.log(data);
   }, [open]);
 
   const addPictureRef = useRef(null);

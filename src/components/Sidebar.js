@@ -22,6 +22,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import pages from "../data/pages";
 import useControls from "../hooks/useControls";
 import PropTypes from "prop-types";
+import { useDispatch } from "react-redux";
 
 const Sidebar = ({
   width,

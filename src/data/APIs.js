@@ -26,10 +26,12 @@ const FILES_HISTORY = "aqar/api/router/HistoryFile/";
 const SUMMARY = "aqar/api/summary/";
 const EXPORT_CLIENTS = "aqar/api/import/";
 const IMPORT_CLIENTS = "aqar/api/export/";
+const LOGIN = "api/login/";
 
 export default BASEURL;
 
 export {
+  LOGIN,
   NOTIFICATIONS,
   POSTS,
   CLIENTS,

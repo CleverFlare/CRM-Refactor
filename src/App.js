@@ -5,9 +5,12 @@ import { Box, useMediaQuery } from "@mui/material";
 import Topbar from "./components/Topbar";
 import useToggle from "./hooks/useToggle";
 import pages from "./data/pages";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import useRequest from "./hooks/useRequest";
-import { NOTIFICATIONS } from "./data/APIs";
+import { NOTIFICATIONS, USER_INFO } from "./data/APIs";
+import Login from "./pages/Login";
+import { Provider } from "react-redux";
+import store from "./store";
 
 const sidebarWidth = 240;
 
@@ -16,11 +19,14 @@ const Layout = ({
   permissions,
   notifications,
   onRemoveNotifications = () => {},
+  isPending = false,
   userInfo = {},
 }) => {
   //----hooks----
   const sm = useMediaQuery("(max-width:712px)");
   const [openSidebar, toggleOpenSidebar] = useToggle(false);
+
+  const dispatch = useDispatch();
 
   //----styles----
   let gridStyle = {
@@ -52,12 +58,18 @@ const Layout = ({
         open={openSidebar}
         onOpen={() => toggleOpenSidebar(true)}
         onClose={() => toggleOpenSidebar(false)}
+        onLogout={() => dispatch({ type: "userInfo/logout" })}
         permissions={permissions}
         name={userInfo.name}
         role={userInfo.role}
         organization={userInfo.organization}
         avatar={userInfo.image}
         width={sidebarWidth}
+        isNamePending={isPending}
+        isRolePending={isPending}
+        isOrganizationPending={isPending}
+        isTabsPending={isPending}
+        isAvatarPending={isPending}
       />
       <Box sx={{ overflowY: "auto" }}>{children}</Box>
     </Box>
@@ -68,10 +80,17 @@ const App = () => {
   //----store----
   const token = useSelector((state) => state.userInfo.value.token);
 
+  const dispatch = useDispatch();
+
   //----states----
   const [notifications, setNotifications] = useState([]);
 
   const userInfo = useSelector((state) => state.userInfo.value);
+
+  const [userInfoGetRequest, userInfoGetResponse] = useRequest({
+    path: USER_INFO,
+    method: "get",
+  });
 
   //----request hooks----
   const [missedNotificationsGetRequest, missedNotificationsGetResponse] =
@@ -82,6 +101,12 @@ const App = () => {
 
   //----effects----
   useEffect(() => {
+    if (!token) return;
+    userInfoGetRequest({
+      onSuccess: (res) => {
+        dispatch({ type: "userInfo/setUserInfo", payload: res.data });
+      },
+    });
     missedNotificationsGetRequest({
       onSuccess: (res) => {
         setNotifications(res.data.notifications);
@@ -92,13 +117,12 @@ const App = () => {
 
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      console.log(data.data);
       if (data.action === "notifications") {
         data.data.followup = data.data.followup.replace(" ", "T");
         setNotifications((old) => [data.data, ...old]);
       }
     };
-  }, []);
+  }, [token]);
 
   const handleRemoveNotifications = () => {
     missedNotificationsGetRequest({
@@ -110,45 +134,55 @@ const App = () => {
   };
 
   return (
-    <Router>
-      <Layout
-        permissions={dummyPermissions}
-        notifications={notifications}
-        onRemoveNotifications={handleRemoveNotifications}
-        userInfo={{
-          name: `${userInfo.first_name} ${userInfo.last_name}`,
-          role: userInfo.job_title,
-          organization: userInfo.organization.name,
-          image: userInfo.image,
-        }}
-      >
-        <Routes>
-          {pages.map((page, pageIndex) => {
-            if (!Boolean(page)) return;
-            switch (page.hasOwnProperty("subtabs")) {
-              case false:
-                return (
-                  <Route
-                    path={page.path}
-                    element={page.element}
-                    key={`route page ${pageIndex}`}
-                  />
-                );
-              case true:
-                return page.subtabs.map((subtab, subtabIndex) => (
-                  <Route
-                    path={page.path + subtab.path}
-                    element={subtab.element}
-                    key={`route subpage ${subtabIndex}`}
-                  />
-                ));
-              default:
-                return;
-            }
-          })}
-        </Routes>
-      </Layout>
-    </Router>
+    <Provider store={store}>
+      <Router>
+        {token && (
+          <Layout
+            permissions={dummyPermissions}
+            notifications={notifications}
+            onRemoveNotifications={handleRemoveNotifications}
+            userInfo={{
+              name: `${userInfo.first_name} ${userInfo.last_name}`,
+              role: userInfo.job_title,
+              organization: userInfo.organization.name,
+              image: userInfo.image,
+            }}
+            isPending={userInfoGetResponse.isPending}
+          >
+            <Routes>
+              {pages.map((page, pageIndex) => {
+                if (!Boolean(page)) return;
+                switch (page.hasOwnProperty("subtabs")) {
+                  case false:
+                    return (
+                      <Route
+                        path={page.path}
+                        element={page.element}
+                        key={`route page ${pageIndex}`}
+                      />
+                    );
+                  case true:
+                    return page.subtabs.map((subtab, subtabIndex) => (
+                      <Route
+                        path={page.path + subtab.path}
+                        element={subtab.element}
+                        key={`route subpage ${subtabIndex}`}
+                      />
+                    ));
+                  default:
+                    return;
+                }
+              })}
+            </Routes>
+          </Layout>
+        )}
+        {!token && (
+          <Routes>
+            <Route path="/" element={<Login />} />
+          </Routes>
+        )}
+      </Router>
+    </Provider>
   );
 };
 

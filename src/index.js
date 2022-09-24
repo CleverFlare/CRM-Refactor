@@ -16,11 +16,11 @@ Math.minimumZero = (number) => {
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <Provider store={store}>
-    <CacheProvider value={cacheRtl}>
-      <ThemeProvider theme={theme}>
+  <CacheProvider value={cacheRtl}>
+    <ThemeProvider theme={theme}>
+      <Provider store={store}>
         <App />
-      </ThemeProvider>
-    </CacheProvider>
-  </Provider>
+      </Provider>
+    </ThemeProvider>
+  </CacheProvider>
 );

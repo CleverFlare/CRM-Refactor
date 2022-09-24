@@ -31,7 +31,6 @@ const AddStatus = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("submit");
     validate().then((output) => {
       if (!output.isOk) return;
       statusPostRequest({

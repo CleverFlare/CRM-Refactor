@@ -120,8 +120,6 @@ const useRequest = ({
 
         setServerResponse(err);
 
-        console.log(err);
-
         const getValues = (data, values = []) => {
           if (typeof data !== "object") {
             return [...values, data];

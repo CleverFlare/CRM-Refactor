@@ -133,7 +133,6 @@ const AddClients = () => {
 
   const handleSubmit = () => {
     validate().then((output) => {
-      console.log(output);
       if (!output.isOk) return;
       const requestBody = filter({
         obj: {
