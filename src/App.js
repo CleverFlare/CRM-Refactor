@@ -165,7 +165,11 @@ const App = () => {
                     return (
                       <Route
                         path={page.path}
-                        element={page.element}
+                        element={
+                          <PrivateRoute permissions={page.permitted}>
+                            {page.element}
+                          </PrivateRoute>
+                        }
                         key={`route page ${pageIndex}`}
                       />
                     );
@@ -186,7 +190,7 @@ const App = () => {
                 }
               })}
               <Route path="/404" element={<Notfound />} />
-              <Route path="*" element={<Navigate replace to="/404" />} />
+              <Route path="/*" element={<Navigate replace to="/404" />} />
             </Routes>
           </Layout>
         )}

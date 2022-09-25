@@ -101,6 +101,7 @@ const AddClients = () => {
   const [clientPostRequest, clientPostResponse] = useRequest({
     path: CLIENTS,
     method: "post",
+    successMessage: "تم إضافة عميل بنجاح",
   });
 
   //----functions----

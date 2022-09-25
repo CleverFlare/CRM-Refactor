@@ -42,12 +42,7 @@ const pages = [
     icon: <AutoAwesomeMosaicIcon />,
     path: "/",
     element: <Home />,
-    permitted: [
-      "add_aqarpost",
-      "view_aqarpost",
-      "delete_aqarpost",
-      "change_aqarpost",
-    ],
+    permitted: ["view_aqarpost"],
   },
   {
     name: "العملاء",

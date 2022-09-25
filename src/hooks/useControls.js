@@ -1,7 +1,8 @@
+import { useRef } from "react";
 import { useCallback, useState, useEffect } from "react";
 import useAfterEffect from "./useAfterEffect";
 
-const useControls = (controls = [], listen = false) => {
+const useControls = (controls = [], dep = []) => {
   if (
     (Boolean(controls.length) &&
       controls.every((control) => !control.hasOwnProperty("control"))) ||
@@ -21,23 +22,20 @@ const useControls = (controls = [], listen = false) => {
     return result;
   });
 
-  useAfterEffect(
-    () => {
-      if (!listen) return;
-      setState(() => {
-        let result = {};
-        controls.map(
-          (control) =>
-            (result = {
-              ...result,
-              [control?.control]: Boolean(control?.value) ? control?.value : "",
-            })
-        );
-        return result;
-      });
-    },
-    controls.map((control) => control.value)
-  );
+  useAfterEffect(() => {
+    console.log("initialized");
+    setState(() => {
+      let result = {};
+      controls.map(
+        (control) =>
+          (result = {
+            ...result,
+            [control?.control]: Boolean(control?.value) ? control?.value : "",
+          })
+      );
+      return result;
+    });
+  }, dep);
 
   const [errors, setErrors] = useState({});
 

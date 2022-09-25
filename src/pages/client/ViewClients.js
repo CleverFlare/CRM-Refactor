@@ -34,6 +34,7 @@ import useAfterEffect from "../../hooks/useAfterEffect";
 import InputField from "../../features/form/components/InputField";
 import useControls from "../../hooks/useControls";
 import Form, {
+  MultiSelectItem,
   NumberField,
   PhoneField,
   SelectField,
@@ -46,8 +47,14 @@ import Dialog, {
   DialogButton,
   DialogButtonsGroup,
   DialogContent,
+  DialogForm,
   DialogHeading,
   DialogInfoWindow,
+  DialogInputField,
+  DialogMultiSelectField,
+  DialogNumberField,
+  DialogPhoneField,
+  DialogSelectField,
   DialogTable,
 } from "../../features/dialog";
 
@@ -61,6 +68,7 @@ import DialogPeopleWindow, {
   DialogSelectItem,
 } from "../../features/dialog/components/DialogPeopleWindow";
 import usePropState from "../../hooks/usePropState";
+import compare from "../../utils/Compare";
 
 const ViewClients = () => {
   //----store----
@@ -485,6 +493,8 @@ const ViewClients = () => {
     });
   };
 
+  const [editData, setEditData] = useState(null);
+
   return (
     <Wrapper>
       <Breadcrumbs path={["العملاء", "جميع العملاء"]} />
@@ -494,6 +504,7 @@ const ViewClients = () => {
         childrenProps={{
           saveBtn: {
             onClick: handleFormFilterSubmit,
+            children: "تصفية",
           },
           closeBtn: {
             onClick: handleClearFilters,
@@ -593,7 +604,7 @@ const ViewClients = () => {
           key={`status ${isCleared}`}
           onOpen={getStatus}
           isPending={statusGetResponse.isPending}
-          disabled={controls.newClients}
+          disabled={Boolean(controls.newClients)}
           value={controls.status}
           isOptionEqualToValue={(option, value) => option.value === value.value}
           onChange={(e, options, reason) => {
@@ -700,7 +711,7 @@ const ViewClients = () => {
             label="العملاء الجدد"
             control={
               <Checkbox
-                checked={controls.newClients}
+                checked={Boolean(controls.newClients)}
                 onChange={(e) => setControl("newClients", e.target.checked)}
               />
             }
@@ -715,7 +726,7 @@ const ViewClients = () => {
         isPending={clientsGetResponse.isPending}
         total={clientsStore.count ? clientsStore.count : 1}
         onCheck={handleChecks}
-        onEdit={() => {}}
+        onEdit={(e, row) => setEditData(row)}
         onDelete={deleteClient}
         onView={(e, row) => {
           setClientDetails((old) => ({
@@ -829,6 +840,8 @@ const ViewClients = () => {
         onSubmit={handleSubmitProjectTransfer}
       />
 
+      <EditDialog onClose={() => setEditData(null)} data={editData} />
+
       {/* buttons */}
       <Stack
         direction="row"
@@ -935,7 +948,7 @@ const InfoDialog = ({
     },
     {
       name: "القناة الإعلانية",
-      value: data?.channel,
+      value: data?.channel?.name,
     },
     {
       name: "موظف",
@@ -1404,3 +1417,261 @@ TransferToProjectDialog.propTypes = {
     })
   ),
 };
+
+const EditDialog = ({ open, onClose, data }) => {
+  const [{ controls }, { setControl, resetControls, validate }] = useControls(
+    [
+      {
+        control: "name",
+        value: `${data?.user?.first_name} ${data?.user?.last_name}`,
+      },
+      {
+        control: "email",
+        value: data?.user?.email,
+      },
+      {
+        control: "phone",
+        value: data?.user?.phone,
+      },
+      {
+        control: "countryCode",
+        value: data?.user?.country_code,
+      },
+      {
+        control: "project",
+        value: data?.user?.business?.map((project) => project.id) ?? [],
+      },
+      {
+        control: "contact",
+        value: "",
+      },
+      {
+        control: "channel",
+        value: "",
+      },
+      {
+        control: "budget",
+        value: "",
+      },
+    ],
+    [data]
+  );
+
+  const [projectsState, setProjectsState] = useState([]);
+  const [projectsGetRequest, projectsGetResponse] = useRequest({
+    path: PROJECTS,
+    method: "get",
+  });
+  const getProjects = () => {
+    if (projectsState.length) return;
+    projectsGetRequest({
+      params: {
+        size: 1000,
+      },
+      onSuccess: (res) => {
+        setProjectsState(res.data.results);
+      },
+    });
+  };
+
+  const [channelsState, setChannelsState] = useState([]);
+  const [channelsGetRequest, channelsGetResponse] = useRequest({
+    path: CHANNELS,
+    method: "get",
+  });
+  const getChannels = () => {
+    if (channelsState.length) return;
+    channelsGetRequest({
+      params: {
+        size: 1000,
+      },
+      onSuccess: (res) => {
+        setChannelsState(res.data.results);
+      },
+    });
+  };
+
+  const [clientPatchRequest, clientPatchResponse] = useRequest({
+    path: CLIENTS,
+    method: "patch",
+    successMessage: "تم تعديل العميل بنجاح",
+  });
+
+  const dispatch = useDispatch();
+
+  const handleSubmit = () => {
+    const isThereChange = compare(
+      [
+        [controls.name, ""],
+        [controls.email, ""],
+        [controls.project, []],
+        [controls.channel, ""],
+        [controls.contact, ""],
+        [controls.budget, ""],
+      ],
+      true
+    );
+
+    if (isThereChange) return;
+
+    const requestBody = filter({
+      obj: {
+        user: {
+          first_name: controls.name.split(/(?<=^\S+)\s/)[0],
+          last_name: controls.name.split(/(?<=^\S+)\s/)?.[1],
+          email: controls.email,
+        },
+        ...(Boolean(controls.project.length) && {
+          bussiness: controls.project,
+        }),
+        channel: controls.channel,
+        agent: controls.employee,
+        fav_contacts: controls.contact,
+        max_budget: controls.budget.replace(/,/gi, ""),
+      },
+      output: "object",
+    });
+
+    clientPatchRequest({
+      id: data.id,
+      body: requestBody,
+      onSuccess: (res) => {
+        dispatch({
+          type: "clients/putItem",
+          payload: { id: res.data.id, item: res.data },
+        });
+      },
+    });
+  };
+
+  useEffect(() => {
+    if (!open) return;
+    console.log(data.user.first_name);
+  }, [open, data]);
+
+  return (
+    <Dialog open={Boolean(data)} onClose={onClose}>
+      <DialogHeading onGoBack={onClose}>تعديل بيانات العميل</DialogHeading>
+      <DialogForm>
+        <DialogInputField
+          placeholder="الإسم"
+          label="الإسم"
+          value={controls.name}
+          onChange={(e) => setControl("name", e.target.value)}
+        />
+        <DialogInputField
+          placeholder="البريد الإلكتروني"
+          label="البريد الإلكتروني"
+          value={controls.email}
+          onChange={(e) => setControl("email", e.target.value)}
+        />
+        <DialogPhoneField
+          placeholder="الهاتف"
+          label="الهاتف"
+          value={controls.phone}
+          onChange={(e) => setControl("phone", e.target.value)}
+          selectProps={{
+            value: controls.countryCode,
+            onChange: (e) => setControl("countryCode", e.target.value),
+          }}
+        />
+        <DialogMultiSelectField
+          placeholder="المشروع"
+          label="المشروع"
+          onOpen={getProjects}
+          isPending={projectsGetResponse.isPending}
+          value={controls.project}
+          onChange={(e) => {
+            setControl("project", [...e.target.value]);
+          }}
+          renderValue={(selected) => {
+            return (
+              selected
+                ?.map(
+                  (id) =>
+                    projectsState.find((project) => project.id === id)?.name
+                )
+                ?.join(" ، ") ?? data?.business.map((project) => project.name)
+            );
+          }}
+        >
+          {projectsState.map((project, index) => (
+            <MultiSelectItem
+              value={project.id}
+              key={`edit client project ${index}`}
+            >
+              {project.name}
+            </MultiSelectItem>
+          ))}
+        </DialogMultiSelectField>
+        <DialogSelectField
+          placeholder="طريقة التواصل"
+          label="طريقة التواصل"
+          value={controls.contact}
+          onChange={(e) => setControl("contact", e.target.value)}
+          renderValue={(selected) => {
+            return contactMeans.find((mean) => mean.value === selected).title;
+          }}
+        >
+          {contactMeans.map((mean, index) => (
+            <MenuItem value={mean.value} key={`${mean.value} ${index}`}>
+              {mean.title}
+            </MenuItem>
+          ))}
+        </DialogSelectField>
+        <DialogSelectField
+          placeholder="القناة الإعلانية"
+          label="القناة الإعلانية"
+          onOpen={getChannels}
+          isPending={channelsGetResponse.isPending}
+          value={controls.channel}
+          onChange={(e) => setControl("channel", e.target.value)}
+          renderValue={(selected) => {
+            return channelsState.find((channel) => channel.id === selected)
+              .name;
+          }}
+        >
+          {channelsState.map((channel, index) => (
+            <MenuItem value={channel.id} key={`edit client channel ${index}`}>
+              {channel.name}
+            </MenuItem>
+          ))}
+        </DialogSelectField>
+        <DialogNumberField
+          placeholder="الميزانية"
+          label="الميزانية"
+          value={controls.budget}
+          onChange={(e) => setControl("budget", e.target.value)}
+        />
+      </DialogForm>
+      <DialogButtonsGroup>
+        <DialogButton
+          onClick={handleSubmit}
+          disabled={clientPatchResponse.isPending}
+        >
+          حفظ
+        </DialogButton>
+        <DialogButton variant="close" onClick={onClose}>
+          إلغاء
+        </DialogButton>
+      </DialogButtonsGroup>
+      {clientPatchResponse.successAlert}
+      {clientPatchResponse.failAlert}
+    </Dialog>
+  );
+};
+
+const contactMeans = [
+  {
+    title: "الهاتف",
+    value: "phone",
+  },
+  {
+    title: "البريد الإلكتروني",
+    value: "email",
+  },
+  {
+    title: "الواتساب",
+    value: "whats app",
+  },
+];

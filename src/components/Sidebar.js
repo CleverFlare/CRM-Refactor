@@ -311,6 +311,13 @@ const Sidebar = ({
                     </React.Fragment>
                   );
                 case false:
+                  if (
+                    !Boolean(
+                      page.permitted.some((perm) => permissions.includes(perm))
+                    )
+                  )
+                    return;
+
                   return (
                     <ListItemButton
                       key={pageIndex}

@@ -57,7 +57,7 @@ const PermissionToggles = ({
               <Switch
                 value={perm.codename}
                 onChange={handleToggle}
-                checked={toggles?.includes(perm.codename)}
+                checked={Boolean(toggles?.includes(perm.codename))}
               />
             </Grid>
           ))}

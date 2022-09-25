@@ -281,7 +281,7 @@ const EditInfoDialog = ({ open = false, onClose = () => {}, data = {} }) => {
         value: data?.parent,
       },
     ],
-    true
+    [data]
   );
 
   const [jobs, setJobs] = useState([]);
