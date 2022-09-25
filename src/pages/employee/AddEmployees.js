@@ -12,7 +12,7 @@ import Form, {
 import useRequest from "../../hooks/useRequest";
 import { useDispatch, useSelector } from "react-redux";
 import { InputAdornment, MenuItem } from "@mui/material";
-import PendingBackdrop from "../../../../CRM-Master/src/components/PendingBackdrop";
+import PendingBackdrop from "../../components/PendingBackdrop";
 import routeGate from "../../features/permissions/hoc/RouteGate";
 import PermissionToggles from "../../components/PermissionToggles";
 import { EMPLOYEES, JOB_PERMISSIONS } from "../../data/APIs";

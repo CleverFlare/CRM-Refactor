@@ -1439,19 +1439,19 @@ const EditDialog = ({ open, onClose, data }) => {
       },
       {
         control: "project",
-        value: data?.user?.business?.map((project) => project.id) ?? [],
+        value: data?.bussiness?.map((project) => project.id) ?? [],
       },
       {
         control: "contact",
-        value: "",
+        value: data?.fav_contacts,
       },
       {
         control: "channel",
-        value: "",
+        value: data?.channel?.id,
       },
       {
         control: "budget",
-        value: "",
+        value: data?.max_budget,
       },
     ],
     [data]
@@ -1545,9 +1545,8 @@ const EditDialog = ({ open, onClose, data }) => {
   };
 
   useEffect(() => {
-    if (!open) return;
-    console.log(data.user.first_name);
-  }, [open, data]);
+    console.log(data?.bussiness);
+  }, [data]);
 
   return (
     <Dialog open={Boolean(data)} onClose={onClose}>
@@ -1585,14 +1584,33 @@ const EditDialog = ({ open, onClose, data }) => {
             setControl("project", [...e.target.value]);
           }}
           renderValue={(selected) => {
-            return (
+            console.log(
+              "asdfasdfas:",
               selected
                 ?.map(
                   (id) =>
                     projectsState.find((project) => project.id === id)?.name
                 )
-                ?.join(" ، ") ?? data?.business.map((project) => project.name)
+                ?.join(" ، ")
+                .trim()
             );
+            return Boolean(
+              selected
+                ?.map(
+                  (id) =>
+                    projectsState.find((project) => project.id === id)?.name
+                )
+                ?.join(" ، ")
+                .trim()
+            )
+              ? selected
+                  ?.map(
+                    (id) =>
+                      projectsState.find((project) => project.id === id)?.name
+                  )
+                  ?.join(" ، ")
+                  .trim()
+              : data?.business.map((project) => project.name);
           }}
         >
           {projectsState.map((project, index) => (
@@ -1627,8 +1645,10 @@ const EditDialog = ({ open, onClose, data }) => {
           value={controls.channel}
           onChange={(e) => setControl("channel", e.target.value)}
           renderValue={(selected) => {
-            return channelsState.find((channel) => channel.id === selected)
-              .name;
+            return (
+              channelsState.find((channel) => channel.id === selected)?.name ??
+              data?.channel?.name
+            );
           }}
         >
           {channelsState.map((channel, index) => (
