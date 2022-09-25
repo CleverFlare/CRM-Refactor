@@ -13,7 +13,6 @@ import useRequest from "../../hooks/useRequest";
 import { useDispatch, useSelector } from "react-redux";
 import { InputAdornment, MenuItem } from "@mui/material";
 import PendingBackdrop from "../../components/PendingBackdrop";
-import routeGate from "../../features/permissions/hoc/RouteGate";
 import PermissionToggles from "../../components/PermissionToggles";
 import { EMPLOYEES, JOB_PERMISSIONS } from "../../data/APIs";
 import useAfterEffect from "../../hooks/useAfterEffect";
@@ -355,4 +354,4 @@ const AddEmployees = () => {
   );
 };
 
-export default routeGate(AddEmployees, ["add_aqaremployee"]);
+export default AddEmployees;
