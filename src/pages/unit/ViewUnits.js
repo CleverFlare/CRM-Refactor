@@ -762,7 +762,7 @@ const InfoDialog = ({ open, onClose, data = {} }) => {
 
   const changePictureRef = useRef(null);
 
-  const [pictures, setPictures] = usePropState(data?.images, true);
+  const [pictures, setPictures] = usePropState(data?.images, true, [data]);
 
   const [picturePatchRequest, picturePatchResponse] = useRequest({
     path: UNITS,

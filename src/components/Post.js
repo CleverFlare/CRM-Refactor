@@ -26,6 +26,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import ChatBubbleIcon from "@mui/icons-material/ChatBubble";
 import PropTypes from "prop-types";
+import PermissionsGate from "../features/permissions/components/PermissionsGate";
 
 const Post = ({
   name = "",
@@ -80,34 +81,38 @@ const Post = ({
                 horizontal: "left",
               }}
             >
-              <MenuItem
-                onClick={() => {
-                  handleCloseMenu();
-                  onEdit({
-                    name,
-                    picture,
-                    createdAt,
-                    images,
-                    children,
-                  });
-                }}
-              >
-                <ListItemIcon>
-                  <EditIcon />
-                </ListItemIcon>
-                <ListItemText>تعديل المنشور</ListItemText>
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  handleCloseMenu();
-                  onDelete();
-                }}
-              >
-                <ListItemIcon>
-                  <DeleteIcon />
-                </ListItemIcon>
-                <ListItemText>نقل إلى سلة المهملات</ListItemText>
-              </MenuItem>
+              <PermissionsGate permissions={["change_aqarpost"]}>
+                <MenuItem
+                  onClick={() => {
+                    handleCloseMenu();
+                    onEdit({
+                      name,
+                      picture,
+                      createdAt,
+                      images,
+                      children,
+                    });
+                  }}
+                >
+                  <ListItemIcon>
+                    <EditIcon />
+                  </ListItemIcon>
+                  <ListItemText>تعديل المنشور</ListItemText>
+                </MenuItem>
+              </PermissionsGate>
+              <PermissionsGate permissions={["delete_aqarpost"]}>
+                <MenuItem
+                  onClick={() => {
+                    handleCloseMenu();
+                    onDelete();
+                  }}
+                >
+                  <ListItemIcon>
+                    <DeleteIcon />
+                  </ListItemIcon>
+                  <ListItemText>نقل إلى سلة المهملات</ListItemText>
+                </MenuItem>
+              </PermissionsGate>
               <MenuItem
                 onClick={() => {
                   handleCloseMenu();

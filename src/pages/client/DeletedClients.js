@@ -21,6 +21,8 @@ import { Box } from "@mui/system";
 import useAfterEffect from "../../hooks/useAfterEffect";
 import useConfirmMessage from "../../hooks/useConfirmMessage";
 import RestoreIcon from "@mui/icons-material/Restore";
+import PermissionsGate from "../../features/permissions/components/PermissionsGate";
+import useIsPermitted from "../../features/permissions/hook/useIsPermitted";
 
 const DeletedClients = () => {
   //----store----
@@ -179,6 +181,8 @@ const DeletedClients = () => {
     });
   };
 
+  const isPermitted = useIsPermitted();
+
   return (
     <Wrapper>
       <Breadcrumbs path={["العملاء", "العملاء المحذوفة"]} />
@@ -191,7 +195,10 @@ const DeletedClients = () => {
         onPaginate={handlePaginate}
         onAmountChange={handleChangeAmount}
         onFilter={handleFilter}
-        onDelete={handleDelete}
+        onDelete={isPermitted(
+          (e, row) => handleDelete(e, row),
+          ["delete_historicalaqarclient"]
+        )}
         aditionProceduresButtons={[
           {
             icon: <RestoreIcon />,
@@ -215,15 +222,17 @@ const DeletedClients = () => {
         >
           إسترجاع المحدد
         </Button>
-        <Button
-          variant="contained"
-          color="error"
-          disabled={!Boolean(selected.length)}
-          sx={{ width: "200px", height: "50px" }}
-          onClick={handleDeleteSelected}
-        >
-          حذف المحدد
-        </Button>
+        <PermissionsGate permissions={["delete_historicalaqarclient"]}>
+          <Button
+            variant="contained"
+            color="error"
+            disabled={!Boolean(selected.length)}
+            sx={{ width: "200px", height: "50px" }}
+            onClick={handleDeleteSelected}
+          >
+            حذف المحدد
+          </Button>
+        </PermissionsGate>
       </Stack>
       {deletedClientsPostResponse.successAlert}
       {deletedClientsDeleteResponse.successAlert}

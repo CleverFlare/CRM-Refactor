@@ -23,7 +23,6 @@ const useControls = (controls = [], dep = []) => {
   });
 
   useAfterEffect(() => {
-    console.log("initialized");
     setState(() => {
       let result = {};
       controls.map(

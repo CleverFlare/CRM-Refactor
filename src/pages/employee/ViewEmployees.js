@@ -107,12 +107,16 @@ const ViewEmployees = () => {
 
   const [openEditPassword, setOpenEditPassword] = useState(null);
 
+  const userInfo = useSelector((state) => state.userInfo.value);
+
   return (
     <Wrapper>
       <Breadcrumbs path={["الموظفين", "عرض الموظفين"]} />
       <DataGrid
         columns={columns}
-        rows={employeesStore.results}
+        rows={employeesStore.results.filter(
+          (employee) => employee.user.id !== userInfo.id
+        )}
         total={employeesStore.amount}
         isPending={employeesGetResponse.isPending}
         onDelete={handleDeleteEmployee}

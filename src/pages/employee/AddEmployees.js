@@ -345,7 +345,7 @@ const AddEmployees = () => {
           permissions={permissionsState}
           sx={{ gridColumn: "1 / -1" }}
           onToggle={({ toggles }) => setSelectedPerms(toggles)}
-          initialToggles={[]}
+          // initialToggles={[]}
         />
       </Form>
       {employeePostResponse.successAlert}

@@ -11,7 +11,9 @@ const PermissionToggles = ({
   onToggle = () => {},
   ...props
 }) => {
-  const [toggles, setToggles] = usePropState(initialToggles, true);
+  const [toggles, setToggles] = usePropState(initialToggles, true, [
+    initialToggles.length,
+  ]);
 
   const handleToggle = (e) => {
     switch (e.target.checked) {

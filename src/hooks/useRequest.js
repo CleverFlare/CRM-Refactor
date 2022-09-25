@@ -59,6 +59,8 @@ const useRequest = ({
     params = {},
 
     body = null,
+
+    noHeaders = false,
   } = {}) => {
     setIsPending(true);
 
@@ -69,7 +71,11 @@ const useRequest = ({
     if (!Boolean(BASEURL) && !Boolean(customBaseUrl))
       throw Error("there is no domain to send data");
 
-    if (!Boolean(userInfo.token) && !Boolean(customToken))
+    if (
+      !Boolean(noHeaders) &&
+      !Boolean(userInfo.token) &&
+      !Boolean(customToken)
+    )
       throw Error("there is no token to send data");
 
     if (!Boolean(method) && !Boolean(customMethod))
@@ -81,10 +87,12 @@ const useRequest = ({
       url: customFullUrl
         ? customFullUrl
         : `${customPath ? customPath : path}${id ? `${id}/` : ""}`,
-      headers: {
-        //prettier-ignore
-        "Authorization": Boolean(customAuthorization) ? customAuthorization : `Token ${Boolean(customToken) ? customToken : userInfo.token}`,
-      },
+      ...(!noHeaders && {
+        headers: {
+          //prettier-ignore
+          "Authorization": Boolean(customAuthorization) ? customAuthorization : `Token ${Boolean(customToken) ? customToken : userInfo.token}`,
+        },
+      }),
       params,
       data: body,
       responseType,

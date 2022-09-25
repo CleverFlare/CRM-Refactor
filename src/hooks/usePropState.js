@@ -1,14 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import useAfterEffect from "./useAfterEffect";
 
-const usePropState = (init, listen = false) => {
+const usePropState = (init, listen = false, dep = [init]) => {
   const [state, setState] = useState("");
-  let dep = [];
+  const initialized = useRef(false);
 
-  listen && (dep = [init]);
-
-  useEffect(() => {
+  useAfterEffect(() => {
     setState(init);
-  }, dep);
+  }, dep ?? []);
 
   return [state, setState];
 };

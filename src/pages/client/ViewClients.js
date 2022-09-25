@@ -11,6 +11,7 @@ import {
   CLIENTS,
   CLIENTS_COMMENTS,
   CLIENTS_HISTORY,
+  CLIENTS_SELECTED_DELETE,
   CLIENTS_TRANSFER,
   CLIENTS_TRANSFER_PROJECT,
   EMPLOYEES,
@@ -69,6 +70,8 @@ import DialogPeopleWindow, {
 } from "../../features/dialog/components/DialogPeopleWindow";
 import usePropState from "../../hooks/usePropState";
 import compare from "../../utils/Compare";
+import useIsPermitted from "../../features/permissions/hook/useIsPermitted";
+import PermissionsGate from "../../features/permissions/components/PermissionsGate";
 
 const ViewClients = () => {
   //----store----
@@ -386,7 +389,9 @@ const ViewClients = () => {
           ? `${item.user.first_name} ${item.user.last_name}`
           : "",
         phone: `${item.user.country_code}${item.user.phone}`,
-        project: `${item.bussiness.map((project) => project.name).join(" ، ")}`,
+        project: `${item.bussiness
+          .map((project) => project?.name)
+          .join(" ، ")}`,
         channel: `${item.channel}`,
         agent: `${item.agent.name}`,
         status: `${item.event}`,
@@ -439,12 +444,13 @@ const ViewClients = () => {
     return clientCommentPostRequest({
       body: requestBody,
       onSuccess: (res) => {
+        console.log(res.data);
         dispatch({ type: "clientComments/addItem", payload: res.data });
         dispatch({
           type: "clients/patchItem",
           payload: {
             id: res.data.client_id,
-            item: { comment: res.data.comment },
+            item: { comment: res.data.comment, event: res.data.event },
           },
         });
       },
@@ -494,6 +500,28 @@ const ViewClients = () => {
   };
 
   const [editData, setEditData] = useState(null);
+
+  const isPermitted = useIsPermitted();
+
+  const [selectedClientsDeleteRequest, selectedClientsDeleteResponse] =
+    useRequest({
+      path: CLIENTS_SELECTED_DELETE,
+      method: "delete",
+      successMessage: "تم حذف العملاء بنجاح",
+    });
+
+  const handleDeleteSelected = () => {
+    selectedClientsDeleteRequest({
+      body: {
+        client: selected.map((client) => client.id),
+      },
+      onSuccess: () => {
+        selected.map((client) => {
+          dispatch({ type: "clients/deleteItem", payload: { id: client.id } });
+        });
+      },
+    });
+  };
 
   return (
     <Wrapper>
@@ -726,8 +754,14 @@ const ViewClients = () => {
         isPending={clientsGetResponse.isPending}
         total={clientsStore.count ? clientsStore.count : 1}
         onCheck={handleChecks}
-        onEdit={(e, row) => setEditData(row)}
-        onDelete={deleteClient}
+        onEdit={isPermitted(
+          (e, row) => setEditData(row),
+          ["change_aqarclient"]
+        )}
+        onDelete={isPermitted(
+          (e, row) => deleteClient(e, row),
+          ["delete_aqarclient"]
+        )}
         onView={(e, row) => {
           setClientDetails((old) => ({
             ...old,
@@ -852,8 +886,11 @@ const ViewClients = () => {
         <Button
           variant="contained"
           color="error"
-          disabled={!Boolean(selected.length)}
+          disabled={
+            !Boolean(selected.length) || selectedClientsDeleteResponse.isPending
+          }
           sx={{ width: "200px", height: "50px" }}
+          onClick={handleDeleteSelected}
         >
           حذف المحدد
         </Button>
@@ -884,6 +921,8 @@ const ViewClients = () => {
       </Stack>
 
       {/* alerts */}
+      {selectedClientsDeleteResponse.successAlert}
+      {selectedClientsDeleteResponse.failAlert}
       {clientDeleteResponse.successAlert}
       {clientDeleteResponse.failAlert}
     </Wrapper>
@@ -944,7 +983,7 @@ const InfoDialog = ({
     },
     {
       name: "المشروع",
-      value: data?.business?.map((project) => project.name)?.join(" ، "),
+      value: data?.business?.map((project) => project?.name)?.join(" ، "),
     },
     {
       name: "القناة الإعلانية",
@@ -954,9 +993,13 @@ const InfoDialog = ({
       name: "موظف",
       value: data?.agent?.name,
       addition: (
-        <IconButton sx={{ color: "white" }} onClick={onTransferAgentClick}>
-          <ChangeCircleIcon sx={{ color: "white", transform: "scale(1.2)" }} />
-        </IconButton>
+        <PermissionsGate permissions={["aqartransfer_clients"]}>
+          <IconButton sx={{ color: "white" }} onClick={onTransferAgentClick}>
+            <ChangeCircleIcon
+              sx={{ color: "white", transform: "scale(1.2)" }}
+            />
+          </IconButton>
+        </PermissionsGate>
       ),
     },
     {
@@ -967,9 +1010,11 @@ const InfoDialog = ({
       name: "تعليق",
       value: data?.comment,
       addition: (
-        <IconButton sx={{ color: "white" }} onClick={onCommentsClick}>
-          <ModeCommentIcon sx={{ color: "white" }} />
-        </IconButton>
+        <PermissionsGate permissions={["view_aqarclientcomment"]}>
+          <IconButton sx={{ color: "white" }} onClick={onCommentsClick}>
+            <ModeCommentIcon sx={{ color: "white" }} />
+          </IconButton>
+        </PermissionsGate>
       ),
     },
     {
@@ -1055,7 +1100,7 @@ const columns = [
     field: "project",
     headerName: "المشروع",
     customContent: ({ bussiness }) =>
-      `${bussiness.map((project) => project.name).join(" ، ")}`,
+      `${bussiness?.map((project) => project?.name).join(" ، ")}`,
   },
   {
     field: "comment",
@@ -1273,57 +1318,59 @@ const CommentDialog = ({
           />
         ))}
       </DialogPeopleWindow>
-      <DialogContent>
-        <Stack spacing={2}>
-          <TextareaField
-            placeholder="تعليق"
-            sx={{
-              "& .MuiInput-root": {
-                bgcolor: "white",
-              },
-            }}
-            value={controls.comment}
-            required={required.includes("comment")}
-            error={Boolean(invalid?.comment)}
-            helperText={invalid?.comment}
-            onChange={(e) => setControl("comment", e.target.value)}
-          />
-          <SelectField
-            placeholder="الحالة"
-            isPending={isStatusPending}
-            onOpen={onStatusOpen}
-            sx={{
-              "& .MuiInput-root": {
-                bgcolor: "white",
-              },
-            }}
-            SelectProps={{
-              MenuProps: {
-                PaperProps: {
-                  sx: {
-                    maxHeight: 100,
-                    overflowY: "auto",
+      <PermissionsGate permissions={["add_aqarclientcomment"]}>
+        <DialogContent>
+          <Stack spacing={2}>
+            <TextareaField
+              placeholder="تعليق"
+              sx={{
+                "& .MuiInput-root": {
+                  bgcolor: "white",
+                },
+              }}
+              value={controls.comment}
+              required={required.includes("comment")}
+              error={Boolean(invalid?.comment)}
+              helperText={invalid?.comment}
+              onChange={(e) => setControl("comment", e.target.value)}
+            />
+            <SelectField
+              placeholder="الحالة"
+              isPending={isStatusPending}
+              onOpen={onStatusOpen}
+              sx={{
+                "& .MuiInput-root": {
+                  bgcolor: "white",
+                },
+              }}
+              SelectProps={{
+                MenuProps: {
+                  PaperProps: {
+                    sx: {
+                      maxHeight: 100,
+                      overflowY: "auto",
+                    },
                   },
                 },
-              },
-            }}
-            renderValue={(selected) =>
-              status.find((item) => item.value === selected).name
-            }
-            value={controls.status}
-            required={required.includes("status")}
-            error={Boolean(invalid?.status)}
-            helperText={invalid?.status}
-            onChange={(e) => setControl("status", e.target.value)}
-          >
-            {status.map((item, index) => (
-              <MenuItem key={`message status ${index}`} value={item.value}>
-                {item.name}
-              </MenuItem>
-            ))}
-          </SelectField>
-        </Stack>
-      </DialogContent>
+              }}
+              renderValue={(selected) =>
+                status.find((item) => item.value === selected).name
+              }
+              value={controls.status}
+              required={required.includes("status")}
+              error={Boolean(invalid?.status)}
+              helperText={invalid?.status}
+              onChange={(e) => setControl("status", e.target.value)}
+            >
+              {status.map((item, index) => (
+                <MenuItem key={`message status ${index}`} value={item.value}>
+                  {item.name}
+                </MenuItem>
+              ))}
+            </SelectField>
+          </Stack>
+        </DialogContent>
+      </PermissionsGate>
       <DialogButtonsGroup>
         <DialogButton onClick={handleSubmit}>تنفيذ</DialogButton>
         <DialogButton variant="close" onClick={onClose}>
@@ -1610,7 +1657,7 @@ const EditDialog = ({ open, onClose, data }) => {
                   )
                   ?.join(" ، ")
                   .trim()
-              : data?.business.map((project) => project.name);
+              : data?.bussiness?.map((project) => project?.name);
           }}
         >
           {projectsState.map((project, index) => (

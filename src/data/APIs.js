@@ -8,6 +8,7 @@ const CLIENTS_HISTORY = "aqar/api/router/HistoryClient/";
 const CLIENTS_COMMENTS = "aqar/api/router/CommentClient/";
 const CLIENTS_TRANSFER = "aqar/api/transfer/";
 const CLIENTS_TRANSFER_PROJECT = "aqar/api/transferclientproject/";
+const CLIENTS_SELECTED_DELETE = "aqar/api/ClientGroupDelete/";
 const STATUS = "aqar/api/router/Status/";
 const EMPLOYEES = "aqar/api/router/Employee/";
 const EMPLOYEES_PERMISSIONS = "aqar/api/router/EmployeePermission/";
@@ -58,4 +59,5 @@ export {
   SUMMARY,
   EXPORT_CLIENTS,
   IMPORT_CLIENTS,
+  CLIENTS_SELECTED_DELETE,
 };

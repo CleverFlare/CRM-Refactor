@@ -12,6 +12,7 @@ const PrivateRoute = ({ children, permissions }) => {
   const isPermitted = Boolean(
     permissions.some((permission) => userPermissions.includes(permission))
   );
+
   return <>{isPermitted ? children : <Navigate replace to="/404" />}</>;
 };
 

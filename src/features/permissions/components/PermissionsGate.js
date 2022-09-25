@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
 
-const PermissionsGate = ({ children, type, permissions, renderAuthFailed }) => {
+const PermissionsGate = ({ children, permissions, renderAuthFailed }) => {
   const userInfo = useSelector((state) => state.userInfo.value);
 
   const userPermissions = userInfo.user_permissions.map(
@@ -12,7 +12,7 @@ const PermissionsGate = ({ children, type, permissions, renderAuthFailed }) => {
     permissions.some((permission) => userPermissions.includes(permission))
   );
 
-  return <>{isPermitted ? renderAuthFailed ?? <></> : children}</>;
+  return <>{isPermitted ? children : renderAuthFailed ?? <></>}</>;
 };
 
 export default PermissionsGate;

@@ -81,14 +81,14 @@ const Overview = () => {
           <StatisticsCard
             title="جميع العملاء"
             since="منذ يوم"
-            number={overviewStore.employees.new_employees}
+            number={overviewStore.clients.all}
             percentage={70}
             sx={{ width: "100%" }}
           />
           <StatisticsCard
             title="الموظفين الجدد"
             since="منذ اسبوع"
-            number={overviewStore.clients.all}
+            number={overviewStore.employees.all}
             bars={[5, 4, 2, 4, 2, 3, 5, 1, 3]}
             sx={{ width: "100%" }}
           />

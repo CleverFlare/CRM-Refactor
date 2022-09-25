@@ -222,12 +222,11 @@ const Sidebar = ({
               switch (page.hasOwnProperty("subtabs")) {
                 case true:
                   if (
-                    !Boolean(
-                      page.subtabs.every((subtab) =>
-                        subtab.permitted.some((perm) =>
+                    page.subtabs.every(
+                      (subtab) =>
+                        !subtab.permitted.some((perm) =>
                           permissions.includes(perm)
                         )
-                      )
                     )
                   )
                     return;

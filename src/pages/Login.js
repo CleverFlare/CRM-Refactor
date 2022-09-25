@@ -22,6 +22,7 @@ import BASEURL, { LOGIN } from "../data/APIs";
 import filter from "../utils/ClearNull";
 import { useDispatch } from "react-redux";
 import axios from "axios";
+import useRequest from "../hooks/useRequest";
 
 const Login = () => {
   const sm = useMediaQuery(`(max-width: 1259px)`);
@@ -45,11 +46,11 @@ const Login = () => {
     },
   ]);
 
-  // const [loginPostRequest, loginPostResponse] = useRequest({
-  //   path: LOGIN,
-  //   method: "post",
-  //   successMessage: "تم تسجيل الدخول بنجاح",
-  // });
+  const [loginPostRequest, loginPostResponse] = useRequest({
+    path: LOGIN,
+    method: "post",
+    successMessage: "تم تسجيل الدخول بنجاح",
+  });
 
   const dispatch = useDispatch();
 
@@ -65,14 +66,13 @@ const Login = () => {
         },
       });
 
-      axios({
-        method: "post",
-        data: requestBody,
-        url: LOGIN,
-        baseURL: BASEURL,
-      }).then((res) => {
-        dispatch({ type: "userInfo/setToken", payload: res.data.token });
-        resetControls();
+      loginPostRequest({
+        body: requestBody,
+        noHeaders: true,
+        onSuccess: (res) => {
+          dispatch({ type: "userInfo/setToken", payload: res.data.token });
+          resetControls();
+        },
       });
     });
   };
@@ -215,7 +215,7 @@ const Login = () => {
           <Lottie loop={false} animationData={loginAnimation} />
         </Box>
       </Stack>
-      {/* {loginPostResponse.failAlert} */}
+      {loginPostResponse.failAlert}
     </Box>
   );
 };

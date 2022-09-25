@@ -24,6 +24,7 @@ import format from "../utils/ISOToReadable";
 import InputField from "../features/form/components/InputField";
 import { DialogButton, DialogButtonsGroup } from "../features/dialog";
 import useAfterEffect from "../hooks/useAfterEffect";
+import PermissionsGate from "../features/permissions/components/PermissionsGate";
 
 const Home = () => {
   //----store----
@@ -138,51 +139,55 @@ const Home = () => {
     <Wrapper>
       <Breadcrumbs path={["الرئيسية"]} />
       <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-        <Publisher
-          name={`${userInfo.first_name} ${userInfo.last_name}`}
-          picture={userInfo.image}
-          value={controls.content}
-          onChange={(e) => setControl("content", e.target.value)}
-          error={Boolean(invalid.content)}
-          onSubmit={handlePublishSubmit}
-          onPickPicture={(e) => setControl("picture", e.target.files[0])}
-          onEmoji={(e, startIndex, endIndex, selected) => {
-            setControl(
-              "content",
-              controls.content.slice(0, startIndex) +
-                selected.emoji +
-                controls.content.slice(endIndex, controls.content.length + 1)
-            );
-          }}
-          isPending={postsPostResponse.isPending}
-        />
+        <PermissionsGate permissions={["add_aqarpost"]}>
+          <Publisher
+            name={`${userInfo.first_name} ${userInfo.last_name}`}
+            picture={userInfo.image}
+            value={controls.content}
+            onChange={(e) => setControl("content", e.target.value)}
+            error={Boolean(invalid.content)}
+            onSubmit={handlePublishSubmit}
+            onPickPicture={(e) => setControl("picture", e.target.files[0])}
+            onEmoji={(e, startIndex, endIndex, selected) => {
+              setControl(
+                "content",
+                controls.content.slice(0, startIndex) +
+                  selected.emoji +
+                  controls.content.slice(endIndex, controls.content.length + 1)
+              );
+            }}
+            isPending={postsPostResponse.isPending}
+          />
+        </PermissionsGate>
 
-        <Typography
-          variant="h6"
-          color="primary"
-          sx={{ padding: "30px 0", fontWeight: "bold" }}
-        >
-          احدث المنشورات
-        </Typography>
-        {postsGetResponse.isPending ? (
-          <PostsSkeletons />
-        ) : (
-          postsStore.results.map((post, index) => (
-            <Post
-              key={`post ${index}`}
-              name={post.user.name}
-              picture={post.user.image}
-              createdAt={post.created_at}
-              images={post.medias}
-              onDelete={() => handleDeletePost(post.id)}
-              onEdit={(data) => {
-                setPostEditData({ ...data, id: post.id });
-              }}
-            >
-              {post.content}
-            </Post>
-          ))
-        )}
+        <PermissionsGate permissions={["view_aqarpost"]}>
+          <Typography
+            variant="h6"
+            color="primary"
+            sx={{ padding: "30px 0", fontWeight: "bold" }}
+          >
+            احدث المنشورات
+          </Typography>
+          {postsGetResponse.isPending ? (
+            <PostsSkeletons />
+          ) : (
+            postsStore.results.map((post, index) => (
+              <Post
+                key={`post ${index}`}
+                name={post.user.name}
+                picture={post.user.image}
+                createdAt={post.created_at}
+                images={post.medias}
+                onDelete={() => handleDeletePost(post.id)}
+                onEdit={(data) => {
+                  setPostEditData({ ...data, id: post.id });
+                }}
+              >
+                {post.content}
+              </Post>
+            ))
+          )}
+        </PermissionsGate>
       </Box>
       <PostEditDialog
         open={Boolean(postEditData)}
