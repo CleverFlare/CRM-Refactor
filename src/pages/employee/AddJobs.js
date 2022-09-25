@@ -11,7 +11,7 @@ import { JOBS, JOB_PERMISSIONS, PERMISSIONS } from "../../data/APIs";
 import { useEffect } from "react";
 import useControls from "../../hooks/useControls";
 import useAfterEffect from "../../hooks/useAfterEffect";
-import PendingBackdrop from "../../../../CRM-Master/src/components/PendingBackdrop";
+import PendingBackdrop from "../../components/PendingBackdrop";
 import { Button, MenuItem } from "@mui/material";
 import { Stack } from "@mui/system";
 import filter from "../../utils/ClearNull";
