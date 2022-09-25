@@ -36,6 +36,7 @@ import filter from "../../utils/ClearNull";
 import _ from "lodash";
 import { useRef } from "react";
 import { Stack } from "@mui/system";
+import Breadcrumbs from "../../components/Breadcrumbs";
 
 const ViewEmployees = () => {
   const employeesStore = useSelector((state) => state.employees.value);
@@ -108,6 +109,7 @@ const ViewEmployees = () => {
 
   return (
     <Wrapper>
+      <Breadcrumbs path={["الموظفين", "عرض الموظفين"]} />
       <DataGrid
         columns={columns}
         rows={employeesStore.results}
