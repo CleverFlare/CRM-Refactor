@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from "react";
 import Sidebar from "./components/Sidebar";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import { Box, useMediaQuery } from "@mui/material";
 import Topbar from "./components/Topbar";
 import useToggle from "./hooks/useToggle";
@@ -11,6 +16,8 @@ import { NOTIFICATIONS, USER_INFO } from "./data/APIs";
 import Login from "./pages/Login";
 import { Provider } from "react-redux";
 import store from "./store";
+import PrivateRoute from "./features/permissions/components/PrivateRoute";
+import Notfound from "./components/Notfound";
 
 const sidebarWidth = 240;
 
@@ -107,6 +114,7 @@ const App = () => {
         dispatch({ type: "userInfo/setUserInfo", payload: res.data });
       },
     });
+
     missedNotificationsGetRequest({
       onSuccess: (res) => {
         setNotifications(res.data.notifications);
@@ -138,7 +146,7 @@ const App = () => {
       <Router>
         {token && (
           <Layout
-            permissions={dummyPermissions}
+            permissions={userInfo.user_permissions.map((perm) => perm.codename)}
             notifications={notifications}
             onRemoveNotifications={handleRemoveNotifications}
             userInfo={{
@@ -165,7 +173,11 @@ const App = () => {
                     return page.subtabs.map((subtab, subtabIndex) => (
                       <Route
                         path={page.path + subtab.path}
-                        element={subtab.element}
+                        element={
+                          <PrivateRoute permissions={subtab.permitted}>
+                            {subtab.element}
+                          </PrivateRoute>
+                        }
                         key={`route subpage ${subtabIndex}`}
                       />
                     ));
@@ -173,12 +185,15 @@ const App = () => {
                     return;
                 }
               })}
+              <Route path="/404" element={<Notfound />} />
+              <Route path="*" element={<Navigate replace to="/404" />} />
             </Routes>
           </Layout>
         )}
         {!token && (
           <Routes>
             <Route path="/" element={<Login />} />
+            <Route path="/*" element={<Navigate replace to="/" />} />
           </Routes>
         )}
       </Router>

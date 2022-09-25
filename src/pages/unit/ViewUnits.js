@@ -758,10 +758,6 @@ const InfoDialog = ({ open, onClose, data = {} }) => {
     },
   ];
 
-  useAfterEffect(() => {
-    if (!open) return;
-  }, [open]);
-
   const addPictureRef = useRef(null);
 
   const changePictureRef = useRef(null);

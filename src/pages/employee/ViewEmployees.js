@@ -256,30 +256,33 @@ const filters = [
 const EditInfoDialog = ({ open = false, onClose = () => {}, data = {} }) => {
   const dispatch = useDispatch();
 
-  const [{ controls, invalid }, { setControl, validate }] = useControls([
-    {
-      control: "name",
-      value: `${data?.user?.first_name} ${data?.user?.last_name}`,
-    },
-    {
-      control: "email",
-      value: data?.user?.email,
-      validations: [
-        {
-          test: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-          message: "البريد غير صالح",
-        },
-      ],
-    },
-    {
-      control: "job",
-      value: data?.job?.id,
-    },
-    {
-      control: "to",
-      value: data?.parent,
-    },
-  ]);
+  const [{ controls, invalid }, { setControl, validate }] = useControls(
+    [
+      {
+        control: "name",
+        value: `${data?.user?.first_name} ${data?.user?.last_name}`,
+      },
+      {
+        control: "email",
+        value: data?.user?.email,
+        validations: [
+          {
+            test: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+            message: "البريد غير صالح",
+          },
+        ],
+      },
+      {
+        control: "job",
+        value: data?.job?.id,
+      },
+      {
+        control: "to",
+        value: data?.parent,
+      },
+    ],
+    true
+  );
 
   const [jobs, setJobs] = useState([]);
 

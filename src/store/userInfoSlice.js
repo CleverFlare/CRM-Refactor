@@ -3,8 +3,8 @@ import { createSlice } from "@reduxjs/toolkit";
 export const userInfo = createSlice({
   name: "userInfo",
   initialState: {
-    value: {
-      token: localStorage.getItem("token") ?? "",
+    value: JSON.parse(localStorage.getItem("userInfo")) ?? {
+      token: "",
       id: null,
       first_name: "",
       last_name: "",
@@ -25,14 +25,15 @@ export const userInfo = createSlice({
   reducers: {
     setToken: (state, action) => {
       state.value.token = action.payload;
-      localStorage.setItem("token", action.payload);
+      localStorage.setItem("userInfo", JSON.stringify(state.value));
     },
     setUserInfo: (state, action) => {
       state.value = { token: state.value.token, ...action.payload };
+      localStorage.setItem("userInfo", JSON.stringify(state.value));
     },
     logout: (state) => {
       state.value.token = "";
-      localStorage.removeItem("token");
+      localStorage.removeItem("userInfo");
     },
   },
 });

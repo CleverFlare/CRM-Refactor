@@ -1,7 +1,8 @@
 import React from "react";
 import { useSelector } from "react-redux";
+import { Navigate } from "react-router-dom";
 
-const PermissionsGate = ({ children, type, permissions, renderAuthFailed }) => {
+const PrivateRoute = ({ children, permissions }) => {
   const userInfo = useSelector((state) => state.userInfo.value);
 
   const userPermissions = userInfo.user_permissions.map(
@@ -11,8 +12,7 @@ const PermissionsGate = ({ children, type, permissions, renderAuthFailed }) => {
   const isPermitted = Boolean(
     permissions.some((permission) => userPermissions.includes(permission))
   );
-
-  return <>{isPermitted ? renderAuthFailed ?? <></> : children}</>;
+  return <>{isPermitted ? children : <Navigate replace to="/404" />}</>;
 };
 
-export default PermissionsGate;
+export default PrivateRoute;
