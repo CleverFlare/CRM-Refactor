@@ -151,7 +151,7 @@ const Login = () => {
               <TextField
                 type={visibilities.password ? "text" : "password"}
                 variant="standard"
-                label="الرقم السري القديم"
+                label="الرقم السري"
                 sx={{
                   "& .MuiInputLabel-formControl": {
                     fontSize: 20,

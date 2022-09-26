@@ -71,6 +71,7 @@ const ViewProjects = () => {
   const handleChangeAmount = ({ value }) => {
     setRequestParams((old) => ({
       ...old,
+      currentPage: [["page", 1]],
       amount: [["size", value]],
     }));
   };

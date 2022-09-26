@@ -77,7 +77,7 @@ const PermissionToggles = ({
               />
             </Grid>
           ))}
-        {Boolean(toggles.length) && (
+        {Boolean(permissions.length) && (
           <Grid
             item
             xs={12}
