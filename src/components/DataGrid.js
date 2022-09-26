@@ -150,7 +150,7 @@ const DataGrid = ({
             availableAmounts={availableAmounts}
             onChange={handleAmountChange}
           />
-          <Stack direction="row" spacing={2}>
+          <Stack direction="row" flexWrap="wrap" gap={2}>
             {filtersList.map((filter) => (
               <ChipsFilterItem
                 key={`filter ${filter.id}`}
