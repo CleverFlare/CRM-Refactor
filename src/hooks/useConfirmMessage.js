@@ -15,6 +15,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 const useConfirmMessage = ({
   onConfirm = () => {},
+  title = "الرجاء التأكيد",
   text = "هل انت متأكد انك تريد المتابعة؟",
   variant = "confirm",
 }) => {
@@ -38,23 +39,28 @@ const useConfirmMessage = ({
       }}
       TransitionComponent={Transition}
     >
-      <DialogTitle>الرجاء التأكيد</DialogTitle>
+      <DialogTitle>{title}</DialogTitle>
       <DialogContent>{text}</DialogContent>
-      {variant === "norm" && (
-        <DialogActions>
-          <Button color="error" onClick={() => setOpen(false)}>
-            لا
-          </Button>
-          <Button
-            onClick={() => {
-              onConfirm(...args);
-              setOpen(false);
-            }}
-          >
-            نعم
-          </Button>
-        </DialogActions>
-      )}
+      <DialogActions>
+        {variant === "confirm" && (
+          <>
+            <Button color="error" onClick={() => setOpen(false)}>
+              لا
+            </Button>
+            <Button
+              onClick={() => {
+                onConfirm(...args);
+                setOpen(false);
+              }}
+            >
+              نعم
+            </Button>
+          </>
+        )}
+        {variant === "alert" && (
+          <Button onClick={() => setOpen(false)}>حسناً</Button>
+        )}
+      </DialogActions>
     </Dialog>,
   ];
 };

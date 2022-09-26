@@ -1,5 +1,6 @@
 import { Grid, Switch } from "@mui/material";
 import { Box } from "@mui/system";
+import _ from "lodash";
 import React from "react";
 import { useState } from "react";
 import useAfterEffect from "../hooks/useAfterEffect";
@@ -22,6 +23,19 @@ const PermissionToggles = ({
         break;
       case false:
         setToggles((old) => old.filter((item) => item !== e.target.value));
+        break;
+      default:
+        setToggles((old) => old);
+    }
+  };
+
+  const handleToggleAll = (e) => {
+    switch (e.target.checked) {
+      case true:
+        setToggles(JSON.parse(e.target.value));
+        break;
+      case false:
+        setToggles([]);
         break;
       default:
         setToggles((old) => old);
@@ -63,6 +77,27 @@ const PermissionToggles = ({
               />
             </Grid>
           ))}
+        {Boolean(toggles.length) && (
+          <Grid
+            item
+            xs={12}
+            sm={4}
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+            }}
+          >
+            جميع الصلاحيات
+            <Switch
+              value={JSON.stringify(permissions.map((perm) => perm.codename))}
+              onChange={handleToggleAll}
+              checked={_.isEqual(
+                permissions.map((perm) => perm.codename),
+                toggles
+              )}
+            />
+          </Grid>
+        )}
       </Grid>
     </Box>
   );

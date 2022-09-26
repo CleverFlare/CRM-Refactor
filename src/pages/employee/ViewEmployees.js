@@ -68,7 +68,18 @@ const ViewEmployees = () => {
     successMessage: "تم حذف الموظف بنجاح",
   });
 
+  const [handlePreventDeleteEmployee, deleteEmployeeAlertDialog] =
+    useConfirmMessage({
+      title: "تحذير",
+      text: "لا يمكن حذف هذا الموظف بسبب متابعته لبعض العملاء ، الرجاء نقل هؤلاء العملاء اولاً",
+      variant: "alert",
+    });
+
   const deleteEmployee = (e, row) => {
+    if (Boolean(row.client_count)) {
+      handlePreventDeleteEmployee();
+      return;
+    }
     employeeDeteleRequest({
       id: row.id,
       onSuccess: (res) => {
@@ -145,6 +156,7 @@ const ViewEmployees = () => {
         id={openEditPassword}
       />
       {deleteEmployeeConfirmDialog}
+      {deleteEmployeeAlertDialog}
       {employeeDeleteResponse.successAlert}
       {employeeDeleteResponse.failAlert}
     </Wrapper>
