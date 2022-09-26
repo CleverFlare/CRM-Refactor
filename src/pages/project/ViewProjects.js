@@ -96,7 +96,7 @@ const ViewProjects = () => {
         onFilter={handleFilter}
         onAmountChange={handleChangeAmount}
         onPaginate={handlePaginate}
-        filter={filters}
+        filters={filters}
       />
       {deleteProjectConfirmDialog}
     </Wrapper>
@@ -213,5 +213,9 @@ const filters = [
   {
     name: "تاريخ",
     component: <DateFilter />,
+    valueShape: {
+      start: "",
+      end: "",
+    },
   },
 ];
