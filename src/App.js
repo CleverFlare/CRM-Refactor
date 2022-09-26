@@ -18,6 +18,8 @@ import { Provider } from "react-redux";
 import store from "./store";
 import PrivateRoute from "./features/permissions/components/PrivateRoute";
 import Notfound from "./components/Notfound";
+import filter from "./utils/ClearNull";
+import Compress from "react-image-file-resizer";
 
 const sidebarWidth = 240;
 
@@ -26,6 +28,8 @@ const Layout = ({
   permissions,
   notifications,
   onRemoveNotifications = () => {},
+  onChangeAvatar,
+  isAvatarPending = false,
   isPending = false,
   userInfo = {},
 }) => {
@@ -67,6 +71,7 @@ const Layout = ({
         onClose={() => toggleOpenSidebar(false)}
         onLogout={() => dispatch({ type: "userInfo/logout" })}
         permissions={permissions}
+        onChangeAvatar={onChangeAvatar}
         name={userInfo.name}
         role={userInfo.role}
         organization={userInfo.organization}
@@ -76,7 +81,7 @@ const Layout = ({
         isRolePending={isPending}
         isOrganizationPending={isPending}
         isTabsPending={isPending}
-        isAvatarPending={isPending}
+        isAvatarPending={isPending || isAvatarPending}
       />
       <Box sx={{ overflowY: "auto" }}>{children}</Box>
     </Box>
@@ -100,11 +105,10 @@ const App = () => {
   });
 
   //----request hooks----
-  const [missedNotificationsGetRequest, missedNotificationsGetResponse] =
-    useRequest({
-      path: NOTIFICATIONS,
-      method: "get",
-    });
+  const [missedNotificationsGetRequest] = useRequest({
+    path: NOTIFICATIONS,
+    method: "get",
+  });
 
   //----effects----
   useEffect(() => {
@@ -141,6 +145,51 @@ const App = () => {
     });
   };
 
+  //===Start===== change avatar login ========
+  const resize = (file) => {
+    return new Promise((resolve) => {
+      Compress.imageFileResizer(
+        file,
+        300,
+        300,
+        "JPEG",
+        100,
+        0,
+        (uri) => resolve(uri),
+        "file"
+      );
+    });
+  };
+
+  const [changeAvatarPatchRequest, changeAvatarPatchResponse] = useRequest({
+    path: USER_INFO,
+    method: "patch",
+  });
+
+  const changeAavatar = async (file) => {
+    console.log("wait");
+    const image = await resize(file);
+    console.log("finish", file);
+
+    const requestBody = filter({
+      obj: {
+        image: image,
+      },
+      output: "formData",
+    });
+
+    changeAvatarPatchRequest({
+      body: requestBody,
+      id: userInfo.id,
+      onSuccess: (res) => {
+        console.log(res.data);
+        dispatch({ type: "userInfo/setUserInfo", payload: res.data });
+      },
+    });
+  };
+
+  //====End==== change avatar login ========
+
   return (
     <Provider store={store}>
       <Router>
@@ -156,6 +205,8 @@ const App = () => {
               image: userInfo.image,
             }}
             isPending={userInfoGetResponse.isPending}
+            onChangeAvatar={changeAavatar}
+            isAvatarPending={changeAvatarPatchResponse.isPending}
           >
             <Routes>
               {pages.map((page, pageIndex) => {
