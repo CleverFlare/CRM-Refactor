@@ -54,6 +54,9 @@ const AddChannels = () => {
 
       channelPostRequest({
         body: requestBody,
+        onSuccess: () => {
+          resetControls();
+        },
       });
     });
   };

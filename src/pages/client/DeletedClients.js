@@ -87,13 +87,13 @@ const DeletedClients = () => {
 
   const [handleDelete, deleteConfirmMessage] = useConfirmMessage({
     onConfirm: handleIndividualPermanentDelete,
-    text: "هل انت متأكد من انك تريد الحذف هذا الموظف؟",
+    text: "هل انت متأكد من انك تريد حذف هذا العميل؟",
   });
 
   const [handleDeleteSelected, deleteSelectedConfirmMessage] =
     useConfirmMessage({
       onConfirm: handleSelectedPermanentDelete,
-      text: "هل انت متأكد من انك تريد الحذف هؤلاء الموظفين؟",
+      text: "هل انت متأكد من انك تريد حذف هؤلاء العملاء؟",
     });
 
   useEffect(() => {

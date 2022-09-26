@@ -12,6 +12,7 @@ import { InputField } from "../../features/form";
 import { TextField } from "@mui/material";
 import { Stack } from "@mui/system";
 import useConfirmMessage from "../../hooks/useConfirmMessage";
+import useIsPermitted from "../../features/permissions/hook/useIsPermitted";
 
 const ViewJobs = () => {
   const jobsStore = useSelector((state) => state.jobs.value);
@@ -55,6 +56,8 @@ const ViewJobs = () => {
     text: "هل انت متأكد من أنك تريد حذف هذه الوظيفة؟",
   });
 
+  const isPermitted = useIsPermitted();
+
   return (
     <Wrapper>
       <Breadcrumbs path={["الموظفين", "عرض وظائف الموظفين"]} />
@@ -66,7 +69,7 @@ const ViewJobs = () => {
         onPaginate={handlePaginate}
         onAmountChange={handleChangeAmount}
         onFilter={handleFilter}
-        onDelete={handleDelete}
+        onDelete={isPermitted(handleDelete, ["delete_aqarjob"])}
         filters={filters}
       />
       {deleteJobConfirmDialog}

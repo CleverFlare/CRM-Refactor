@@ -13,6 +13,7 @@ import format from "../../utils/ISOToReadable";
 import useConfirmMessage from "../../hooks/useConfirmMessage";
 import { Stack } from "@mui/system";
 import { InputField } from "../../features/form";
+import useIsPermitted from "../../features/permissions/hook/useIsPermitted";
 
 const ViewChannels = () => {
   const channelsStore = useSelector((state) => state.channels.value);
@@ -57,6 +58,8 @@ const ViewChannels = () => {
     text: "هل انت متأكد من انك تريد حذف هذه القناة",
   });
 
+  const isPermitted = useIsPermitted();
+
   return (
     <Wrapper>
       <Breadcrumbs path={["القنوات", "عرض القنوات"]} />
@@ -67,7 +70,7 @@ const ViewChannels = () => {
         onPaginate={handlePaginate}
         onAmountChange={handleChangeAmount}
         onFilter={handleFilter}
-        onDelete={handleDeleteChannel}
+        onDelete={isPermitted(handleDeleteChannel, ["delete_aqarchannel"])}
         filters={filters}
       />
       {deleteChannelConfirmDialog}

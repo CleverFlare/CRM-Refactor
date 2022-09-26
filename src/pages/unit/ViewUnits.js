@@ -28,6 +28,7 @@ import { Box, Stack } from "@mui/system";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useRef } from "react";
 import usePropState from "../../hooks/usePropState";
+import useIsPermitted from "../../features/permissions/hook/useIsPermitted";
 
 const ViewUnits = () => {
   const unitsStore = useSelector((state) => state.units.value);
@@ -210,6 +211,8 @@ const ViewUnits = () => {
 
   const [infoData, setInfoData] = useState(null);
 
+  const isPermitted = useIsPermitted();
+
   return (
     <Wrapper>
       <Breadcrumbs path={["الوحدات", "عرض الوحدات"]} />
@@ -322,8 +325,8 @@ const ViewUnits = () => {
         isPending={unitsGetResponse.isPending}
         onPaginate={handlePaginate}
         onAmountChange={handleChangeAmount}
-        onDelete={handleDeleteUnit}
-        onEdit={(e, row) => setEditData(row)}
+        onDelete={isPermitted(handleDeleteUnit, ["delete_aqarunit"])}
+        onEdit={isPermitted((e, row) => setEditData(row), ["change_aqarunit"])}
         onView={(e, row) => setInfoData(row)}
       />
       <EditDialog
@@ -557,7 +560,6 @@ const EditDialog = ({ open = false, onClose = () => {}, data = {} }) => {
       });
     }
   };
-
   return (
     <Dialog open={open} onClose={onClose} paperProps={{ height: "100%" }}>
       <DialogHeading>تعديل بيانات الوحدة</DialogHeading>
