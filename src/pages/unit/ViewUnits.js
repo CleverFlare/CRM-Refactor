@@ -597,6 +597,7 @@ const EditDialog = ({ open = false, onClose = () => {}, data = {} }) => {
             type: "units/putItem",
             payload: { id: res.data.id, item: res.data },
           });
+          onClose();
         },
       });
     }
@@ -715,7 +716,6 @@ const EditDialog = ({ open = false, onClose = () => {}, data = {} }) => {
         </DialogButton>
         <DialogButton variant="close">إلغاء</DialogButton>
       </DialogButtonsGroup>
-      {unitPatchResponse.successAlert}
       {unitPatchResponse.failAlert}
     </Dialog>
   );

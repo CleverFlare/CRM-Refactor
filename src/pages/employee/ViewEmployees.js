@@ -437,6 +437,7 @@ const EditInfoDialog = ({ open = false, onClose = () => {}, data = {} }) => {
               type: "employees/putItem",
               payload: { id: res.data.id, item: res.data },
             });
+            onClose();
           },
         });
       });
@@ -528,15 +529,10 @@ const EditInfoDialog = ({ open = false, onClose = () => {}, data = {} }) => {
         >
           حفظ
         </DialogButton>
-        <DialogButton
-          variant="close"
-          onClick={onClose}
-          disabled={employeePatchResponse.isPending}
-        >
+        <DialogButton variant="close" onClick={onClose}>
           إلغاء
         </DialogButton>
       </DialogButtonsGroup>
-      {employeePatchResponse.successAlert}
       {employeePatchResponse.failAlert}
     </Dialog>
   );
@@ -560,6 +556,9 @@ const EditPasswordDialog = ({ open, onClose, id }) => {
         },
       },
       id: id,
+      onSuccess: () => {
+        onClose();
+      },
     });
   };
 
@@ -616,14 +615,12 @@ const EditPasswordDialog = ({ open, onClose, id }) => {
               variant="close"
               onClick={onClose}
               sx={{ width: "100%" }}
-              disabled={changePasswordPatchResponse.isPending}
             >
               إلغاء
             </DialogButton>
           </DialogButtonsGroup>
         </Stack>
       </DialogContent>
-      {changePasswordPatchResponse.successAlert}
       {changePasswordPatchResponse.failAlert}
     </Dialog>
   );

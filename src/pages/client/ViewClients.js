@@ -470,6 +470,7 @@ const ViewClients = () => {
     clientTransferPostRequest({
       body: e,
       onSuccess: (res) => {
+        setOpenTransferMultipleClientsToEmployee(false);
         if (res.data.hasOwnProperty("clients")) {
           res.data.clients.map((client) => {
             dispatch({
@@ -491,6 +492,7 @@ const ViewClients = () => {
     clientTransferProjectPostRequest({
       body: e,
       onSuccess: (res) => {
+        setOpenTransferProject(false);
         if (res.data.hasOwnProperty("clients")) {
           res.data.clients.map((client) => {
             dispatch({
@@ -933,10 +935,6 @@ const ViewClients = () => {
       </Stack>
 
       {/* alerts */}
-      {clientTransferPostResponse.successAlert}
-      {clientTransferPostResponse.failAlert}
-      {clientTransferProjectPostResponse.successAlert}
-      {clientTransferProjectPostResponse.failAlert}
       {selectedClientsDeleteResponse.successAlert}
       {selectedClientsDeleteResponse.failAlert}
       {clientDeleteResponse.successAlert}
@@ -980,7 +978,7 @@ const InfoDialog = ({
         followup: new Date(selectedPreviewDate).toCorrectISOString(),
       },
       onSuccess: (res) => {
-        console.log(res.data);
+        setPreviewDatePicker(null);
         dispatch({
           type: "clients/putItem",
           payload: { id: res.data.id, item: res.data },
@@ -989,8 +987,6 @@ const InfoDialog = ({
       },
     });
   };
-
-  //====End===== Preview Date Logic ===============
 
   //----variables----
   const info = [
