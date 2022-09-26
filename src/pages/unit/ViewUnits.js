@@ -29,6 +29,43 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { useRef } from "react";
 import usePropState from "../../hooks/usePropState";
 import useIsPermitted from "../../features/permissions/hook/useIsPermitted";
+import PermissionsGate from "../../features/permissions/components/PermissionsGate";
+
+import {
+  FacebookShareButton,
+  GooglePlusShareButton,
+  LinkedinShareButton,
+  TwitterShareButton,
+  TelegramShareButton,
+  WhatsappShareButton,
+  PinterestShareButton,
+  VKShareButton,
+  OKShareButton,
+  RedditShareButton,
+  TumblrShareButton,
+  LivejournalShareButton,
+  MailruShareButton,
+  ViberShareButton,
+  WorkplaceShareButton,
+  LineShareButton,
+  EmailShareButton,
+  FacebookIcon,
+  TwitterIcon,
+  TelegramIcon,
+  WhatsappIcon,
+  LinkedinIcon,
+  PinterestIcon,
+  VKIcon,
+  OKIcon,
+  RedditIcon,
+  TumblrIcon,
+  LivejournalIcon,
+  MailruIcon,
+  ViberIcon,
+  WorkplaceIcon,
+  LineIcon,
+  EmailIcon,
+} from "react-share";
 
 const ViewUnits = () => {
   const unitsStore = useSelector((state) => state.units.value);
@@ -843,107 +880,328 @@ const InfoDialog = ({ open, onClose, data = {} }) => {
     });
   };
 
+  //===Start====== share logic ===========
+
+  const userInfo = useSelector((state) => state.userInfo.value);
+
+  const message = `متوفر لدى ${
+    userInfo?.organization?.name ? userInfo?.organization?.name : "غير معروف"
+  }
+  نوع الوحدة: ${data?.unit_type ? data?.unit_type : "لا يوجد"}
+  العنوان: ${data?.address ? data?.address : "لا يوجد"}
+  المنطقة: ${data?.area ? data?.area : "لا يوجد"}
+  الدور: ${data?.floor_number ? data?.floor_number : "لا يوجد"}
+  المساحة: ${data?.area_size ? data?.area_size : "لا يوجد"}
+  عدد الغرف: ${data?.room_number ? data?.room_number : "لا يوجد"}
+  عدد الحمامات: ${data?.bath_count ? data?.bath_count : "لا يوجد"}
+  نوع التشطيب: ${data?.complete_type ? data?.complete_type : "لا يوجد"}
+  السعر: ${data?.price ? data?.price : "لا يوجد"}
+  البلد: ${data?.country ? data?.country : "لا يوجد"}
+  المحافظة: ${data?.state ? data?.state : "لا يوجد"}
+  المدينة: ${data?.city ? data?.city : "لا يوجد"}
+  رقم العمارة: ${data?.flat_number ? data?.flat_number : "لا يوجد"}\n`;
+
+  //===End====== share logic ===========
+
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogContent>
-        <Stack
-          direction="row"
-          sx={{ width: "100%" }}
-          justifyContent="center"
-          gap="20px"
-        >
-          <Box
-            component="input"
-            type="file"
-            ref={changePictureRef}
-            sx={{ display: "none" }}
-            onChange={(e) => {
-              handleChangePicture({
-                id: e.target.id,
-                image: e.target.files[0],
-              });
-            }}
-          ></Box>
-          {pictures &&
-            pictures.map((item, index) => (
-              <Badge
-                badgeContent={
-                  <IconButton
-                    sx={{
-                      bgcolor: "red",
-                      position: "relative",
-                      "&:hover": {
-                        bgcolor: "red",
-                      },
-                    }}
-                    onClick={() => handleDeletePicture(item.id)}
-                  >
-                    <DeleteIcon sx={{ color: "white" }} />
-                  </IconButton>
-                }
-                key={`image ${index}`}
-              >
-                {picturePatchResponse.isPending && (
-                  <Stack
-                    justifyContent="center"
-                    alignItems="center"
-                    sx={{
-                      position: "absolute",
-                      top: 0,
-                      left: 0,
-                      width: "100%",
-                      height: "100%",
-                      bgcolor: "rgba(0, 0, 0, 0.2)",
-                      zIndex: 1,
-                    }}
-                  >
-                    <CircularProgress sx={{ color: "white" }} />
-                  </Stack>
-                )}
-                <Avatar
-                  variant="rounded"
-                  src={item.image}
-                  sx={{
-                    width: 120,
-                    height: 120,
-                    cursor: "pointer",
-                  }}
-                  onClick={() => {
-                    changePictureRef.current.id = item.id;
-                    changePictureRef.current.click();
-                  }}
-                >
-                  U
-                </Avatar>
-              </Badge>
-            ))}
-          <Box
-            component="input"
-            type="file"
-            sx={{ display: "none" }}
-            ref={addPictureRef}
-            onChange={handleAddPicture}
-          ></Box>
-          {pictures?.length < 5 && (
+      <PermissionsGate permissions={["change_aqarunit"]}>
+        <DialogContent>
+          <Stack
+            direction="row"
+            sx={{ width: "100%" }}
+            justifyContent="center"
+            gap="20px"
+          >
             <Box
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                width: 120,
-                height: 120,
-                bgcolor: "rgba(0, 0, 0, 0.2)",
-                borderRadius: 1.5,
-                cursor: "pointer",
+              component="input"
+              type="file"
+              ref={changePictureRef}
+              sx={{ display: "none" }}
+              onChange={(e) => {
+                handleChangePicture({
+                  id: e.target.id,
+                  image: e.target.files[0],
+                });
               }}
-              onClick={() => addPictureRef.current.click()}
-            >
-              <AddIcon sx={{ color: "white" }} />
-            </Box>
-          )}
+            ></Box>
+            {pictures &&
+              pictures.map((item, index) => (
+                <Badge
+                  badgeContent={
+                    <IconButton
+                      sx={{
+                        bgcolor: "red",
+                        position: "relative",
+                        "&:hover": {
+                          bgcolor: "red",
+                        },
+                      }}
+                      onClick={() => handleDeletePicture(item.id)}
+                    >
+                      <DeleteIcon sx={{ color: "white" }} />
+                    </IconButton>
+                  }
+                  key={`image ${index}`}
+                >
+                  {picturePatchResponse.isPending && (
+                    <Stack
+                      justifyContent="center"
+                      alignItems="center"
+                      sx={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        width: "100%",
+                        height: "100%",
+                        bgcolor: "rgba(0, 0, 0, 0.2)",
+                        zIndex: 1,
+                      }}
+                    >
+                      <CircularProgress sx={{ color: "white" }} />
+                    </Stack>
+                  )}
+                  <Avatar
+                    variant="rounded"
+                    src={item.image}
+                    sx={{
+                      width: 120,
+                      height: 120,
+                      cursor: "pointer",
+                    }}
+                    onClick={() => {
+                      changePictureRef.current.id = item.id;
+                      changePictureRef.current.click();
+                    }}
+                  >
+                    U
+                  </Avatar>
+                </Badge>
+              ))}
+            <Box
+              component="input"
+              type="file"
+              sx={{ display: "none" }}
+              ref={addPictureRef}
+              onChange={handleAddPicture}
+            ></Box>
+            {pictures?.length < 5 && (
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  width: 120,
+                  height: 120,
+                  bgcolor: "rgba(0, 0, 0, 0.2)",
+                  borderRadius: 1.5,
+                  cursor: "pointer",
+                }}
+                onClick={() => addPictureRef.current.click()}
+              >
+                <AddIcon sx={{ color: "white" }} />
+              </Box>
+            )}
+          </Stack>
+        </DialogContent>
+      </PermissionsGate>
+      <DialogInfoWindow information={info} />
+      <DialogContent>
+        <Stack direction="row" justifyContent="center">
+          <FacebookShareButton
+            quote={message}
+            url={`${
+              userInfo.organization.url
+                ? userInfo.organization.url
+                : "الرابط غير معروف"
+            }`}
+          >
+            <IconButton>
+              <FacebookIcon size={32} round={true} />
+            </IconButton>
+          </FacebookShareButton>
+          <WhatsappShareButton
+            title={message}
+            url={`${
+              userInfo.organization.url
+                ? userInfo.organization.url
+                : "الرابط غير معروف"
+            }`}
+          >
+            <IconButton>
+              <WhatsappIcon size={32} round={true} />
+            </IconButton>
+          </WhatsappShareButton>
+          <LinkedinShareButton
+            title={message}
+            url={`${
+              userInfo.organization.url
+                ? userInfo.organization.url
+                : "الرابط غير معروف"
+            }`}
+          >
+            <IconButton>
+              <LinkedinIcon size={32} round={true} />
+            </IconButton>
+          </LinkedinShareButton>
+          <TelegramShareButton
+            title={message}
+            url={`${
+              userInfo.organization.url
+                ? userInfo.organization.url
+                : "الرابط غير معروف"
+            }`}
+          >
+            <IconButton>
+              <TelegramIcon size={32} round={true} />
+            </IconButton>
+          </TelegramShareButton>
+          <PinterestShareButton
+            title={message}
+            url={`${
+              userInfo.organization.url
+                ? userInfo.organization.url
+                : "الرابط غير معروف"
+            }`}
+          >
+            <IconButton>
+              <PinterestIcon size={32} round={true} />
+            </IconButton>
+          </PinterestShareButton>
+          <VKShareButton
+            title={message}
+            url={`${
+              userInfo.organization.url
+                ? userInfo.organization.url
+                : "الرابط غير معروف"
+            }`}
+          >
+            <IconButton>
+              <VKIcon size={32} round={true} />
+            </IconButton>
+          </VKShareButton>
+          <OKShareButton
+            title={message}
+            url={`${
+              userInfo.organization.url
+                ? userInfo.organization.url
+                : "الرابط غير معروف"
+            }`}
+          >
+            <IconButton>
+              <OKIcon size={32} round={true} />
+            </IconButton>
+          </OKShareButton>
+          <RedditShareButton
+            title={message}
+            url={`${
+              userInfo.organization.url
+                ? userInfo.organization.url
+                : "الرابط غير معروف"
+            }`}
+          >
+            <IconButton>
+              <RedditIcon size={32} round={true} />
+            </IconButton>
+          </RedditShareButton>
+          <TumblrShareButton
+            title={message}
+            url={`${
+              userInfo.organization.url
+                ? userInfo.organization.url
+                : "الرابط غير معروف"
+            }`}
+          >
+            <IconButton>
+              <TumblrIcon size={32} round={true} />
+            </IconButton>
+          </TumblrShareButton>
+          <LivejournalShareButton
+            title={message}
+            url={`${
+              userInfo.organization.url
+                ? userInfo.organization.url
+                : "الرابط غير معروف"
+            }`}
+          >
+            <IconButton>
+              <LivejournalIcon size={32} round={true} />
+            </IconButton>
+          </LivejournalShareButton>
+          <TwitterShareButton
+            title={message}
+            url={`${
+              userInfo.organization.url
+                ? userInfo.organization.url
+                : "الرابط غير معروف"
+            }`}
+          >
+            <IconButton>
+              <TwitterIcon size={32} round={true} />
+            </IconButton>
+          </TwitterShareButton>
+          <MailruShareButton
+            title={message}
+            url={`${
+              userInfo.organization.url
+                ? userInfo.organization.url
+                : "الرابط غير معروف"
+            }`}
+          >
+            <IconButton>
+              <MailruIcon size={32} round={true} />
+            </IconButton>
+          </MailruShareButton>
+          <WorkplaceShareButton
+            title={message}
+            url={`${
+              userInfo.organization.url
+                ? userInfo.organization.url
+                : "الرابط غير معروف"
+            }`}
+          >
+            <IconButton>
+              <WorkplaceIcon size={32} round={true} />
+            </IconButton>
+          </WorkplaceShareButton>
+          <ViberShareButton
+            title={message}
+            url={`${
+              userInfo.organization.url
+                ? userInfo.organization.url
+                : "الرابط غير معروف"
+            }`}
+          >
+            <IconButton>
+              <ViberIcon size={32} round={true} />
+            </IconButton>
+          </ViberShareButton>
+          <LineShareButton
+            title={message}
+            url={`${
+              userInfo.organization.url
+                ? userInfo.organization.url
+                : "الرابط غير معروف"
+            }`}
+          >
+            <IconButton>
+              <LineIcon size={32} round={true} />
+            </IconButton>
+          </LineShareButton>
+          <EmailShareButton
+            title={message}
+            url={`${
+              userInfo.organization.url
+                ? userInfo.organization.url
+                : "الرابط غير معروف"
+            }`}
+          >
+            <IconButton>
+              <EmailIcon size={32} round={true} />
+            </IconButton>
+          </EmailShareButton>
         </Stack>
       </DialogContent>
-      <DialogInfoWindow information={info} />
     </Dialog>
   );
 };
