@@ -4,7 +4,7 @@ import useAfterEffect from "./useAfterEffect";
 const usePropState = (init, dep = []) => {
   const [state, setState] = useState("");
 
-  useAfterEffect(() => {
+  useEffect(() => {
     setState(init);
   }, dep);
 

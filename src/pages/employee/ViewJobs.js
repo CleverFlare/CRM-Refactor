@@ -5,14 +5,29 @@ import Wrapper from "../../components/Wrapper";
 import Breadcrumbs from "../../components/Breadcrumbs";
 import { useDispatch, useSelector } from "react-redux";
 import useRequest from "../../hooks/useRequest";
-import { JOBS } from "../../data/APIs";
+import { JOBS, JOB_PERMISSIONS, PERMISSIONS } from "../../data/APIs";
 import useDataGrid from "../../hooks/useDataGrid";
 import format from "../../utils/ISOToReadable";
 import { InputField } from "../../features/form";
-import { TextField } from "@mui/material";
+import { MenuItem, TextField } from "@mui/material";
 import { Stack } from "@mui/system";
 import useConfirmMessage from "../../hooks/useConfirmMessage";
 import useIsPermitted from "../../features/permissions/hook/useIsPermitted";
+import Dialog, {
+  DialogButton,
+  DialogButtonsGroup,
+  DialogContent,
+  DialogForm,
+  DialogHeading,
+  DialogInputField,
+  DialogSelectField,
+} from "../../features/dialog";
+import PermissionToggles from "../../components/PermissionToggles";
+import useControls from "../../hooks/useControls";
+import { useRef } from "react";
+import useAfterEffect from "../../hooks/useAfterEffect";
+import compare from "../../utils/Compare";
+import filter from "../../utils/ClearNull";
 
 const ViewJobs = () => {
   const jobsStore = useSelector((state) => state.jobs.value);
@@ -58,6 +73,12 @@ const ViewJobs = () => {
 
   const isPermitted = useIsPermitted();
 
+  const [editData, setEditData] = useState(null);
+
+  const handleEditJob = (e, row) => {
+    setEditData(row);
+  };
+
   return (
     <Wrapper>
       <Breadcrumbs path={["الموظفين", "عرض وظائف الموظفين"]} />
@@ -70,7 +91,13 @@ const ViewJobs = () => {
         onAmountChange={handleChangeAmount}
         onFilter={handleFilter}
         onDelete={isPermitted(handleDelete, ["delete_aqarjob"])}
+        onEdit={isPermitted(handleEditJob, ["change_aqarjob"])}
         filters={filters}
+      />
+      <EditDialog
+        open={Boolean(editData)}
+        onClose={() => setEditData(null)}
+        data={editData}
       />
       {deleteJobConfirmDialog}
       {jobDeleteResponse.successAlert}
@@ -170,3 +197,235 @@ const filters = [
     component: <DateFilter />,
   },
 ];
+
+const EditDialog = ({
+  open,
+  onClose,
+  data = {
+    name: "",
+  },
+}) => {
+  const allPermissions = useSelector((state) => state.allPermissions.value);
+
+  const dispatch = useDispatch();
+
+  const [{ controls }, { setControl, resetControls }] = useControls(
+    [
+      {
+        control: "name",
+        value: data?.title,
+      },
+      {
+        control: "to",
+        value: data?.parent?.id,
+      },
+    ],
+    [data]
+  );
+
+  useEffect(() => {
+    if (!open) return;
+    console.log(data);
+  }, [open]);
+
+  //===Start==== Permissions Logic =========
+
+  const [toggles, setToggles] = useState([]);
+  const initialPermissions = useRef([]);
+  const [selectedPermissions, setSelectedPermissions] = useState([]);
+
+  const [jobPermissionsGetRequest, jobPermissionsGetResponse] = useRequest({
+    path: JOB_PERMISSIONS,
+    method: "get",
+  });
+
+  const [parentPermissionsGetRequest, parentPermissionsGetResponse] =
+    useRequest({
+      path: JOB_PERMISSIONS,
+      method: "get",
+    });
+
+  const [allPermissionsGetRequest, allPermissionsGetResponse] = useRequest({
+    path: PERMISSIONS,
+    method: "get",
+  });
+
+  const getJobPermissions = () => {
+    jobPermissionsGetRequest({
+      params: {
+        id: data.id,
+      },
+      onSuccess: (res) => {
+        initialPermissions.current = res.data.map((perm) => perm.codename);
+        setSelectedPermissions(res.data.map((perm) => perm.codename));
+      },
+    });
+  };
+
+  const getParentPermissions = () => {
+    parentPermissionsGetRequest({
+      params: {
+        id: data.parent.id,
+      },
+      onSuccess: (res) => {
+        setToggles(res.data);
+        getJobPermissions();
+      },
+    });
+  };
+
+  const getAllPermissions = () => {
+    allPermissionsGetRequest({
+      onSuccess: (res) => {
+        dispatch({ type: "allPermissions/set", payload: res.data.permissions });
+        getJobPermissions();
+      },
+    });
+  };
+
+  useEffect(() => {
+    if (!open) return;
+    if (!Boolean(data?.parent)) {
+      !allPermissions.length && getAllPermissions();
+      getJobPermissions();
+      setToggles([...allPermissions]);
+    } else {
+      getParentPermissions();
+    }
+  }, [open]);
+
+  useAfterEffect(() => {
+    setToggles([...allPermissions]);
+  }, [allPermissions.length]);
+
+  //===End==== Permissions Logic =========
+
+  //====Start====== Parent Logic =========
+
+  const [parents, setParents] = useState([]);
+
+  const [parentsGetRequest, parentsGetResponse] = useRequest({
+    path: JOBS,
+    method: "get",
+  });
+
+  const getParents = () => {
+    parentsGetRequest({
+      params: {
+        top: 1,
+        id: data.id,
+      },
+      onSuccess: (res) => {
+        setParents(res.data);
+      },
+    });
+  };
+
+  //====End====== Parent Logic =========
+
+  //====Start====== Submit Logic =========
+
+  const [jobPatchRequest, jobPatchResponse] = useRequest({
+    path: JOBS,
+    method: "patch",
+  });
+
+  const handleSubmit = () => {
+    const isThereChange = !compare(
+      [
+        [data.title, controls.name],
+        [data.parent.id ?? "", controls.to],
+        [selectedPermissions, initialPermissions.current],
+      ],
+      true
+    );
+
+    if (!isThereChange) return;
+
+    const requestBody = filter({
+      obj: {
+        title: controls.name,
+        parent: controls.to,
+        permissions: selectedPermissions.map((perm) => ({ codename: perm })),
+      },
+    });
+
+    jobPatchRequest({
+      id: data.id,
+      body: requestBody,
+      onSuccess: (res) => {
+        dispatch({
+          type: "jobs/putItem",
+          payload: { id: res.data.id, item: res.data },
+        });
+        onClose();
+      },
+    });
+  };
+
+  //====End====== Submit Logic =========
+
+  return (
+    <Dialog
+      open={open}
+      onClose={onClose}
+      isPending={
+        jobPermissionsGetResponse.isPending ||
+        parentPermissionsGetResponse.isPending ||
+        allPermissionsGetResponse.isPending
+      }
+      paperProps={{ height: "100%" }}
+    >
+      <DialogHeading>تعديل الوظيفة</DialogHeading>
+      <DialogForm>
+        <DialogInputField
+          label="الإسم"
+          placeholder="الإسم"
+          value={controls.name}
+          onChange={(e) => setControl("name", e.target.value)}
+        />
+        {data?.parent && (
+          <DialogSelectField
+            label="التابع له"
+            placeholder="التابع له"
+            onOpen={getParents}
+            isPending={parentsGetResponse.isPending}
+            value={controls.to}
+            onChange={(e) => setControl("to", e.target.value)}
+            renderValue={(selected) => {
+              return (
+                parents.find((parent) => parent.id === selected)?.title ??
+                data?.parent?.title
+              );
+            }}
+          >
+            {parents.map((parent, index) => (
+              <MenuItem value={parent.id} key={`job ${index}`}>
+                {parent.title}
+              </MenuItem>
+            ))}
+          </DialogSelectField>
+        )}
+      </DialogForm>
+      <DialogContent>
+        <PermissionToggles
+          permissions={toggles}
+          initialToggles={selectedPermissions}
+          onToggle={({ toggles }) => setSelectedPermissions(toggles)}
+        />
+      </DialogContent>
+      <DialogButtonsGroup>
+        <DialogButton
+          sx={{ width: "100%" }}
+          disabled={jobPatchResponse.isPending}
+          onClick={handleSubmit}
+        >
+          حفظ
+        </DialogButton>
+        <DialogButton variant="close" onClick={onClose} sx={{ width: "100%" }}>
+          إلغاء
+        </DialogButton>
+      </DialogButtonsGroup>
+    </Dialog>
+  );
+};
