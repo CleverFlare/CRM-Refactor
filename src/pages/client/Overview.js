@@ -118,7 +118,7 @@ const Overview = () => {
             columns={clientStatusColumns}
             rows={selectedClients}
             isPending={overviewGetResponse.isPending}
-            path="/"
+            path="/clients/view-clients"
             sx={{ flex: 2, maxWidth: "100%" }}
           />
           <DataTable
@@ -126,7 +126,7 @@ const Overview = () => {
             columns={bestEmployeeColumns}
             rows={overviewStore.employees.best_employees}
             isPending={overviewGetResponse.isPending}
-            path="/"
+            path="/employees/view-employees"
             sx={{ flex: 1, maxWidth: "100%" }}
             onClick={(e, row) => setSelectedClients(row.clients)}
             actions={
