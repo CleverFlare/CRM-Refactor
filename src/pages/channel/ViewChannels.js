@@ -67,6 +67,7 @@ const ViewChannels = () => {
         columns={columns}
         rows={channelsStore.results}
         isPending={channelsGetResponse.isPending}
+        total={channelsStore.count}
         onPaginate={handlePaginate}
         onAmountChange={handleChangeAmount}
         onFilter={handleFilter}

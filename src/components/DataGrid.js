@@ -79,6 +79,10 @@ const DataGrid = ({
   //----effects----
   useEffect(() => {
     setRowsState(rows);
+    setChecked({
+      type: "",
+      checks: [],
+    });
   }, [rows]);
 
   useEffect(() => {
@@ -859,10 +863,12 @@ const FilterTemplate = ({
   onClose,
 }) => {
   //----states----
-  const [valueState, setValueState] = usePropState(value, true);
-  const [renderedValueState, setRenderedValueState] =
-    usePropState(renderedValue);
-  const [queryState, setQueryState] = usePropState(query);
+  const [valueState, setValueState] = usePropState(value, [value]);
+  const [renderedValueState, setRenderedValueState] = usePropState(
+    renderedValue,
+    [renderedValue]
+  );
+  const [queryState, setQueryState] = usePropState(query, [query.length]);
 
   //----conditions----
   const nullishValue =

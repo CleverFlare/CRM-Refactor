@@ -120,7 +120,7 @@ const ViewEmployees = () => {
         rows={employeesStore.results.filter(
           (employee) => employee.user.id !== userInfo.id
         )}
-        total={employeesStore.amount}
+        total={employeesStore.count}
         isPending={employeesGetResponse.isPending}
         onDelete={isPermitted(handleDeleteEmployee, ["delete_aqaremployee"])}
         onBlock={isPermitted(handleBlockEmployee, ["aqarblock_employees"])}

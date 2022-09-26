@@ -217,15 +217,18 @@ const ViewClients = () => {
     method: "post",
   });
 
-  const [clientTransferPostRequest] = useRequest({
+  const [clientTransferPostRequest, clientTransferPostResponse] = useRequest({
     path: CLIENTS_TRANSFER,
     method: "post",
+    successMessage: "تم التحويل",
   });
 
-  const [clientTransferProjectPostRequest] = useRequest({
-    path: CLIENTS_TRANSFER_PROJECT,
-    method: "post",
-  });
+  const [clientTransferProjectPostRequest, clientTransferProjectPostResponse] =
+    useRequest({
+      path: CLIENTS_TRANSFER_PROJECT,
+      method: "post",
+      successMessage: "تم تغيير المشروع",
+    });
 
   //----effects----
   useEffect(() => {
@@ -923,6 +926,10 @@ const ViewClients = () => {
       </Stack>
 
       {/* alerts */}
+      {clientTransferPostResponse.successAlert}
+      {clientTransferPostResponse.failAlert}
+      {clientTransferProjectPostResponse.successAlert}
+      {clientTransferProjectPostResponse.failAlert}
       {selectedClientsDeleteResponse.successAlert}
       {selectedClientsDeleteResponse.failAlert}
       {clientDeleteResponse.successAlert}
@@ -1147,7 +1154,7 @@ const TransferToEmployeeDialog = ({
   initSelected,
   onSubmit = () => {},
 }) => {
-  const [selected, setSelected] = usePropState(initSelected, true);
+  const [selected, setSelected] = usePropState(initSelected, [initSelected]);
   const [searchValue, setSearchValue] = useState("");
   const [method, setMethod] = useState(0);
 
