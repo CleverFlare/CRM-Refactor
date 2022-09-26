@@ -1103,13 +1103,14 @@ const InfoDialog = ({
             <Button
               variant="contained"
               sx={{ width: "100%", marginTop: 3 }}
-              onClick={(e) =>
+              disabled={previewDatePatchResponse.isPending}
+              onClick={(e) => {
                 handlePreviewSubmit({
                   ...e,
                   selectedPreviewDate,
                   clientId: data.id,
-                })
-              }
+                });
+              }}
             >
               حفظ
             </Button>

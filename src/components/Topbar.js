@@ -148,10 +148,10 @@ const Topbar = ({ showBurger, onBurgerClick, onClear, notifications = [] }) => {
                     <NotificationItem
                       key={`notification ${index}`}
                       onClick={handleCloseMenu}
-                      content={notification?.content}
-                      time={`${
-                        notification?.created_at /*format(notification?.created_at)*/
-                      }`}
+                      content={notification?.message}
+                      time={`${format(
+                        notification?.date ?? "sad/asdfa/asdfT435:34534:453"
+                      )}`}
                       unread={index < unreadNotifCache.current}
                     />
                   ))

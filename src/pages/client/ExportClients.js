@@ -27,7 +27,7 @@ const ExportClients = () => {
   //----states----
   const uploadInputRef = useRef();
   const [files, setFiles] = useState(null);
-  const [selected, setSelected] = useState(null);
+  const [selected, setSelected] = useState("");
   const [selectedEmployee, setSelectedEmployee] = useState("");
   const [employeesState, setEmployeesState] = useState([]);
 
@@ -70,7 +70,7 @@ const ExportClients = () => {
       onSuccess: (res) => {
         setEmployeesState([
           {
-            id: "admin",
+            id: null,
             user: {
               first_name: "أدمن",
               last_name: "",
