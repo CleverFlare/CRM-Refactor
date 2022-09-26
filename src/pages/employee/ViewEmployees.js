@@ -375,6 +375,7 @@ const EditInfoDialog = ({ open = false, onClose = () => {}, data = {} }) => {
   };
 
   useAfterEffect(() => {
+    if (!Boolean(controls.job)) return;
     getJobPermissions();
   }, [controls.job]);
 
