@@ -9,9 +9,10 @@ import { useState } from "react";
 import { useEffect } from "react";
 import format from "../../utils/ISOToReadable";
 import { useDispatch, useSelector } from "react-redux";
-import { Avatar } from "@mui/material";
+import { Avatar, Stack, TextField } from "@mui/material";
 import useConfirmMessage from "../../hooks/useConfirmMessage";
 import useIsPermitted from "../../features/permissions/hook/useIsPermitted";
+import { InputField } from "../../features/form";
 
 const ViewProjects = () => {
   const projectsStore = useSelector((state) => state.projects.value);

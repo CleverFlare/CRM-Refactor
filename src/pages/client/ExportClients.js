@@ -87,7 +87,7 @@ const ExportClients = () => {
       <Breadcrumbs path={["العملاء", "تصدير عملاء"]} />
       <Stack alignItems="center" spacing={2}>
         <SelectField
-          placeholder="الموظف"
+          placeholder="أدمن"
           sx={{ maxWidth: 600, width: "100%" }}
           onOpen={getEmployees}
           value={selectedEmployee}
