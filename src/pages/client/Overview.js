@@ -86,17 +86,24 @@ const Overview = () => {
             sx={{ width: "100%" }}
           />
           <StatisticsCard
-            title="الموظفين الجدد"
-            since="منذ اسبوع"
-            number={overviewStore.employees.all}
+            title="العملاء الجدد"
+            since="اكتساب"
+            number={overviewStore.clients.new_clients}
             bars={[5, 4, 2, 4, 2, 3, 5, 1, 3]}
             sx={{ width: "100%" }}
           />
           <StatisticsCard
-            title="العملاء الجدد"
-            since="اكتساب"
-            number={overviewStore.clients.new_clients}
+            title="جميع الموظفين"
+            since="منذ اسبوع"
+            number={overviewStore.employees.all}
             percentage={30}
+            sx={{ width: "100%" }}
+          />
+          <StatisticsCard
+            title="الموظفين الجدد"
+            since="منذ اسبوع"
+            number={overviewStore.employees.new_employees}
+            bars={[5, 4, 2, 4, 2, 3, 5, 1, 3]}
             sx={{ width: "100%" }}
           />
         </Stack>

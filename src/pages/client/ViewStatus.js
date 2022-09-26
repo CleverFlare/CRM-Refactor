@@ -11,6 +11,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { InputField } from "../../features/form";
 import { Box } from "@mui/system";
 import { Stack, TextField } from "@mui/material";
+import useIsPermitted from "../../features/permissions/hook/useIsPermitted";
+import useConfirmMessage from "../../hooks/useConfirmMessage";
 
 const ViewStatus = () => {
   //----store----
@@ -66,6 +68,28 @@ const ViewStatus = () => {
     }));
   };
 
+  const [statusDeleteRequest, statusDeleteResponse] = useRequest({
+    path: STATUS,
+    method: "delete",
+    successMessage: "تم حذف الحالة بنجاح",
+  });
+
+  const deleteStatus = (e, row) => {
+    statusDeleteRequest({
+      id: row.id,
+      onSuccess: () => {
+        dispatch({ type: "status/deleteItem", payload: { id: row.id } });
+      },
+    });
+  };
+
+  const [handleDeleteStatus, deleteStatusConfirmDialog] = useConfirmMessage({
+    onConfirm: deleteStatus,
+    text: "هل انت متأكد من انك تريد حذف هذه الحالة؟",
+  });
+
+  const isPermitted = useIsPermitted();
+
   return (
     <Wrapper>
       <Breadcrumbs path={["العملاء", "عرض حالات العملاء"]} />
@@ -74,12 +98,18 @@ const ViewStatus = () => {
         rows={statusStore.results}
         isPending={statusGetResponse.isPending}
         total={statusStore.count}
-        onDelete={() => {}}
+        onDelete={isPermitted(
+          (e, row) => handleDeleteStatus(e, row),
+          ["delete_aqarevent"]
+        )}
         onFilter={handleFilter}
         onAmountChange={handleChangeAmount}
         onPaginate={handlePaginate}
         filters={filters}
       />
+      {deleteStatusConfirmDialog}
+      {statusDeleteResponse.successAlert}
+      {statusDeleteResponse.failAlert}
     </Wrapper>
   );
 };

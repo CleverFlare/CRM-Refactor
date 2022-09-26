@@ -444,7 +444,6 @@ const ViewClients = () => {
     return clientCommentPostRequest({
       body: requestBody,
       onSuccess: (res) => {
-        console.log(res.data);
         dispatch({ type: "clientComments/addItem", payload: res.data });
         dispatch({
           type: "clients/patchItem",
@@ -883,17 +882,20 @@ const ViewClients = () => {
         alignItems="center"
         spacing={2}
       >
-        <Button
-          variant="contained"
-          color="error"
-          disabled={
-            !Boolean(selected.length) || selectedClientsDeleteResponse.isPending
-          }
-          sx={{ width: "200px", height: "50px" }}
-          onClick={handleDeleteSelected}
-        >
-          حذف المحدد
-        </Button>
+        <PermissionsGate permissions={["delete_aqarclient"]}>
+          <Button
+            variant="contained"
+            color="error"
+            disabled={
+              !Boolean(selected.length) ||
+              selectedClientsDeleteResponse.isPending
+            }
+            sx={{ width: "200px", height: "50px" }}
+            onClick={handleDeleteSelected}
+          >
+            حذف المحدد
+          </Button>
+        </PermissionsGate>
         <Button
           variant="contained"
           disabled={!Boolean(selected.length)}
@@ -1566,6 +1568,8 @@ const EditDialog = ({ open, onClose, data }) => {
         user: {
           first_name: controls.name.split(/(?<=^\S+)\s/)[0],
           last_name: controls.name.split(/(?<=^\S+)\s/)?.[1],
+          phone: controls.phone,
+          country_code: controls.countryCode,
           email: controls.email,
         },
         ...(Boolean(controls.project.length) && {
@@ -1590,10 +1594,6 @@ const EditDialog = ({ open, onClose, data }) => {
       },
     });
   };
-
-  useEffect(() => {
-    console.log(data?.bussiness);
-  }, [data]);
 
   return (
     <Dialog open={Boolean(data)} onClose={onClose}>
@@ -1631,25 +1631,11 @@ const EditDialog = ({ open, onClose, data }) => {
             setControl("project", [...e.target.value]);
           }}
           renderValue={(selected) => {
-            console.log(
-              "asdfasdfas:",
-              selected
-                ?.map(
-                  (id) =>
-                    projectsState.find((project) => project.id === id)?.name
-                )
-                ?.join(" ، ")
-                .trim()
-            );
-            return Boolean(
-              selected
-                ?.map(
-                  (id) =>
-                    projectsState.find((project) => project.id === id)?.name
-                )
-                ?.join(" ، ")
-                .trim()
-            )
+            return selected
+              ?.map(
+                (id) => projectsState.find((project) => project.id === id)?.name
+              )
+              .filter((item) => Boolean(item)).length
               ? selected
                   ?.map(
                     (id) =>
@@ -1657,7 +1643,7 @@ const EditDialog = ({ open, onClose, data }) => {
                   )
                   ?.join(" ، ")
                   .trim()
-              : data?.bussiness?.map((project) => project?.name);
+              : data?.bussiness?.map((project) => project?.name).join(" ، ");
           }}
         >
           {projectsState.map((project, index) => (

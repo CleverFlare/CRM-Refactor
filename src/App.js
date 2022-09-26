@@ -189,9 +189,8 @@ const App = () => {
                     return;
                 }
               })}
-              {Boolean(userInfo.user_permissions.length) && (
-                <Route path="/*" element={<Navigate replace to="/404" />} />
-              )}
+
+              <Route path="/*" element={<Navigate replace to="/home" />} />
               <Route path="/404" element={<Notfound />} />
             </Routes>
           </Layout>

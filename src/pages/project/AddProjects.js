@@ -25,7 +25,7 @@ const AddProjects = () => {
     {
       control: "picture",
       value: "",
-      isRequired: true,
+      isRequired: false,
     },
     {
       control: "name",
@@ -35,17 +35,17 @@ const AddProjects = () => {
     {
       control: "address",
       value: "",
-      isRequired: true,
+      isRequired: false,
     },
     {
       control: "description",
       value: "",
-      isRequired: true,
+      isRequired: false,
     },
     {
       control: "image",
       value: "",
-      isRequired: true,
+      isRequired: false,
     },
   ]);
 

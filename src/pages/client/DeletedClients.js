@@ -430,7 +430,7 @@ const columns = [
   {
     field: "agent",
     headerName: "الموظف",
-    customContent: ({ agent }) => `${agent.name}`,
+    customContent: ({ agent }) => agent && `${agent.name}`,
   },
 ];
 

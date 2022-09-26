@@ -12,8 +12,6 @@ const useIsPermitted = () => {
       userPermissions.includes(permission)
     );
 
-    console.log(canAccess);
-
     return canAccess ? callback : null;
   };
 

@@ -11,6 +11,7 @@ import format from "../../utils/ISOToReadable";
 import { useDispatch, useSelector } from "react-redux";
 import { Avatar } from "@mui/material";
 import useConfirmMessage from "../../hooks/useConfirmMessage";
+import useIsPermitted from "../../features/permissions/hook/useIsPermitted";
 
 const ViewProjects = () => {
   const projectsStore = useSelector((state) => state.projects.value);
@@ -81,6 +82,8 @@ const ViewProjects = () => {
     }));
   };
 
+  const isPermitted = useIsPermitted();
+
   return (
     <Wrapper>
       <Breadcrumbs path={["المشاريع", "عرض المشاريع"]} />
@@ -89,7 +92,7 @@ const ViewProjects = () => {
         rows={projectsStore.results}
         isPending={projectsGetResponse.isPending}
         total={projectsStore.count}
-        onDelete={handleDelete}
+        onDelete={isPermitted(handleDelete, ["delete_aqarproject"])}
         onFilter={handleFilter}
         onAmountChange={handleChangeAmount}
         onPaginate={handlePaginate}

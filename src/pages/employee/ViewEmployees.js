@@ -37,6 +37,7 @@ import _ from "lodash";
 import { useRef } from "react";
 import { Stack } from "@mui/system";
 import Breadcrumbs from "../../components/Breadcrumbs";
+import useIsPermitted from "../../features/permissions/hook/useIsPermitted";
 
 const ViewEmployees = () => {
   const employeesStore = useSelector((state) => state.employees.value);
@@ -109,6 +110,8 @@ const ViewEmployees = () => {
 
   const userInfo = useSelector((state) => state.userInfo.value);
 
+  const isPermitted = useIsPermitted();
+
   return (
     <Wrapper>
       <Breadcrumbs path={["الموظفين", "عرض الموظفين"]} />
@@ -119,10 +122,13 @@ const ViewEmployees = () => {
         )}
         total={employeesStore.amount}
         isPending={employeesGetResponse.isPending}
-        onDelete={handleDeleteEmployee}
-        onBlock={handleBlockEmployee}
-        onChangePassword={(e, row) => setOpenEditPassword(row.id)}
-        onEdit={handleOpenEdit}
+        onDelete={isPermitted(handleDeleteEmployee, ["delete_aqaremployee"])}
+        onBlock={isPermitted(handleBlockEmployee, ["aqarblock_employees"])}
+        onChangePassword={isPermitted(
+          (e, row) => setOpenEditPassword(row.id),
+          ["change_aqaremployee"]
+        )}
+        onEdit={isPermitted(handleOpenEdit, ["change_aqaremployee"])}
         onPaginate={handlePaginate}
         onAmountChange={handleChangeAmount}
         onFilter={handleFilter}
@@ -386,10 +392,7 @@ const EditInfoDialog = ({ open = false, onClose = () => {}, data = {} }) => {
         [controls.email, data.user.email],
         [controls.job, data.job.id],
         [controls.to, data.parent],
-        [
-          originalEmployeePermissions.current.map((perm) => perm.codename),
-          employeePermissions.map((perm) => perm.codename),
-        ],
+        [originalEmployeePermissions.current, employeePermissions],
       ],
       true
     );
@@ -403,6 +406,9 @@ const EditInfoDialog = ({ open = false, onClose = () => {}, data = {} }) => {
               first_name: controls.name.split(/(?<=^\S+)\s/)[0],
               last_name: controls.name.split(/(?<=^\S+)\s/)[1],
               email: controls.email,
+              user_permissions: employeePermissions.map((perm) => ({
+                codename: perm,
+              })),
             },
             parent: controls.to,
             job: controls.id,

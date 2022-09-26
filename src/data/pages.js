@@ -35,12 +35,13 @@ import AddUnits from "../pages/unit/AddUnits";
 import ViewUnits from "../pages/unit/ViewUnits";
 
 import ChangePassword from "../pages/setting/ChangePassword";
+import { Navigate } from "react-router-dom";
 
 const pages = [
   {
     name: "الرئيسية",
     icon: <AutoAwesomeMosaicIcon />,
-    path: "/",
+    path: "/home",
     element: <Home />,
     permitted: ["view_aqarpost"],
   },
