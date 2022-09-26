@@ -411,7 +411,7 @@ const EditInfoDialog = ({ open = false, onClose = () => {}, data = {} }) => {
               })),
             },
             parent: controls.to,
-            job: controls.id,
+            job: controls.job,
           },
         });
 
