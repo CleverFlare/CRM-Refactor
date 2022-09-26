@@ -11,7 +11,7 @@ const PermissionToggles = ({
   onToggle = () => {},
   ...props
 }) => {
-  const [toggles, setToggles] = usePropState(initialToggles, true, [
+  const [toggles, setToggles] = usePropState(initialToggles, [
     initialToggles.length,
   ]);
 
