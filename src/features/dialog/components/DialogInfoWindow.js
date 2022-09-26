@@ -31,7 +31,10 @@ const DialogInfoWindow = ({
             spacing={2}
           >
             <Typography>
-              {piece.name} : {Boolean(piece.value) ? piece.value : "غير معروف"}
+              {piece.name} :{" "}
+              {Boolean(piece.value)
+                ? piece.value
+                : piece.customEmpty ?? "غير معروف"}
             </Typography>
             {piece?.addition}
           </Stack>

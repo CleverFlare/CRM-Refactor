@@ -334,11 +334,12 @@ const EditInfoDialog = ({ open = false, onClose = () => {}, data = {} }) => {
   const getEmployees = () => {
     employeesGetRequest({
       params: {
-        top: controls.job,
+        top: 1,
+        job: controls.job,
         size: 1000,
       },
       onSuccess: (res) => {
-        setEmployees(res.data.results);
+        setEmployees(res.data);
       },
     });
   };
@@ -474,7 +475,10 @@ const EditInfoDialog = ({ open = false, onClose = () => {}, data = {} }) => {
           onOpen={getJobs}
           isPending={jobsGetResponse.isPending}
           value={controls.job}
-          onChange={(e) => setControl("job", e.target.value)}
+          onChange={(e) => {
+            setControl("job", e.target.value);
+            setControl("to", "");
+          }}
           renderValue={(selected) => {
             return Boolean(jobs.find((job) => job.id === controls.job))
               ? jobs.find((job) => job.id === selected).title

@@ -30,6 +30,8 @@ import {
   RadioGroup,
   Radio,
   FormGroup,
+  Menu,
+  TextField,
 } from "@mui/material";
 import useAfterEffect from "../../hooks/useAfterEffect";
 import InputField from "../../features/form/components/InputField";
@@ -63,6 +65,7 @@ import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import CallIcon from "@mui/icons-material/Call";
 import ChangeCircleIcon from "@mui/icons-material/ChangeCircle";
 import ModeCommentIcon from "@mui/icons-material/ModeComment";
+import DateRangeIcon from "@mui/icons-material/DateRange";
 
 import * as XLSX from "xlsx";
 import DialogPeopleWindow, {
@@ -72,6 +75,9 @@ import usePropState from "../../hooks/usePropState";
 import compare from "../../utils/Compare";
 import useIsPermitted from "../../features/permissions/hook/useIsPermitted";
 import PermissionsGate from "../../features/permissions/components/PermissionsGate";
+import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 
 const ViewClients = () => {
   //----store----
@@ -953,6 +959,39 @@ const InfoDialog = ({
   //----store----
   const historyStore = useSelector((state) => state.clientHistory.value);
 
+  const dispatch = useDispatch();
+
+  //====Start===== Preview Date Logic ===============
+
+  const [previewDatePicker, setPreviewDatePicker] = useState(null);
+  const openPreviewPicker = Boolean(previewDatePicker);
+  const [selectedPreviewDate, setSelectedPreviewDate] = useState("");
+
+  const [previewDatePatchRequest, previewDatePatchResponse] = useRequest({
+    path: CLIENTS,
+    method: "patch",
+  });
+
+  const handlePreviewSubmit = () => {
+    previewDatePatchRequest({
+      id: data.id,
+      body: {
+        user: {},
+        followup: new Date(selectedPreviewDate).toCorrectISOString(),
+      },
+      onSuccess: (res) => {
+        console.log(res.data);
+        dispatch({
+          type: "clients/putItem",
+          payload: { id: res.data.id, item: res.data },
+        });
+        data.followup = res.data.followup;
+      },
+    });
+  };
+
+  //====End===== Preview Date Logic ===============
+
   //----variables----
   const info = [
     {
@@ -1015,6 +1054,68 @@ const InfoDialog = ({
     {
       name: "تاريخ الإنشاء",
       value: data?.created_at ? format(data?.created_at) : "",
+      customEmpty: "لا يوجد",
+    },
+    {
+      name: "تاريخ المعاينة",
+      value: data?.followup ? format(data?.followup) : "",
+      customEmpty: "لا يوجد",
+      addition: (
+        <PermissionsGate permissions={["aqartransfer_clients"]}>
+          <IconButton
+            sx={{ color: "white" }}
+            onClick={(e) => setPreviewDatePicker(e.currentTarget)}
+          >
+            <DateRangeIcon sx={{ color: "white", transform: "scale(1.2)" }} />
+          </IconButton>
+          <Menu
+            open={openPreviewPicker}
+            anchorEl={previewDatePicker}
+            onClose={() => setPreviewDatePicker(null)}
+            PaperProps={{
+              sx: {
+                "& .MuiList-root": {
+                  p: 2,
+                },
+              },
+            }}
+          >
+            <LocalizationProvider dateAdapter={AdapterMoment}>
+              <DateTimePicker
+                label="DateTimePicker"
+                value={selectedPreviewDate}
+                onChange={(newValue) => {
+                  setSelectedPreviewDate(newValue);
+                }}
+                renderInput={(params) => (
+                  <InputField
+                    sx={{
+                      width: "100%",
+                      "& .MuiInputBase-root": {
+                        border: "none",
+                      },
+                    }}
+                    {...params}
+                  />
+                )}
+              />
+            </LocalizationProvider>
+            <Button
+              variant="contained"
+              sx={{ width: "100%", marginTop: 3 }}
+              onClick={(e) =>
+                handlePreviewSubmit({
+                  ...e,
+                  selectedPreviewDate,
+                  clientId: data.id,
+                })
+              }
+            >
+              حفظ
+            </Button>
+          </Menu>
+        </PermissionsGate>
+      ),
     },
     {
       name: "تعليق",
