@@ -409,88 +409,91 @@ const columns = [
 ];
 
 const EditDialog = ({ open = false, onClose = () => {}, data = {} }) => {
-  const [{ controls }, { setControl, resetControls }] = useControls([
-    {
-      control: "country",
-      value: data?.country,
-      isRequired: false,
-    },
-    {
-      control: "governorate",
-      value: data?.state,
-      isRequired: false,
-    },
-    {
-      control: "city",
-      value: data?.city,
-      isRequired: false,
-    },
-    {
-      control: "district",
-      value: data?.area,
-      isRequired: false,
-    },
-    {
-      control: "near",
-      value: data?.part,
-      isRequired: false,
-    },
-    {
-      control: "address",
-      value: data?.address,
-      isRequired: false,
-    },
-    {
-      control: "number",
-      value: data?.flat_number,
-      isRequired: false,
-    },
-    {
-      control: "type",
-      value: data?.unit_type,
-      isRequired: false,
-    },
-    {
-      control: "floor",
-      value: data?.floor_number,
-      isRequired: false,
-    },
-    {
-      control: "area",
-      value: data?.area_size,
-      isRequired: false,
-    },
-    {
-      control: "rooms",
-      value: data?.room_number,
-      isRequired: false,
-    },
-    {
-      control: "bathrooms",
-      value: data?.bath_count,
-      isRequired: false,
-    },
-    {
-      control: "genre",
-      value: data?.complete_type,
-      isRequired: false,
-    },
-    {
-      control: "price",
-      value: data?.price,
-      isRequired: false,
-    },
-    {
-      control: "client",
-      value: data?.client,
-      isRequired: false,
-    },
-    {
-      control: "notes",
-      value: data?.comment,
-      isRequired: false,
-    },
-  ]);
+  const [{ controls }, { setControl, resetControls }] = useControls(
+    [
+      {
+        control: "country",
+        value: data?.country,
+        isRequired: false,
+      },
+      {
+        control: "governorate",
+        value: data?.state,
+        isRequired: false,
+      },
+      {
+        control: "city",
+        value: data?.city,
+        isRequired: false,
+      },
+      {
+        control: "district",
+        value: data?.area,
+        isRequired: false,
+      },
+      {
+        control: "near",
+        value: data?.part,
+        isRequired: false,
+      },
+      {
+        control: "address",
+        value: data?.address,
+        isRequired: false,
+      },
+      {
+        control: "number",
+        value: data?.flat_number,
+        isRequired: false,
+      },
+      {
+        control: "type",
+        value: data?.unit_type,
+        isRequired: false,
+      },
+      {
+        control: "floor",
+        value: data?.floor_number,
+        isRequired: false,
+      },
+      {
+        control: "area",
+        value: data?.area_size,
+        isRequired: false,
+      },
+      {
+        control: "rooms",
+        value: data?.room_number,
+        isRequired: false,
+      },
+      {
+        control: "bathrooms",
+        value: data?.bath_count,
+        isRequired: false,
+      },
+      {
+        control: "genre",
+        value: data?.complete_type,
+        isRequired: false,
+      },
+      {
+        control: "price",
+        value: data?.price,
+        isRequired: false,
+      },
+      {
+        control: "client",
+        value: data?.client,
+        isRequired: false,
+      },
+      {
+        control: "notes",
+        value: data?.comment,
+        isRequired: false,
+      },
+    ],
+    [data]
+  );
 
   useAfterEffect(() => {
     if (!open) return;
