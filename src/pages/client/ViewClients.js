@@ -78,6 +78,7 @@ import PermissionsGate from "../../features/permissions/components/PermissionsGa
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import useConfirmMessage from "../../hooks/useConfirmMessage";
 
 const ViewClients = () => {
   //----store----
@@ -212,12 +213,6 @@ const ViewClients = () => {
     method: "get",
   });
 
-  const [clientDeleteRequest, clientDeleteResponse] = useRequest({
-    path: CLIENTS,
-    method: "delete",
-    successMessage: "تم الحذف بنجاح",
-  });
-
   const [clientCommentPostRequest] = useRequest({
     path: CLIENTS_COMMENTS,
     method: "post",
@@ -273,6 +268,14 @@ const ViewClients = () => {
     });
   };
 
+  //===Start===== Delete Client Logic =========
+
+  const [clientDeleteRequest, clientDeleteResponse] = useRequest({
+    path: CLIENTS,
+    method: "delete",
+    successMessage: "تم الحذف بنجاح",
+  });
+
   const deleteClient = (e, { id }) => {
     clientDeleteRequest({
       id: id,
@@ -281,6 +284,13 @@ const ViewClients = () => {
       },
     });
   };
+
+  const [handleDeleteClient, deleteClientConfirmDialog] = useConfirmMessage({
+    onConfirm: deleteClient,
+    text: "هل انت متأكد من انك تريد حذف هذا العميل؟",
+  });
+
+  //===End===== Delete Client Logic =========
 
   const handlePaginate = (params) => {
     setRequestParams((old) => ({
@@ -514,6 +524,8 @@ const ViewClients = () => {
 
   const isPermitted = useIsPermitted();
 
+  //===Start===== Delete Selected Clients Logic ===========
+
   const [selectedClientsDeleteRequest, selectedClientsDeleteResponse] =
     useRequest({
       path: CLIENTS_SELECTED_DELETE,
@@ -521,7 +533,7 @@ const ViewClients = () => {
       successMessage: "تم حذف العملاء بنجاح",
     });
 
-  const handleDeleteSelected = () => {
+  const deleteSelected = () => {
     selectedClientsDeleteRequest({
       body: {
         client: selected.map((client) => client.id),
@@ -533,6 +545,15 @@ const ViewClients = () => {
       },
     });
   };
+
+  const [handleDeleteSelected, deleteSelectedConfirmDialog] = useConfirmMessage(
+    {
+      onConfirm: deleteSelected,
+      text: "هل انت متأكد من انك تريد حذف هؤلاء العملاء؟",
+    }
+  );
+
+  //===End===== Delete Selected Clients Logic ===========
 
   return (
     <Wrapper>
@@ -770,7 +791,7 @@ const ViewClients = () => {
           ["change_aqarclient"]
         )}
         onDelete={isPermitted(
-          (e, row) => deleteClient(e, row),
+          (e, row) => handleDeleteClient(e, row),
           ["delete_aqarclient"]
         )}
         onView={(e, row) => {
@@ -934,11 +955,13 @@ const ViewClients = () => {
         </Button>
       </Stack>
 
-      {/* alerts */}
       {selectedClientsDeleteResponse.successAlert}
       {selectedClientsDeleteResponse.failAlert}
       {clientDeleteResponse.successAlert}
       {clientDeleteResponse.failAlert}
+
+      {deleteSelectedConfirmDialog}
+      {deleteClientConfirmDialog}
     </Wrapper>
   );
 };
