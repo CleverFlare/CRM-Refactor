@@ -266,7 +266,7 @@ const EditDialog = ({
   const getParentPermissions = () => {
     parentPermissionsGetRequest({
       params: {
-        id: data.parent.id,
+        id: controls.parent ?? data.parent.id,
       },
       onSuccess: (res) => {
         setToggles(res.data);
@@ -392,7 +392,10 @@ const EditDialog = ({
             onOpen={getParents}
             isPending={parentsGetResponse.isPending}
             value={controls.to}
-            onChange={(e) => setControl("to", e.target.value)}
+            onChange={(e) => {
+              setControl("to", e.target.value);
+              getParentPermissions();
+            }}
             renderValue={(selected) => {
               return (
                 parents.find((parent) => parent.id === selected)?.title ??
