@@ -13,6 +13,7 @@ const ImportClients = () => {
   const [importClientsGetRequest, importClientsGetResponse] = useRequest({
     path: IMPORT_CLIENTS,
     method: "get",
+    responseType: "blob",
   });
 
   const handleDownload = () => {
@@ -21,7 +22,8 @@ const ImportClients = () => {
         const url = window.URL.createObjectURL(new Blob([res.data]));
         const link = document.createElement("a");
         link.href = url;
-        link.setAttribute("download", "CRM Clients Sheet.xls");
+        link.setAttribute("download", "sheet.xls");
+        document.body.appendChild(link);
         link.click();
       },
     });
