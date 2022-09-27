@@ -1406,6 +1406,7 @@ const CommentDialog = ({
   status = [],
   onSubmit = () => {},
 }) => {
+  const [search, setSearch] = useState("");
   const [
     { controls, required, invalid },
     { setControl, validate, resetControls },
@@ -1445,16 +1446,28 @@ const CommentDialog = ({
       }}
     >
       <DialogHeading onGoBack={onGoBack}>التعليقات</DialogHeading>
-      <DialogPeopleWindow isPending={isPending} sx={{ height: 400 }}>
-        {data.map((item, index) => (
-          <DialogSelectItem
-            key={`comment ${index}`}
-            title={item.title}
-            body={`${item.body} [${item.status}]`}
-            subtitle={item.date}
-            picture={item.picture}
-          />
-        ))}
+      <DialogPeopleWindow
+        searchValue={search}
+        onSearch={(e) => setSearch(e.target.value)}
+        isPending={isPending}
+        sx={{ height: 400 }}
+      >
+        {data
+          .filter(
+            (item) =>
+              item.title.includes(search) ||
+              item.body.includes(search) ||
+              item.status.includes(search)
+          )
+          .map((item, index) => (
+            <DialogSelectItem
+              key={`comment ${index}`}
+              title={item.title}
+              body={`${item.body} [${item.status}]`}
+              subtitle={item.date}
+              picture={item.picture}
+            />
+          ))}
       </DialogPeopleWindow>
       <PermissionsGate permissions={["add_aqarclientcomment"]}>
         <DialogContent>
