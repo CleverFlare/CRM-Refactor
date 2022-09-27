@@ -1188,7 +1188,7 @@ const InfoDialog = ({
       field: "history_date",
       headerName: "تاريخ الإجراء",
       customContent: ({ rowData }) =>
-        rowData.created_at ? format(rowData.created_at) : "",
+        rowData.history_date ? format(rowData.history_date) : "",
     },
   ];
 

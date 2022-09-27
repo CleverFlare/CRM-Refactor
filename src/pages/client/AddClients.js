@@ -356,10 +356,10 @@ const AddClients = () => {
           label="الميزانية"
           placeholder="الميزانية"
           thousandSeparator
+          value={controls.budget}
           onChange={(e) => {
             setControl("budget", e.target.value);
           }}
-          value={controls.budget}
           required={required.includes("budget")}
           error={Boolean(invalid.budget)}
           helperText={invalid.budget}
