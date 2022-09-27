@@ -534,6 +534,10 @@ const TablePagination = ({ current = 1, limit, onChange = () => {} }) => {
     max.current = limit;
   }, [limit]);
 
+  useAfterEffect(() => {
+    setPage(1);
+  }, [limit]);
+
   //----functions----
   const handleKeyDown = (e) => {
     if (
