@@ -41,7 +41,7 @@ const pages = [
   {
     name: "الرئيسية",
     icon: <AutoAwesomeMosaicIcon />,
-    path: "/home",
+    path: "/",
     element: <Home />,
     permitted: ["view_aqarpost"],
   },

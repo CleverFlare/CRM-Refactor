@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Fragment } from "react";
 import Sidebar from "./components/Sidebar";
 import {
   BrowserRouter as Router,
   Routes,
   Route,
   Navigate,
+  useLocation,
 } from "react-router-dom";
 import { Box, useMediaQuery } from "@mui/material";
 import Topbar from "./components/Topbar";
@@ -14,8 +15,6 @@ import { useDispatch, useSelector } from "react-redux";
 import useRequest from "./hooks/useRequest";
 import { NOTIFICATIONS, USER_INFO } from "./data/APIs";
 import Login from "./pages/Login";
-import { Provider } from "react-redux";
-import store from "./store";
 import PrivateRoute from "./features/permissions/components/PrivateRoute";
 import Notfound from "./components/Notfound";
 import filter from "./utils/ClearNull";
@@ -214,70 +213,74 @@ const App = () => {
 
   //====End==== change avatar login ========
 
-  return (
-    <Provider store={store}>
-      <Router>
-        {token && (
-          <Layout
-            permissions={userInfo.user_permissions.map((perm) => perm.codename)}
-            notifications={notifications}
-            onRemoveNotifications={handleRemoveNotifications}
-            userInfo={{
-              name: `${userInfo.first_name} ${userInfo.last_name}`,
-              role: userInfo.job_title,
-              organization: userInfo.organization.name,
-              image: userInfo.image,
-            }}
-            isPending={userInfoGetResponse.isPending}
-            onChangeAvatar={changeAavatar}
-            isAvatarPending={changeAvatarPatchResponse.isPending}
-          >
-            <Routes>
-              {pages.map((page, pageIndex) => {
-                if (!Boolean(page)) return;
-                switch (page.hasOwnProperty("subtabs")) {
-                  case false:
-                    return (
-                      <Route
-                        path={page.path}
-                        element={
-                          <PrivateRoute permissions={page.permitted}>
-                            {page.element}
-                          </PrivateRoute>
-                        }
-                        key={`route page ${pageIndex}`}
-                      />
-                    );
-                  case true:
-                    return page.subtabs.map((subtab, subtabIndex) => (
-                      <Route
-                        path={page.path + subtab.path}
-                        element={
-                          <PrivateRoute permissions={subtab.permitted}>
-                            {subtab.element}
-                          </PrivateRoute>
-                        }
-                        key={`route subpage ${subtabIndex}`}
-                      />
-                    ));
-                  default:
-                    return;
-                }
-              })}
+  const location = useLocation();
 
-              <Route path="/*" element={<Navigate replace to="/home" />} />
-              <Route path="/404" element={<Notfound />} />
-            </Routes>
-          </Layout>
-        )}
-        {!token && (
+  useEffect(() => {
+    console.log(location);
+  }, [location]);
+
+  return (
+    <Fragment>
+      {token && (
+        <Layout
+          permissions={userInfo.user_permissions.map((perm) => perm.codename)}
+          notifications={notifications}
+          onRemoveNotifications={handleRemoveNotifications}
+          userInfo={{
+            name: `${userInfo.first_name} ${userInfo.last_name}`,
+            role: userInfo.job_title,
+            organization: userInfo.organization.name,
+            image: userInfo.image,
+          }}
+          isPending={userInfoGetResponse.isPending}
+          onChangeAvatar={changeAavatar}
+          isAvatarPending={changeAvatarPatchResponse.isPending}
+        >
           <Routes>
-            <Route path="/" element={<Login />} />
+            {pages.map((page, pageIndex) => {
+              if (!Boolean(page)) return;
+              switch (page.hasOwnProperty("subtabs")) {
+                case false:
+                  return (
+                    <Route
+                      path={page.path}
+                      element={
+                        <PrivateRoute permissions={page.permitted}>
+                          {page.element}
+                        </PrivateRoute>
+                      }
+                      key={`route page ${pageIndex}`}
+                    />
+                  );
+                case true:
+                  return page.subtabs.map((subtab, subtabIndex) => (
+                    <Route
+                      path={page.path + subtab.path}
+                      element={
+                        <PrivateRoute permissions={subtab.permitted}>
+                          {subtab.element}
+                        </PrivateRoute>
+                      }
+                      key={`route subpage ${subtabIndex}`}
+                    />
+                  ));
+                default:
+                  return;
+              }
+            })}
+
             <Route path="/*" element={<Navigate replace to="/" />} />
+            {/* <Route path="/404" element={<Notfound />} /> */}
           </Routes>
-        )}
-      </Router>
-    </Provider>
+        </Layout>
+      )}
+      {!token && (
+        <Routes>
+          <Route path="/" element={<Login />} />
+          <Route path="/*" element={<Navigate replace to="/" />} />
+        </Routes>
+      )}
+    </Fragment>
   );
 };
 

@@ -7,6 +7,7 @@ import { ThemeProvider } from "@mui/material";
 import theme, { cacheRtl } from "./Theme";
 import { Provider } from "react-redux";
 import store from "./store";
+import { BrowserRouter as Router } from "react-router-dom";
 
 //this is a simple mathematical method that takes a number and returns 0 if it's less than 0
 Math.minimumZero = (number) => {
@@ -19,7 +20,9 @@ root.render(
   <CacheProvider value={cacheRtl}>
     <ThemeProvider theme={theme}>
       <Provider store={store}>
-        <App />
+        <Router>
+          <App />
+        </Router>
       </Provider>
     </ThemeProvider>
   </CacheProvider>

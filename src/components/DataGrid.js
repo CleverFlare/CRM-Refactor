@@ -68,7 +68,7 @@ const DataGrid = ({
 
   //----conditions----
   const renderProcedures = Boolean(
-    onDelete || onArchive || onChangePassword || onBlock || onEdit
+    onDelete || onArchive || onChangePassword || onBlock || onEdit || onView
   );
   const rootCheckboxCheck =
     Boolean(rowsState.length) && checked.checks.length === rowsState.length;
