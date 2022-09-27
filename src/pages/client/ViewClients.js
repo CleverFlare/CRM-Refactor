@@ -906,7 +906,11 @@ const ViewClients = () => {
         onSubmit={handleSubmitProjectTransfer}
       />
 
-      <EditDialog onClose={() => setEditData(null)} data={editData} />
+      <EditDialog
+        open={Boolean(editData)}
+        onClose={() => setEditData(null)}
+        data={editData}
+      />
 
       {/* buttons */}
       <Stack
@@ -1600,27 +1604,38 @@ TransferToProjectDialog.propTypes = {
 };
 
 const EditDialog = ({ open, onClose, data }) => {
-  const [{ controls }, { setControl, resetControls, validate }] = useControls(
+  const [{ controls, invalid }, { setControl, validate }] = useControls(
     [
       {
         control: "name",
         value: `${data?.user?.first_name} ${data?.user?.last_name}`,
+        isRequired: true,
       },
       {
         control: "email",
         value: data?.user?.email,
+        validations: [
+          {
+            test: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+            message: "البريد غير صالح",
+          },
+        ],
       },
       {
         control: "phone",
         value: data?.user?.phone,
+        isRequired: true,
       },
       {
         control: "countryCode",
         value: data?.user?.country_code,
+        isRequired: true,
       },
       {
         control: "project",
         value: data?.bussiness?.map((project) => project.id) ?? [],
+        isRequired: true,
+        convert: (project) => project.join("-"),
       },
       {
         control: "contact",
@@ -1629,6 +1644,7 @@ const EditDialog = ({ open, onClose, data }) => {
       {
         control: "channel",
         value: data?.channel?.id,
+        isRequired: true,
       },
       {
         control: "budget",
@@ -1683,52 +1699,59 @@ const EditDialog = ({ open, onClose, data }) => {
   const handleSubmit = () => {
     const isThereChange = compare(
       [
-        [controls.name, ""],
-        [controls.email, ""],
-        [controls.project, []],
-        [controls.channel, ""],
-        [controls.contact, ""],
-        [controls.budget, ""],
+        [controls.name, `${data?.user?.first_name} ${data?.user?.last_name}`],
+        [controls.email, data?.user?.email],
+        [controls.project, data?.bussiness.map((project) => project.id)],
+        [controls.channel, data?.channel?.id],
+        [controls.contact, data?.fav_contacts],
+        [controls.budget, data?.max_budget],
       ],
-      true
+      false
     );
 
-    if (isThereChange) return;
+    console.log(!isThereChange);
 
-    const requestBody = filter({
-      obj: {
-        user: {
-          first_name: controls.name.split(/(?<=^\S+)\s/)[0],
-          last_name: controls.name.split(/(?<=^\S+)\s/)?.[1],
-          phone: controls.phone,
-          country_code: controls.countryCode,
-          email: controls.email,
+    if (!isThereChange) return;
+
+    validate().then(({ isOk }) => {
+      if (!isOk) return;
+
+      const requestBody = filter({
+        obj: {
+          user: {
+            first_name: controls.name.split(/(?<=^\S+)\s/)[0],
+            last_name: controls.name.split(/(?<=^\S+)\s/)?.[1],
+            phone: controls.phone,
+            country_code: controls.countryCode,
+            email: controls.email,
+          },
+          ...(Boolean(controls.project.length) && {
+            bussiness: controls.project,
+          }),
+          channel: controls.channel,
+          agent: controls.employee,
+          fav_contacts: controls.contact,
+          max_budget: controls.budget.replace(/,/gi, ""),
         },
-        ...(Boolean(controls.project.length) && {
-          bussiness: controls.project,
-        }),
-        channel: controls.channel,
-        agent: controls.employee,
-        fav_contacts: controls.contact,
-        max_budget: controls.budget.replace(/,/gi, ""),
-      },
-      output: "object",
-    });
+        output: "object",
+      });
 
-    clientPatchRequest({
-      id: data.id,
-      body: requestBody,
-      onSuccess: (res) => {
-        dispatch({
-          type: "clients/putItem",
-          payload: { id: res.data.id, item: res.data },
-        });
-      },
+      clientPatchRequest({
+        id: data.id,
+        body: requestBody,
+        onSuccess: (res) => {
+          onClose();
+          dispatch({
+            type: "clients/putItem",
+            payload: { id: res.data.id, item: res.data },
+          });
+        },
+      });
     });
   };
 
   return (
-    <Dialog open={Boolean(data)} onClose={onClose}>
+    <Dialog open={open} onClose={onClose}>
       <DialogHeading onGoBack={onClose}>تعديل بيانات العميل</DialogHeading>
       <DialogForm>
         <DialogInputField
@@ -1736,22 +1759,29 @@ const EditDialog = ({ open, onClose, data }) => {
           label="الإسم"
           value={controls.name}
           onChange={(e) => setControl("name", e.target.value)}
+          error={Boolean(invalid.name)}
+          helperText={invalid.name}
         />
         <DialogInputField
           placeholder="البريد الإلكتروني"
           label="البريد الإلكتروني"
           value={controls.email}
           onChange={(e) => setControl("email", e.target.value)}
+          error={Boolean(invalid.email)}
+          helperText={invalid.email}
         />
         <DialogPhoneField
           placeholder="الهاتف"
           label="الهاتف"
           value={controls.phone}
+          requiredCode
           onChange={(e) => setControl("phone", e.target.value)}
           selectProps={{
             value: controls.countryCode,
             onChange: (e) => setControl("countryCode", e.target.value),
           }}
+          error={Boolean(invalid.countryCode)}
+          helperText={invalid.countryCode}
         />
         <DialogMultiSelectField
           placeholder="المشروع"
@@ -1777,6 +1807,8 @@ const EditDialog = ({ open, onClose, data }) => {
                   .trim()
               : data?.bussiness?.map((project) => project?.name).join(" ، ");
           }}
+          error={Boolean(invalid.project)}
+          helperText={invalid.project}
         >
           {projectsState.map((project, index) => (
             <MultiSelectItem
@@ -1795,6 +1827,8 @@ const EditDialog = ({ open, onClose, data }) => {
           renderValue={(selected) => {
             return contactMeans.find((mean) => mean.value === selected).title;
           }}
+          error={Boolean(invalid.contact)}
+          helperText={invalid.contact}
         >
           {contactMeans.map((mean, index) => (
             <MenuItem value={mean.value} key={`${mean.value} ${index}`}>
@@ -1815,6 +1849,8 @@ const EditDialog = ({ open, onClose, data }) => {
               data?.channel?.name
             );
           }}
+          error={Boolean(invalid.channel)}
+          helperText={invalid.channel}
         >
           {channelsState.map((channel, index) => (
             <MenuItem value={channel.id} key={`edit client channel ${index}`}>
@@ -1827,6 +1863,8 @@ const EditDialog = ({ open, onClose, data }) => {
           label="الميزانية"
           value={controls.budget}
           onChange={(e) => setControl("budget", e.target.value)}
+          error={Boolean(invalid.budget)}
+          helperText={invalid.budget}
         />
       </DialogForm>
       <DialogButtonsGroup>
@@ -1840,7 +1878,6 @@ const EditDialog = ({ open, onClose, data }) => {
           إلغاء
         </DialogButton>
       </DialogButtonsGroup>
-      {clientPatchResponse.successAlert}
       {clientPatchResponse.failAlert}
     </Dialog>
   );
