@@ -1008,6 +1008,8 @@ const InfoDialog = ({
         });
         data.followup = res.data.followup;
       },
+    }).then(() => {
+      setPreviewDatePicker(null);
     });
   };
 
@@ -1261,7 +1263,8 @@ const columns = [
   {
     field: "agent",
     headerName: "الموظف",
-    customContent: ({ agent }) => agent && `${agent.name}`,
+    customContent: ({ agent }) => Boolean(agent.name) && `${agent.name}`,
+    customEmpty: "أدمن",
   },
 ];
 
