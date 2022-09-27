@@ -28,6 +28,7 @@ import { useRef } from "react";
 import useAfterEffect from "../../hooks/useAfterEffect";
 import compare from "../../utils/Compare";
 import filter from "../../utils/ClearNull";
+import func from "@mylib";
 
 const ViewJobs = () => {
   const jobsStore = useSelector((state) => state.jobs.value);
@@ -225,7 +226,7 @@ const EditDialog = ({
 
   useEffect(() => {
     if (!open) return;
-    console.log(data);
+    func();
   }, [open]);
 
   //===Start==== Permissions Logic =========

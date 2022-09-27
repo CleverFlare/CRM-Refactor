@@ -102,6 +102,8 @@ const AddJobs = () => {
     successMessage: "تم إضافة وظيفة بنجاح",
   });
 
+  const [selectedPermissions, setSelectedPermissions] = useState([]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
     validate().then(({ isOk }) => {
@@ -111,9 +113,7 @@ const AddJobs = () => {
         obj: {
           title: controls.name,
           parent: controls.to,
-          permissions: permissionsState.map((perm) => ({
-            codename: perm.codename,
-          })),
+          permissions: selectedPermissions.map((perm) => ({ codename: perm })),
         },
       });
 
@@ -121,6 +121,7 @@ const AddJobs = () => {
         body: requestBody,
         onSuccess: () => {
           resetControls();
+          setSelectedPermissions([]);
         },
       }).then((res) => {
         let response = res?.response?.data;
@@ -191,7 +192,10 @@ const AddJobs = () => {
           </SelectField>
           <PermissionToggles
             sx={{ gridColumn: "1 / -1" }}
-            initialToggles={[]}
+            initialToggles={selectedPermissions}
+            onToggle={({ toggles }) => {
+              setSelectedPermissions(toggles);
+            }}
             permissions={permissionsState}
           />
         </Form>
