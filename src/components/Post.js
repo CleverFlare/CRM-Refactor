@@ -34,9 +34,9 @@ const Post = ({
   createdAt,
   children,
   images = [],
-  onDelete = () => {},
-  onEdit = () => {},
-  onPreventNotifications = () => {},
+  onDelete = null,
+  onEdit = null,
+  onPreventNotifications = null,
 }) => {
   //----states----
   const [anchorEl, setAnchorEl] = useState(null);
@@ -82,48 +82,54 @@ const Post = ({
               }}
             >
               <PermissionsGate permissions={["change_aqarpost"]}>
-                <MenuItem
-                  onClick={() => {
-                    handleCloseMenu();
-                    onEdit({
-                      name,
-                      picture,
-                      createdAt,
-                      images,
-                      children,
-                    });
-                  }}
-                >
-                  <ListItemIcon>
-                    <EditIcon />
-                  </ListItemIcon>
-                  <ListItemText>تعديل المنشور</ListItemText>
-                </MenuItem>
+                {onEdit && (
+                  <MenuItem
+                    onClick={() => {
+                      handleCloseMenu();
+                      onEdit({
+                        name,
+                        picture,
+                        createdAt,
+                        images,
+                        children,
+                      });
+                    }}
+                  >
+                    <ListItemIcon>
+                      <EditIcon />
+                    </ListItemIcon>
+                    <ListItemText>تعديل المنشور</ListItemText>
+                  </MenuItem>
+                )}
               </PermissionsGate>
               <PermissionsGate permissions={["delete_aqarpost"]}>
+                {onDelete && (
+                  <MenuItem
+                    onClick={() => {
+                      handleCloseMenu();
+                      onDelete();
+                    }}
+                  >
+                    <ListItemIcon>
+                      <DeleteIcon />
+                    </ListItemIcon>
+                    <ListItemText>نقل إلى سلة المهملات</ListItemText>
+                  </MenuItem>
+                )}
+              </PermissionsGate>
+              {onPreventNotifications && (
                 <MenuItem
                   onClick={() => {
                     handleCloseMenu();
-                    onDelete();
+                    onPreventNotifications();
                   }}
                 >
                   <ListItemIcon>
-                    <DeleteIcon />
+                    <NotificationsOffIcon />
                   </ListItemIcon>
-                  <ListItemText>نقل إلى سلة المهملات</ListItemText>
+                  <ListItemText>إيقاف إشعارات المنشور</ListItemText>
                 </MenuItem>
-              </PermissionsGate>
-              <MenuItem
-                onClick={() => {
-                  handleCloseMenu();
-                  onPreventNotifications();
-                }}
-              >
-                <ListItemIcon>
-                  <NotificationsOffIcon />
-                </ListItemIcon>
-                <ListItemText>إيقاف إشعارات المنشور</ListItemText>
-              </MenuItem>
+              )}
             </Menu>
           </div>
         }

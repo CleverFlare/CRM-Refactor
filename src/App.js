@@ -52,6 +52,7 @@ const Layout = ({
   permissions,
   notifications,
   onRemoveNotifications = () => {},
+  onClear = () => {},
   onChangeAvatar,
   isAvatarPending = false,
   isPending = false,
@@ -86,7 +87,8 @@ const Layout = ({
         showBurger={sm}
         onBurgerClick={() => toggleOpenSidebar()}
         notifications={notifications}
-        onClear={onRemoveNotifications}
+        onNotificationsOpen={onRemoveNotifications}
+        onClear={onClear}
       />
       <Sidebar
         permanent={!sm}
@@ -159,12 +161,9 @@ const App = () => {
     };
   }, [token]);
 
-  const handleRemoveNotifications = () => {
+  const handleSeenNotifications = () => {
     missedNotificationsGetRequest({
       customMethod: "delete",
-      onSuccess: () => {
-        setNotifications([]);
-      },
     });
   };
 
@@ -215,17 +214,13 @@ const App = () => {
 
   const location = useLocation();
 
-  useEffect(() => {
-    console.log(location);
-  }, [location]);
-
   return (
     <Fragment>
       {token && (
         <Layout
           permissions={userInfo.user_permissions.map((perm) => perm.codename)}
           notifications={notifications}
-          onRemoveNotifications={handleRemoveNotifications}
+          onRemoveNotifications={handleSeenNotifications}
           userInfo={{
             name: `${userInfo.first_name} ${userInfo.last_name}`,
             role: userInfo.job_title,
@@ -235,6 +230,7 @@ const App = () => {
           isPending={userInfoGetResponse.isPending}
           onChangeAvatar={changeAavatar}
           isAvatarPending={changeAvatarPatchResponse.isPending}
+          onClear={() => setNotifications([])}
         >
           <Routes>
             {pages.map((page, pageIndex) => {

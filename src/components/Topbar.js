@@ -33,7 +33,13 @@ const NotificationItem = ({ onClick, content, time, unread = false }) => {
   );
 };
 
-const Topbar = ({ showBurger, onBurgerClick, onClear, notifications = [] }) => {
+const Topbar = ({
+  showBurger,
+  onBurgerClick,
+  onClear,
+  notifications = [],
+  onNotificationsOpen,
+}) => {
   //----states----
   const [notificationsState, setNotificationsState] = useState([]);
   const unreadNotifCache = useRef(0);
@@ -57,6 +63,7 @@ const Topbar = ({ showBurger, onBurgerClick, onClear, notifications = [] }) => {
 
   useEffect(() => {
     if (!open) return;
+    onNotificationsOpen();
     setReadNotif(notifications.length);
     setUnreadNotif(() => {
       unreadNotifCache.current = unreadNotif;

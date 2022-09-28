@@ -8,9 +8,9 @@ const useIsPermitted = () => {
   );
 
   const isPermitted = (callback, permissions = []) => {
-    const canAccess = permissions.some((permission) =>
-      userPermissions.includes(permission)
-    );
+    const canAccess =
+      Boolean(permissions.length) &&
+      permissions.some((permission) => userPermissions.includes(permission));
 
     return canAccess ? callback : null;
   };

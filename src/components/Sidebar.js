@@ -311,6 +311,7 @@ const Sidebar = ({
                   );
                 case false:
                   if (
+                    Boolean(page.permitted.length) &&
                     !Boolean(
                       page.permitted.some((perm) => permissions.includes(perm))
                     )

@@ -1,5 +1,5 @@
 import React from "react";
-import VpnKeyOffIcon from "@mui/icons-material/VpnKeyOff";
+import safe from "../../../assets/safe.png";
 import { useSelector } from "react-redux";
 import { Box, Stack } from "@mui/system";
 import { Typography } from "@mui/material";
@@ -11,9 +11,11 @@ const routeGate =
     const userPermissions = userInfo.user_permissions.map(
       (perm) => perm.codename
     );
-    const isPermitted = Boolean(
-      permissions.some((permission) => userPermissions.includes(permission))
-    );
+    const isPermitted =
+      Boolean(
+        permissions.some((permission) => userPermissions.includes(permission))
+      ) || !Boolean(permissions.length);
+
     return (
       <>
         {isPermitted ? (
@@ -25,7 +27,7 @@ const routeGate =
             justifyContent="center"
             alignItems="center"
           >
-            <VpnKeyOffIcon sx={{ width: 300, height: 300, color: "#494949" }} />
+            <Box component="img" src={safe} sx={{ width: 500, height: 500 }} />
             <Typography
               variant="h4"
               sx={{ fontWeight: "bold", color: "#494949" }}

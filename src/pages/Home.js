@@ -25,6 +25,7 @@ import InputField from "../features/form/components/InputField";
 import { DialogButton, DialogButtonsGroup } from "../features/dialog";
 import useAfterEffect from "../hooks/useAfterEffect";
 import PermissionsGate from "../features/permissions/components/PermissionsGate";
+import routeGate from "../features/permissions/hoc/RouteGate";
 
 const Home = () => {
   //----store----
@@ -178,10 +179,21 @@ const Home = () => {
                 picture={post.user.image}
                 createdAt={post.created_at}
                 images={post.medias}
-                onDelete={() => handleDeletePost(post.id)}
-                onEdit={(data) => {
-                  setPostEditData({ ...data, id: post.id });
-                }}
+                onDelete={
+                  post.user.username === userInfo.username
+                    ? () => handleDeletePost(post.id)
+                    : null
+                }
+                onEdit={
+                  post.user.username === userInfo.username
+                    ? (data) => {
+                        setPostEditData({ ...data, id: post.id });
+                      }
+                    : null
+                }
+                onPreventNotifications={
+                  post.user.username === userInfo.username ? null : () => {}
+                }
               >
                 {post.content}
               </Post>
@@ -212,7 +224,7 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default routeGate(Home, ["add_aqarpost", "view_aqarpost"]);
 
 const PostEditDialog = ({ data, open, onClose, onSubmit }) => {
   const [{ controls, invalid }, { setControl, resetControls }] = useControls([
