@@ -27,10 +27,29 @@ const routeGate =
             justifyContent="center"
             alignItems="center"
           >
-            <Box component="img" src={safe} sx={{ width: 500, height: 500 }} />
+            <Box
+              component="img"
+              src={safe}
+              sx={{
+                maxWidth: {
+                  xl: 500,
+                  lg: 500,
+                  md: 300,
+                  sm: 300,
+                  xs: 300,
+                },
+                maxHeight: {
+                  xl: 500,
+                  lg: 500,
+                  md: 300,
+                  sm: 300,
+                  xs: 300,
+                },
+              }}
+            />
             <Typography
               variant="h4"
-              sx={{ fontWeight: "bold", color: "#494949" }}
+              sx={{ fontWeight: "bold", color: "#494949", textAlign: "center" }}
             >
               للأسف انت لا تملك الصلاحية لرؤية هذه الصفحة
             </Typography>
