@@ -36,20 +36,31 @@ const routeGate =
                   lg: 500,
                   md: 300,
                   sm: 300,
-                  xs: 300,
+                  xs: 200,
                 },
                 maxHeight: {
                   xl: 500,
                   lg: 500,
                   md: 300,
-                  sm: 300,
-                  xs: 300,
+                  sm: 200,
+                  xs: 200,
                 },
               }}
             />
             <Typography
               variant="h4"
-              sx={{ fontWeight: "bold", color: "#494949", textAlign: "center" }}
+              sx={{
+                fontWeight: "bold",
+                color: "#494949",
+                textAlign: "center",
+                fontSize: {
+                  xl: 50,
+                  lg: 50,
+                  md: 50,
+                  sm: 40,
+                  xs: 30,
+                },
+              }}
             >
               للأسف انت لا تملك الصلاحية لرؤية هذه الصفحة
             </Typography>
