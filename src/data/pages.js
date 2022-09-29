@@ -137,18 +137,6 @@ const pages = [
     path: "/employees",
     subtabs: [
       {
-        name: "إضافة موظف",
-        path: "/create-employees",
-        element: <AddEmployees />,
-        permitted: ["add_aqaremployee"],
-      },
-      {
-        name: "عرض الموظفين",
-        path: "/view-employees",
-        element: <ViewEmployees />,
-        permitted: ["view_aqaremployee"],
-      },
-      {
         name: "إضافة وظيفة موظف",
         path: "/create-jobs",
         element: <AddJobs />,
@@ -159,6 +147,18 @@ const pages = [
         path: "/view-jobs",
         element: <ViewJobs />,
         permitted: ["view_aqarjob"],
+      },
+      {
+        name: "إضافة موظف",
+        path: "/create-employees",
+        element: <AddEmployees />,
+        permitted: ["add_aqaremployee"],
+      },
+      {
+        name: "عرض الموظفين",
+        path: "/view-employees",
+        element: <ViewEmployees />,
+        permitted: ["view_aqaremployee"],
       },
     ],
   },
