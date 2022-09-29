@@ -133,7 +133,7 @@ const Post = ({
                 </MenuItem>
               )}
 
-              {onHide && (
+              {/* {onHide && (
                 <MenuItem
                   onClick={() => {
                     handleCloseMenu();
@@ -145,7 +145,7 @@ const Post = ({
                   </ListItemIcon>
                   <ListItemText>إخفاء هذا المنشور</ListItemText>
                 </MenuItem>
-              )}
+              )} */}
             </Menu>
           </div>
         }
