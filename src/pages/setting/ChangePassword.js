@@ -224,7 +224,11 @@ const ChangePassword = () => {
             error={Boolean(invalid?.confirm)}
             helperText={invalid?.confirm}
           />
-          <Button type="submit" variant="contained">
+          <Button
+            type="submit"
+            variant="contained"
+            disabled={changePasswordPostResponse.isPending}
+          >
             حفظ
           </Button>
         </Stack>
