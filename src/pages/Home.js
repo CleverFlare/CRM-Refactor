@@ -213,6 +213,9 @@ const Home = () => {
                 onPreventNotifications={
                   post.user.username === userInfo.username ? null : () => {}
                 }
+                onHide={
+                  post.user.username === userInfo.username ? null : () => {}
+                }
               >
                 {post.content}
               </Post>

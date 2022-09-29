@@ -22,6 +22,7 @@ import {
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import EditIcon from "@mui/icons-material/Edit";
 import NotificationsOffIcon from "@mui/icons-material/NotificationsOff";
+import HideSourceIcon from "@mui/icons-material/HideSource";
 import DeleteIcon from "@mui/icons-material/Delete";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import ChatBubbleIcon from "@mui/icons-material/ChatBubble";
@@ -37,6 +38,7 @@ const Post = ({
   onDelete = null,
   onEdit = null,
   onPreventNotifications = null,
+  onHide = null,
 }) => {
   //----states----
   const [anchorEl, setAnchorEl] = useState(null);
@@ -128,6 +130,20 @@ const Post = ({
                     <NotificationsOffIcon />
                   </ListItemIcon>
                   <ListItemText>إيقاف إشعارات المنشور</ListItemText>
+                </MenuItem>
+              )}
+
+              {onHide && (
+                <MenuItem
+                  onClick={() => {
+                    handleCloseMenu();
+                    onPreventNotifications();
+                  }}
+                >
+                  <ListItemIcon>
+                    <HideSourceIcon />
+                  </ListItemIcon>
+                  <ListItemText>إخفاء هذا المنشور</ListItemText>
                 </MenuItem>
               )}
             </Menu>
