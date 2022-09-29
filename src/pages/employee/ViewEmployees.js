@@ -300,7 +300,7 @@ const EditInfoDialog = ({ open = false, onClose = () => {}, data = {} }) => {
       },
       {
         control: "to",
-        value: data?.parent,
+        value: data?.parent?.id,
       },
     ],
     [data]
@@ -507,14 +507,16 @@ const EditInfoDialog = ({ open = false, onClose = () => {}, data = {} }) => {
                 } ${
                   employees.find((job) => job.id === selected).user.last_name
                 }`
-              : "غير معروف الإسم";
+              : data?.parent?.name;
           }}
         >
-          {employees.map((employee, index) => (
-            <MenuItem value={employee.id} key={`employeeSuperEdit ${index}`}>
-              {employee.user.first_name} {employee.user.last_name}
-            </MenuItem>
-          ))}
+          {employees
+            .filter((employee) => employee.id !== data?.id)
+            .map((employee, index) => (
+              <MenuItem value={employee.id} key={`employeeSuperEdit ${index}`}>
+                {employee.user.first_name} {employee.user.last_name}
+              </MenuItem>
+            ))}
         </DialogSelectField>
         <PermissionToggles
           permissions={permissionsState}
