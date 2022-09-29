@@ -240,7 +240,7 @@ const ViewClients = () => {
     if (!clientDetails.details) return;
     setClientDetails((old) => ({
       ...old,
-      details: clientsStore.results.find((item) => item.id === old.details.id),
+      details: clientsStore.results.find((item) => item.id === old.details?.id),
     }));
   }, [clientsStore]);
 
@@ -481,6 +481,7 @@ const ViewClients = () => {
       body: e,
       onSuccess: (res) => {
         setOpenTransferMultipleClientsToEmployee(false);
+        setClientDetails((old) => ({ ...old, details: null, tab: "details" }));
         if (res.data.hasOwnProperty("clients")) {
           res.data.clients.map((client) => {
             dispatch({
@@ -829,6 +830,7 @@ const ViewClients = () => {
           })),
         ]}
         isPending={employeesGetResponse.isPending}
+        submitPending={clientTransferPostResponse.isPending}
         onSubmit={handleSubmitEmployeeTransfer}
       />
 
@@ -889,6 +891,7 @@ const ViewClients = () => {
           })),
         ]}
         isPending={employeesGetResponse.isPending}
+        submitPending={clientTransferPostResponse.isPending}
         onSubmit={handleSubmitEmployeeTransfer}
       />
 
@@ -903,6 +906,7 @@ const ViewClients = () => {
           picture: item.logo,
           id: item.id,
         }))}
+        submitPending={clientTransferProjectPostResponse.isPending}
         onSubmit={handleSubmitProjectTransfer}
       />
 
@@ -1278,6 +1282,7 @@ const TransferToEmployeeDialog = ({
   onClose = () => {},
   onGoBack = () => {},
   isPending = false,
+  submitPending = false,
   id,
   data = [],
   initSelected,
@@ -1370,7 +1375,9 @@ const TransferToEmployeeDialog = ({
         </FormGroup>
       </DialogContent>
       <DialogButtonsGroup>
-        <DialogButton onClick={handleSubmit}>تنفيذ</DialogButton>
+        <DialogButton onClick={handleSubmit} disabled={submitPending}>
+          تنفيذ
+        </DialogButton>
         <DialogButton variant="close" onClick={onClose}>
           إلغاء
         </DialogButton>
@@ -1538,6 +1545,7 @@ const TransferToProjectDialog = ({
   onClose = () => {},
   onGoBack = () => {},
   isPending = false,
+  submitPending = false,
   id,
   data = [],
   onSubmit = () => {},
@@ -1598,7 +1606,9 @@ const TransferToProjectDialog = ({
           ))}
       </DialogPeopleWindow>
       <DialogButtonsGroup>
-        <DialogButton onClick={handleSubmit}>تنفيذ</DialogButton>
+        <DialogButton onClick={handleSubmit} disabled={submitPending}>
+          تنفيذ
+        </DialogButton>
         <DialogButton variant="close" onClick={onClose}>
           إلغاء
         </DialogButton>
