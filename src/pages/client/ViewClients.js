@@ -61,6 +61,7 @@ import Dialog, {
   DialogTable,
 } from "../../features/dialog";
 
+import moment from "moment";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import CallIcon from "@mui/icons-material/Call";
 import ChangeCircleIcon from "@mui/icons-material/ChangeCircle";
@@ -1006,7 +1007,7 @@ const InfoDialog = ({
       id: data.id,
       body: {
         user: {},
-        followup: new Date(selectedPreviewDate).toCorrectISOString(),
+        followup: moment(selectedPreviewDate).format(),
       },
       onSuccess: (res) => {
         setPreviewDatePicker(null);
