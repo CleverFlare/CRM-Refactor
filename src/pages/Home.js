@@ -26,6 +26,7 @@ import { DialogButton, DialogButtonsGroup } from "../features/dialog";
 import useAfterEffect from "../hooks/useAfterEffect";
 import PermissionsGate from "../features/permissions/components/PermissionsGate";
 import routeGate from "../features/permissions/hoc/RouteGate";
+import Compress from "react-image-file-resizer";
 
 const Home = () => {
   //----store----
@@ -84,18 +85,36 @@ const Home = () => {
   }, []);
 
   //----functions----
-  const handlePublishSubmit = () => {
-    validate().then((output) => {
+  const resize = (file) => {
+    return new Promise((resolve) => {
+      Compress.imageFileResizer(
+        file,
+        300,
+        300,
+        "JPEG",
+        100,
+        0,
+        (uri) => resolve(uri),
+        "file"
+      );
+    });
+  };
+
+  const handlePublishSubmit = async () => {
+    await validate().then(async (output) => {
       if (!output.isOk) return;
+
+      const compressedImage = await resize(controls.picture);
+
       const requestBody = filter({
         obj: {
           content: controls.content,
           user: 44806,
-          media: controls.picture,
+          media: compressedImage,
         },
         output: "formData",
       });
-      postsPostRequest({
+      await postsPostRequest({
         body: requestBody,
         onSuccess: (res) => {
           dispatch({ type: "posts/addItem", payload: res.data });

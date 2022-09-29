@@ -41,7 +41,9 @@ const Publisher = ({
 
   //----functions----
   const handleSubmit = () => {
-    onSubmit();
+    onSubmit().then(() => {
+      setPicturesLength(0);
+    });
   };
 
   const handlePickPicture = (e) => {
