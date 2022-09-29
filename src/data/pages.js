@@ -46,6 +46,37 @@ const pages = [
     permitted: [],
   },
   {
+    name: "الموظفين",
+    icon: <BadgeIcon />,
+    path: "/employees",
+    subtabs: [
+      {
+        name: "إضافة وظيفة موظف",
+        path: "/create-jobs",
+        element: <AddJobs />,
+        permitted: ["add_aqarjob"],
+      },
+      {
+        name: "عرض وظائف الموظفين",
+        path: "/view-jobs",
+        element: <ViewJobs />,
+        permitted: ["view_aqarjob"],
+      },
+      {
+        name: "إضافة موظف",
+        path: "/create-employees",
+        element: <AddEmployees />,
+        permitted: ["add_aqaremployee"],
+      },
+      {
+        name: "عرض الموظفين",
+        path: "/view-employees",
+        element: <ViewEmployees />,
+        permitted: ["view_aqaremployee"],
+      },
+    ],
+  },
+  {
     name: "العملاء",
     icon: <GroupsIcon />,
     path: "/clients",
@@ -128,37 +159,6 @@ const pages = [
         path: "/view-projects",
         element: <ViewProjects />,
         permitted: ["view_aqarproject"],
-      },
-    ],
-  },
-  {
-    name: "الموظفين",
-    icon: <BadgeIcon />,
-    path: "/employees",
-    subtabs: [
-      {
-        name: "إضافة وظيفة موظف",
-        path: "/create-jobs",
-        element: <AddJobs />,
-        permitted: ["add_aqarjob"],
-      },
-      {
-        name: "عرض وظائف الموظفين",
-        path: "/view-jobs",
-        element: <ViewJobs />,
-        permitted: ["view_aqarjob"],
-      },
-      {
-        name: "إضافة موظف",
-        path: "/create-employees",
-        element: <AddEmployees />,
-        permitted: ["add_aqaremployee"],
-      },
-      {
-        name: "عرض الموظفين",
-        path: "/view-employees",
-        element: <ViewEmployees />,
-        permitted: ["view_aqaremployee"],
       },
     ],
   },
