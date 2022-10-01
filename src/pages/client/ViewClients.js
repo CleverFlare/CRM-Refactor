@@ -946,14 +946,16 @@ const ViewClients = () => {
         >
           تصدير المحدد
         </Button>
-        <Button
-          variant="contained"
-          disabled={!Boolean(selected.length)}
-          sx={{ width: "200px", height: "50px" }}
-          onClick={() => setOpenTransferMultipleClientsToEmployee(true)}
-        >
-          تحويل المحدد
-        </Button>
+        <PermissionsGate permissions={["aqartransfer_clients"]}>
+          <Button
+            variant="contained"
+            disabled={!Boolean(selected.length)}
+            sx={{ width: "200px", height: "50px" }}
+            onClick={() => setOpenTransferMultipleClientsToEmployee(true)}
+          >
+            تحويل المحدد
+          </Button>
+        </PermissionsGate>
         <Button
           variant="contained"
           disabled={!Boolean(selected.length)}
@@ -1091,7 +1093,7 @@ const InfoDialog = ({
       value: data?.followup ? format(data?.followup) : "",
       customEmpty: "لا يوجد",
       addition: (
-        <PermissionsGate permissions={["aqartransfer_clients"]}>
+        <PermissionsGate permissions={[]}>
           <IconButton
             sx={{ color: "white" }}
             onClick={(e) => setPreviewDatePicker(e.currentTarget)}
