@@ -1213,12 +1213,14 @@ const InfoDialog = ({
     <Dialog open={open} onClose={onClose}>
       <DialogHeading>تفاصيل العميل</DialogHeading>
       <DialogInfoWindow information={info} />
-      <DialogHeading>سجل العميل</DialogHeading>
-      <DialogTable
-        rows={historyStore.results}
-        columns={columns}
-        isPending={isHistoryPending}
-      />
+      <PermissionsGate permissions={["view_historicalaqarclient"]}>
+        <DialogHeading>سجل العميل</DialogHeading>
+        <DialogTable
+          rows={historyStore.results}
+          columns={columns}
+          isPending={isHistoryPending}
+        />
+      </PermissionsGate>
       <DialogButtonsGroup>
         <DialogButton variant="close" onClick={onClose}>
           إلغاء
@@ -1291,7 +1293,7 @@ const TransferToEmployeeDialog = ({
 }) => {
   const [selected, setSelected] = usePropState(initSelected, [initSelected]);
   const [searchValue, setSearchValue] = useState("");
-  const [method, setMethod] = useState(0);
+  const [method, setMethod] = useState(1);
 
   const handleChangeSearchValue = (e) => {
     setSearchValue(e.target.value);
@@ -1337,44 +1339,46 @@ const TransferToEmployeeDialog = ({
             />
           ))}
       </DialogPeopleWindow>
-      <DialogContent>
-        <FormGroup>
-          <RadioGroup
-            name="transfer-method"
-            value={method}
-            onChange={(e) => setMethod(e.target.value)}
-          >
-            <FormControlLabel
-              control={
-                <Radio
-                  sx={{
-                    color: "white",
-                    "& *": {
+      <PermissionsGate permissions={["delete_historicalaqarclient"]}>
+        <DialogContent>
+          <FormGroup>
+            <RadioGroup
+              name="transfer-method"
+              value={method}
+              onChange={(e) => setMethod(e.target.value)}
+            >
+              <FormControlLabel
+                control={
+                  <Radio
+                    sx={{
                       color: "white",
-                    },
-                  }}
-                />
-              }
-              label="نفس المرحلة"
-              value={1}
-            />
-            <FormControlLabel
-              control={
-                <Radio
-                  sx={{
-                    color: "white",
-                    "& *": {
+                      "& *": {
+                        color: "white",
+                      },
+                    }}
+                  />
+                }
+                label="نفس المرحلة"
+                value={1}
+              />
+              <FormControlLabel
+                control={
+                  <Radio
+                    sx={{
                       color: "white",
-                    },
-                  }}
-                />
-              }
-              label="حذف السجلات"
-              value={0}
-            />
-          </RadioGroup>
-        </FormGroup>
-      </DialogContent>
+                      "& *": {
+                        color: "white",
+                      },
+                    }}
+                  />
+                }
+                label="حذف السجلات"
+                value={0}
+              />
+            </RadioGroup>
+          </FormGroup>
+        </DialogContent>
+      </PermissionsGate>
       <DialogButtonsGroup>
         <DialogButton onClick={handleSubmit} disabled={submitPending}>
           تنفيذ
