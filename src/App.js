@@ -159,6 +159,8 @@ const App = () => {
         setNotifications((old) => [data.data, ...old]);
       }
     };
+
+    return () => ws.close();
   }, [token]);
 
   const handleSeenNotifications = () => {

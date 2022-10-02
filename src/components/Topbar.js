@@ -21,6 +21,8 @@ import MenuIcon from "@mui/icons-material/Menu";
 import format from "../utils/ISOToReadable";
 import notificationSfx from "../assets/notification sfx.wav";
 import playSoundEffect from "../utils/playSoundEffect";
+import pages from "../data/pages";
+import { useNavigate } from "react-router-dom";
 
 const NotificationItem = ({ onClick, content, time, unread = false }) => {
   return (
@@ -88,6 +90,33 @@ const Topbar = ({
     onClear();
   };
 
+  //===Start======= Notification Redirects Logic ============
+  const navigate = useNavigate();
+
+  const getPath = (name, isChild = false) => {
+    switch (isChild) {
+      case false:
+        return pages.find((page) => page?.name === name)?.path;
+      case true:
+        const parent = pages.find(
+          (page) =>
+            page?.subtabs?.filter((subtab) => subtab?.name === name).length > 0
+        );
+        return (
+          parent.path +
+          parent.subtabs.find((subtab) => subtab?.name === name)?.path
+        );
+    }
+  };
+
+  const typesAndPaths = {
+    project: getPath("عرض المشاريع", true),
+    unit: getPath("عرض الوحدات", true),
+    other: "",
+  };
+
+  //===End======= Notification Redirects Logic ============
+
   return (
     <AppBar
       position="static"
@@ -154,7 +183,10 @@ const Topbar = ({
                   notificationsState.map((notification, index) => (
                     <NotificationItem
                       key={`notification ${index}`}
-                      onClick={handleCloseMenu}
+                      onClick={() => {
+                        navigate(typesAndPaths[notification.types]);
+                        handleCloseMenu();
+                      }}
                       content={notification?.message}
                       time={`${format(
                         notification?.date ?? "sad/asdfa/asdfT435:34534:453"
