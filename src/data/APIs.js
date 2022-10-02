@@ -29,6 +29,11 @@ const EXPORT_CLIENTS = "aqar/api/import/";
 const IMPORT_CLIENTS = "aqar/api/export/";
 const LOGIN = "api/login/";
 
+const COUNTRY_FILTER = "https://countriesnow.space/api/v0.1/countries/info";
+const STATES = "https://countriesnow.space/api/v0.1/countries/states";
+const STATE_CITIES =
+  "https://countriesnow.space/api/v0.1/countries/state/cities";
+
 export default BASEURL;
 
 export {
@@ -60,4 +65,7 @@ export {
   EXPORT_CLIENTS,
   IMPORT_CLIENTS,
   CLIENTS_SELECTED_DELETE,
+  COUNTRY_FILTER,
+  STATES,
+  STATE_CITIES,
 };

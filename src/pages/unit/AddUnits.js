@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
 import Wrapper from "../../components/Wrapper";
 import Breadcrumbs from "../../components/Breadcrumbs";
@@ -12,7 +12,7 @@ import Form, {
 import useControls from "../../hooks/useControls";
 import { MenuItem } from "@mui/material";
 import useRequest from "../../hooks/useRequest";
-import { UNITS } from "../../data/APIs";
+import { COUNTRY_FILTER, STATES, STATE_CITIES, UNITS } from "../../data/APIs";
 import filter from "../../utils/ClearNull";
 
 const AddUnits = () => {
@@ -216,6 +216,67 @@ const AddUnits = () => {
     });
   };
 
+  //===Start===== Get Countries logic =========
+  const [countriesData, setCountriesData] = useState([]);
+
+  const [countriesGetRequest, countriesGetResponse] = useRequest({
+    path: COUNTRY_FILTER,
+    method: "get",
+  });
+
+  const getCountries = () => {
+    if (countriesData.length) return;
+    countriesGetRequest({
+      params: {
+        returns: "country",
+      },
+      onSuccess: (res) => {
+        setCountriesData(res.data.data);
+      },
+    });
+  };
+
+  const [governoratesData, setGovernoratesData] = useState([]);
+
+  const [statesGetRequest, statesGetResponse] = useRequest({
+    path: STATES,
+    method: "post",
+  });
+
+  const getGovernorates = () => {
+    if (governoratesData.length) return;
+    statesGetRequest({
+      body: {
+        country: controls.country,
+      },
+      onSuccess: (res) => {
+        setGovernoratesData(res.data.data.states);
+      },
+    });
+  };
+
+  const [citiesData, setCitiesData] = useState([]);
+
+  const [citiesGetRequest, citiesGetResponse] = useRequest({
+    path: STATE_CITIES,
+    method: "post",
+  });
+
+  const getCities = () => {
+    if (citiesData.length) return;
+    citiesGetRequest({
+      body: {
+        country: controls.country,
+        state: controls.governorate,
+      },
+      onSuccess: (res) => {
+        setCitiesData(res.data.data);
+      },
+    });
+  };
+
+  //===End===== Get Countries logic =========
+
   return (
     <Wrapper>
       <Breadcrumbs path={["الوحدات", "إضافة وحدة"]} />
@@ -231,33 +292,59 @@ const AddUnits = () => {
           },
         }}
       >
-        <InputField
+        <SelectField
           label="البلد"
           placeholder="البلد"
+          onOpen={getCountries}
+          isPending={countriesGetResponse.isPending}
           required={required.includes("country")}
           value={controls.country}
           onChange={(e) => setControl("country", e.target.value)}
           error={Boolean(invalid.country)}
           helperText={invalid.country}
-        />
-        <InputField
+        >
+          {countriesData.map((country, index) => (
+            <MenuItem value={country.name} key={`country ${index}`}>
+              {country.name}
+            </MenuItem>
+          ))}
+        </SelectField>
+        <SelectField
           label="المحافظة"
           placeholder="المحافظة"
+          disabled={!Boolean(controls.country)}
+          onOpen={getGovernorates}
+          isPending={statesGetResponse.isPending}
           required={required.includes("governorate")}
           value={controls.governorate}
           onChange={(e) => setControl("governorate", e.target.value)}
           error={Boolean(invalid.governorate)}
           helperText={invalid.governorate}
-        />
-        <InputField
+        >
+          {governoratesData.map((governorate, index) => (
+            <MenuItem value={governorate.name} key={`state ${index}`}>
+              {governorate.name}
+            </MenuItem>
+          ))}
+        </SelectField>
+        <SelectField
           label="المدينة"
           placeholder="المدينة"
+          disabled={!Boolean(controls.governorate)}
+          onOpen={getCities}
+          isPending={citiesGetResponse.isPending}
           required={required.includes("city")}
           value={controls.city}
           onChange={(e) => setControl("city", e.target.value)}
           error={Boolean(invalid.city)}
           helperText={invalid.city}
-        />
+        >
+          {citiesData.map((city, index) => (
+            <MenuItem value={city} key={`state ${index}`}>
+              {city}
+            </MenuItem>
+          ))}
+        </SelectField>
         <InputField
           label="المنطقة"
           placeholder="المنطقة"

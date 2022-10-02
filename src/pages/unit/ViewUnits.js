@@ -3,12 +3,18 @@ import PropTypes from "prop-types";
 import Wrapper from "../../components/Wrapper";
 import Breadcrumbs from "../../components/Breadcrumbs";
 import DataGrid from "../../components/DataGrid";
-import { Avatar, Badge, CircularProgress, IconButton } from "@mui/material";
+import {
+  Avatar,
+  Badge,
+  CircularProgress,
+  IconButton,
+  MenuItem,
+} from "@mui/material";
 import useRequest from "../../hooks/useRequest";
-import { UNITS } from "../../data/APIs";
+import { COUNTRY_FILTER, STATES, STATE_CITIES, UNITS } from "../../data/APIs";
 import { useDispatch, useSelector } from "react-redux";
 import useConfirmMessage from "../../hooks/useConfirmMessage";
-import Form, { InputField } from "../../features/form";
+import Form, { InputField, SelectField } from "../../features/form";
 import useControls from "../../hooks/useControls";
 import filter from "../../utils/ClearNull";
 import Dialog, {
@@ -19,6 +25,7 @@ import Dialog, {
   DialogHeading,
   DialogInfoWindow,
   DialogInputField,
+  DialogSelectField,
 } from "../../features/dialog";
 import useAfterEffect from "../../hooks/useAfterEffect";
 import DialogNumberField from "../../features/dialog/components/DialogNumberField";
@@ -251,6 +258,67 @@ const ViewUnits = () => {
 
   const isPermitted = useIsPermitted();
 
+  //===Start===== Get Countries logic =========
+  const [countriesData, setCountriesData] = useState([]);
+
+  const [countriesGetRequest, countriesGetResponse] = useRequest({
+    path: COUNTRY_FILTER,
+    method: "get",
+  });
+
+  const getCountries = () => {
+    if (countriesData.length) return;
+    countriesGetRequest({
+      params: {
+        returns: "country",
+      },
+      onSuccess: (res) => {
+        setCountriesData(res.data.data);
+      },
+    });
+  };
+
+  const [governoratesData, setGovernoratesData] = useState([]);
+
+  const [statesGetRequest, statesGetResponse] = useRequest({
+    path: STATES,
+    method: "post",
+  });
+
+  const getGovernorates = () => {
+    if (governoratesData.length) return;
+    statesGetRequest({
+      body: {
+        country: controls.country,
+      },
+      onSuccess: (res) => {
+        setGovernoratesData(res.data.data.states);
+      },
+    });
+  };
+
+  const [citiesData, setCitiesData] = useState([]);
+
+  const [citiesGetRequest, citiesGetResponse] = useRequest({
+    path: STATE_CITIES,
+    method: "post",
+  });
+
+  const getCities = () => {
+    if (citiesData.length) return;
+    citiesGetRequest({
+      body: {
+        country: controls.country,
+        state: controls.governorate,
+      },
+      onSuccess: (res) => {
+        setCitiesData(res.data.data);
+      },
+    });
+  };
+
+  //===End===== Get Countries logic =========
+
   return (
     <Wrapper>
       <Breadcrumbs path={["الوحدات", "عرض الوحدات"]} />
@@ -265,24 +333,50 @@ const ViewUnits = () => {
           },
         }}
       >
-        <InputField
+        <SelectField
           label="البلد"
           placeholder="البلد"
+          onOpen={getCountries}
+          isPending={countriesGetResponse.isPending}
           value={controls.country}
           onChange={(e) => setControl("country", e.target.value)}
-        />
-        <InputField
+        >
+          {countriesData.map((country, index) => (
+            <MenuItem value={country.name} key={`country ${index}`}>
+              {country.name}
+            </MenuItem>
+          ))}
+        </SelectField>
+        <SelectField
           label="المحافظة"
           placeholder="المحافظة"
+          disabled={!Boolean(controls.country)}
+          onOpen={getGovernorates}
+          isPending={statesGetResponse.isPending}
           value={controls.governorate}
           onChange={(e) => setControl("governorate", e.target.value)}
-        />
-        <InputField
+        >
+          {governoratesData.map((governorate, index) => (
+            <MenuItem value={governorate.name} key={`state ${index}`}>
+              {governorate.name}
+            </MenuItem>
+          ))}
+        </SelectField>
+        <SelectField
           label="المدينة"
           placeholder="المدينة"
+          disabled={!Boolean(controls.governorate)}
+          onOpen={getCities}
+          isPending={citiesGetResponse.isPending}
           value={controls.city}
           onChange={(e) => setControl("city", e.target.value)}
-        />
+        >
+          {citiesData.map((city, index) => (
+            <MenuItem value={city} key={`state ${index}`}>
+              {city}
+            </MenuItem>
+          ))}
+        </SelectField>
         <InputField
           label="المنطقة"
           placeholder="المنطقة"
@@ -602,28 +696,116 @@ const EditDialog = ({ open = false, onClose = () => {}, data = {} }) => {
       });
     }
   };
+
+  //===Start===== Get Countries logic =========
+  const [countriesData, setCountriesData] = useState([]);
+
+  const [countriesGetRequest, countriesGetResponse] = useRequest({
+    path: COUNTRY_FILTER,
+    method: "get",
+  });
+
+  const getCountries = () => {
+    if (countriesData.length) return;
+    countriesGetRequest({
+      params: {
+        returns: "country",
+      },
+      onSuccess: (res) => {
+        setCountriesData(res.data.data);
+      },
+    });
+  };
+
+  const [governoratesData, setGovernoratesData] = useState([]);
+
+  const [statesGetRequest, statesGetResponse] = useRequest({
+    path: STATES,
+    method: "post",
+  });
+
+  const getGovernorates = () => {
+    if (governoratesData.length) return;
+    statesGetRequest({
+      body: {
+        country: controls.country,
+      },
+      onSuccess: (res) => {
+        setGovernoratesData(res.data.data.states);
+      },
+    });
+  };
+
+  const [citiesData, setCitiesData] = useState([]);
+
+  const [citiesGetRequest, citiesGetResponse] = useRequest({
+    path: STATE_CITIES,
+    method: "post",
+  });
+
+  const getCities = () => {
+    if (citiesData.length) return;
+    citiesGetRequest({
+      body: {
+        country: controls.country,
+        state: controls.governorate,
+      },
+      onSuccess: (res) => {
+        setCitiesData(res.data.data);
+      },
+    });
+  };
+
+  //===End===== Get Countries logic =========
+
   return (
     <Dialog open={open} onClose={onClose} paperProps={{ height: "100%" }}>
       <DialogHeading>تعديل بيانات الوحدة</DialogHeading>
       <DialogForm>
-        <DialogInputField
-          placeholder="البلد"
+        <DialogSelectField
           label="البلد"
+          placeholder="البلد"
+          onOpen={getCountries}
+          isPending={countriesGetResponse.isPending}
           value={controls.country}
           onChange={(e) => setControl("country", e.target.value)}
-        />
-        <DialogInputField
-          placeholder="المحافظة"
+        >
+          {countriesData.map((country, index) => (
+            <MenuItem value={country.name} key={`country ${index}`}>
+              {country.name}
+            </MenuItem>
+          ))}
+        </DialogSelectField>
+        <DialogSelectField
           label="المحافظة"
+          placeholder="المحافظة"
+          disabled={!Boolean(controls.country)}
+          onOpen={getGovernorates}
+          isPending={statesGetResponse.isPending}
           value={controls.governorate}
           onChange={(e) => setControl("governorate", e.target.value)}
-        />
-        <DialogInputField
-          placeholder="المدينة"
+        >
+          {governoratesData.map((governorate, index) => (
+            <MenuItem value={governorate.name} key={`state ${index}`}>
+              {governorate.name}
+            </MenuItem>
+          ))}
+        </DialogSelectField>
+        <DialogSelectField
           label="المدينة"
+          placeholder="المدينة"
+          disabled={!Boolean(controls.governorate)}
+          onOpen={getCities}
+          isPending={citiesGetResponse.isPending}
           value={controls.city}
           onChange={(e) => setControl("city", e.target.value)}
-        />
+        >
+          {citiesData.map((city, index) => (
+            <MenuItem value={city} key={`state ${index}`}>
+              {city}
+            </MenuItem>
+          ))}
+        </DialogSelectField>
         <DialogInputField
           placeholder="المنطقة"
           label="المنطقة"
