@@ -267,7 +267,6 @@ const ViewUnits = () => {
   });
 
   const getCountries = () => {
-    if (countriesData.length) return;
     countriesGetRequest({
       params: {
         returns: "country",
@@ -286,7 +285,6 @@ const ViewUnits = () => {
   });
 
   const getGovernorates = () => {
-    if (governoratesData.length) return;
     statesGetRequest({
       body: {
         country: controls.country,
@@ -305,7 +303,6 @@ const ViewUnits = () => {
   });
 
   const getCities = () => {
-    if (citiesData.length) return;
     citiesGetRequest({
       body: {
         country: controls.country,
@@ -339,7 +336,11 @@ const ViewUnits = () => {
           onOpen={getCountries}
           isPending={countriesGetResponse.isPending}
           value={controls.country}
-          onChange={(e) => setControl("country", e.target.value)}
+          onChange={(e) => {
+            setControl("country", e.target.value);
+            setControl("governorate", "");
+            setControl("city", "");
+          }}
         >
           {countriesData.map((country, index) => (
             <MenuItem value={country.name} key={`country ${index}`}>
@@ -354,7 +355,10 @@ const ViewUnits = () => {
           onOpen={getGovernorates}
           isPending={statesGetResponse.isPending}
           value={controls.governorate}
-          onChange={(e) => setControl("governorate", e.target.value)}
+          onChange={(e) => {
+            setControl("governorate", e.target.value);
+            setControl("city", "");
+          }}
         >
           {governoratesData.map((governorate, index) => (
             <MenuItem value={governorate.name} key={`state ${index}`}>
@@ -768,7 +772,11 @@ const EditDialog = ({ open = false, onClose = () => {}, data = {} }) => {
           onOpen={getCountries}
           isPending={countriesGetResponse.isPending}
           value={controls.country}
-          onChange={(e) => setControl("country", e.target.value)}
+          onChange={(e) => {
+            setControl("country", e.target.value);
+            setControl("governorate", "");
+            setControl("city", "");
+          }}
         >
           {countriesData.map((country, index) => (
             <MenuItem value={country.name} key={`country ${index}`}>
@@ -783,7 +791,10 @@ const EditDialog = ({ open = false, onClose = () => {}, data = {} }) => {
           onOpen={getGovernorates}
           isPending={statesGetResponse.isPending}
           value={controls.governorate}
-          onChange={(e) => setControl("governorate", e.target.value)}
+          onChange={(e) => {
+            setControl("governorate", e.target.value);
+            setControl("city", "");
+          }}
         >
           {governoratesData.map((governorate, index) => (
             <MenuItem value={governorate.name} key={`state ${index}`}>

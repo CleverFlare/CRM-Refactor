@@ -225,7 +225,6 @@ const AddUnits = () => {
   });
 
   const getCountries = () => {
-    if (countriesData.length) return;
     countriesGetRequest({
       params: {
         returns: "country",
@@ -244,7 +243,6 @@ const AddUnits = () => {
   });
 
   const getGovernorates = () => {
-    if (governoratesData.length) return;
     statesGetRequest({
       body: {
         country: controls.country,
@@ -263,7 +261,6 @@ const AddUnits = () => {
   });
 
   const getCities = () => {
-    if (citiesData.length) return;
     citiesGetRequest({
       body: {
         country: controls.country,
@@ -299,7 +296,11 @@ const AddUnits = () => {
           isPending={countriesGetResponse.isPending}
           required={required.includes("country")}
           value={controls.country}
-          onChange={(e) => setControl("country", e.target.value)}
+          onChange={(e) => {
+            setControl("country", e.target.value);
+            setControl("governorate", "");
+            setControl("city", "");
+          }}
           error={Boolean(invalid.country)}
           helperText={invalid.country}
         >
@@ -317,7 +318,10 @@ const AddUnits = () => {
           isPending={statesGetResponse.isPending}
           required={required.includes("governorate")}
           value={controls.governorate}
-          onChange={(e) => setControl("governorate", e.target.value)}
+          onChange={(e) => {
+            setControl("governorate", e.target.value);
+            setControl("city", "");
+          }}
           error={Boolean(invalid.governorate)}
           helperText={invalid.governorate}
         >
