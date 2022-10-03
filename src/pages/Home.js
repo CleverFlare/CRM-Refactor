@@ -140,6 +140,7 @@ const Home = () => {
         content: info.data.content,
         user: 44806,
         media: info.data.pictures.files,
+        media_id: info.data.pictureId,
       },
       output: "formData",
     });
@@ -267,7 +268,10 @@ const PostEditDialog = ({ data, open, onClose, onSubmit }) => {
 
   //----functions----
   const handleEditSubmit = () => {
-    onSubmit({ data: { ...controls, id: data.id }, invalid });
+    onSubmit({
+      data: { ...controls, id: data.id, pictureId: data.images[0].id },
+      invalid,
+    });
   };
 
   useAfterEffect(() => {
