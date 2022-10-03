@@ -27,6 +27,7 @@ import useAfterEffect from "../hooks/useAfterEffect";
 import PermissionsGate from "../features/permissions/components/PermissionsGate";
 import routeGate from "../features/permissions/hoc/RouteGate";
 import Compress from "react-image-file-resizer";
+import useIsPermitted from "../features/permissions/hook/useIsPermitted";
 
 const Home = () => {
   //----store----
@@ -155,6 +156,12 @@ const Home = () => {
     });
   };
 
+  //===Start==== Callback Permissions Logic ======
+
+  const isPermitted = useIsPermitted();
+
+  //===End==== Callback Permissions Logic ======
+
   return (
     <Wrapper>
       <Breadcrumbs path={["الرئيسية"]} />
@@ -198,24 +205,16 @@ const Home = () => {
                 picture={post.user.image}
                 createdAt={post.created_at}
                 images={post.medias}
-                onDelete={
-                  post.user.username === userInfo.username
-                    ? () => handleDeletePost(post.id)
-                    : null
-                }
-                onEdit={
-                  post.user.username === userInfo.username
-                    ? (data) => {
-                        setPostEditData({ ...data, id: post.id });
-                      }
-                    : null
-                }
-                onPreventNotifications={
-                  post.user.username === userInfo.username ? null : () => {}
-                }
-                onHide={
-                  post.user.username === userInfo.username ? null : () => {}
-                }
+                onDelete={isPermitted(
+                  () => handleDeletePost(post.id),
+                  ["delete_aqarpost"]
+                )}
+                onEdit={isPermitted(
+                  (data) => {
+                    setPostEditData({ ...data, id: post.id });
+                  },
+                  ["change_aqarpost"]
+                )}
               >
                 {post.content}
               </Post>
