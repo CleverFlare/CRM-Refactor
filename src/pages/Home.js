@@ -269,7 +269,7 @@ const PostEditDialog = ({ data, open, onClose, onSubmit }) => {
   //----functions----
   const handleEditSubmit = () => {
     onSubmit({
-      data: { ...controls, id: data.id, pictureId: data.images[0].id },
+      data: { ...controls, id: data.id, pictureId: data.images?.[0]?.id || "" },
       invalid,
     });
   };
