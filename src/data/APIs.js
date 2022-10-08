@@ -29,8 +29,8 @@ const EXPORT_CLIENTS = "aqar/api/import/";
 const IMPORT_CLIENTS = "aqar/api/export/";
 const LOGIN = "api/login/";
 
-const COUNTRY_FILTER = "https://countriesnow.space/api/v0.1/countries/info";
-const STATES = "https://countriesnow.space/api/v0.1/countries/states";
+const COUNTRY_FILTER = "api/countries/";
+const STATES = "api/states/";
 const STATE_CITIES =
   "https://countriesnow.space/api/v0.1/countries/state/cities";
 

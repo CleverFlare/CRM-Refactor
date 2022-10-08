@@ -226,9 +226,6 @@ const AddUnits = () => {
 
   const getCountries = () => {
     countriesGetRequest({
-      params: {
-        returns: "country",
-      },
       onSuccess: (res) => {
         setCountriesData(res.data.data);
       },
@@ -248,7 +245,7 @@ const AddUnits = () => {
         country: controls.country,
       },
       onSuccess: (res) => {
-        setGovernoratesData(res.data.data.states);
+        setGovernoratesData(res.data.data);
       },
     });
   };
@@ -305,8 +302,8 @@ const AddUnits = () => {
           helperText={invalid.country}
         >
           {countriesData.map((country, index) => (
-            <MenuItem value={country.name} key={`country ${index}`}>
-              {country.name}
+            <MenuItem value={country} key={`country ${index}`}>
+              {country}
             </MenuItem>
           ))}
         </SelectField>
@@ -326,29 +323,20 @@ const AddUnits = () => {
           helperText={invalid.governorate}
         >
           {governoratesData.map((governorate, index) => (
-            <MenuItem value={governorate.name} key={`state ${index}`}>
-              {governorate.name}
+            <MenuItem value={governorate} key={`state ${index}`}>
+              {governorate}
             </MenuItem>
           ))}
         </SelectField>
-        <SelectField
+        <InputField
           label="المدينة"
           placeholder="المدينة"
-          disabled={!Boolean(controls.governorate)}
-          onOpen={getCities}
-          isPending={citiesGetResponse.isPending}
           required={required.includes("city")}
           value={controls.city}
           onChange={(e) => setControl("city", e.target.value)}
           error={Boolean(invalid.city)}
           helperText={invalid.city}
-        >
-          {citiesData.map((city, index) => (
-            <MenuItem value={city} key={`state ${index}`}>
-              {city}
-            </MenuItem>
-          ))}
-        </SelectField>
+        />
         <InputField
           label="المنطقة"
           placeholder="المنطقة"

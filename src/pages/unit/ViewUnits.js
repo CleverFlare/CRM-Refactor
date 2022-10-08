@@ -73,6 +73,7 @@ import {
   LineIcon,
   EmailIcon,
 } from "react-share";
+import format from "../../utils/ISOToReadable";
 
 const ViewUnits = () => {
   const unitsStore = useSelector((state) => state.units.value);
@@ -268,9 +269,6 @@ const ViewUnits = () => {
 
   const getCountries = () => {
     countriesGetRequest({
-      params: {
-        returns: "country",
-      },
       onSuccess: (res) => {
         setCountriesData(res.data.data);
       },
@@ -290,7 +288,7 @@ const ViewUnits = () => {
         country: controls.country,
       },
       onSuccess: (res) => {
-        setGovernoratesData(res.data.data.states);
+        setGovernoratesData(res.data.data);
       },
     });
   };
@@ -343,8 +341,8 @@ const ViewUnits = () => {
           }}
         >
           {countriesData.map((country, index) => (
-            <MenuItem value={country.name} key={`country ${index}`}>
-              {country.name}
+            <MenuItem value={country} key={`country ${index}`}>
+              {country}
             </MenuItem>
           ))}
         </SelectField>
@@ -361,26 +359,17 @@ const ViewUnits = () => {
           }}
         >
           {governoratesData.map((governorate, index) => (
-            <MenuItem value={governorate.name} key={`state ${index}`}>
-              {governorate.name}
+            <MenuItem value={governorate} key={`state ${index}`}>
+              {governorate}
             </MenuItem>
           ))}
         </SelectField>
-        <SelectField
+        <InputField
           label="المدينة"
           placeholder="المدينة"
-          disabled={!Boolean(controls.governorate)}
-          onOpen={getCities}
-          isPending={citiesGetResponse.isPending}
           value={controls.city}
           onChange={(e) => setControl("city", e.target.value)}
-        >
-          {citiesData.map((city, index) => (
-            <MenuItem value={city} key={`state ${index}`}>
-              {city}
-            </MenuItem>
-          ))}
-        </SelectField>
+        />
         <InputField
           label="المنطقة"
           placeholder="المنطقة"
@@ -712,9 +701,6 @@ const EditDialog = ({ open = false, onClose = () => {}, data = {} }) => {
   const getCountries = () => {
     if (countriesData.length) return;
     countriesGetRequest({
-      params: {
-        returns: "country",
-      },
       onSuccess: (res) => {
         setCountriesData(res.data.data);
       },
@@ -735,7 +721,7 @@ const EditDialog = ({ open = false, onClose = () => {}, data = {} }) => {
         country: controls.country,
       },
       onSuccess: (res) => {
-        setGovernoratesData(res.data.data.states);
+        setGovernoratesData(res.data.data);
       },
     });
   };
@@ -779,8 +765,8 @@ const EditDialog = ({ open = false, onClose = () => {}, data = {} }) => {
           }}
         >
           {countriesData.map((country, index) => (
-            <MenuItem value={country.name} key={`country ${index}`}>
-              {country.name}
+            <MenuItem value={country} key={`country ${index}`}>
+              {country}
             </MenuItem>
           ))}
         </DialogSelectField>
@@ -797,26 +783,17 @@ const EditDialog = ({ open = false, onClose = () => {}, data = {} }) => {
           }}
         >
           {governoratesData.map((governorate, index) => (
-            <MenuItem value={governorate.name} key={`state ${index}`}>
-              {governorate.name}
+            <MenuItem value={governorate} key={`state ${index}`}>
+              {governorate}
             </MenuItem>
           ))}
         </DialogSelectField>
-        <DialogSelectField
+        <DialogInputField
           label="المدينة"
           placeholder="المدينة"
-          disabled={!Boolean(controls.governorate)}
-          onOpen={getCities}
-          isPending={citiesGetResponse.isPending}
           value={controls.city}
           onChange={(e) => setControl("city", e.target.value)}
-        >
-          {citiesData.map((city, index) => (
-            <MenuItem value={city} key={`state ${index}`}>
-              {city}
-            </MenuItem>
-          ))}
-        </DialogSelectField>
+        />
         <DialogInputField
           placeholder="المنطقة"
           label="المنطقة"
@@ -921,7 +898,7 @@ const InfoDialog = ({ open, onClose, data = {} }) => {
       value: data?.agent,
     },
     {
-      name: "الهاتف",
+      name: "هاتف الموظف",
       value: data?.phone,
     },
     {
@@ -965,6 +942,10 @@ const InfoDialog = ({ open, onClose, data = {} }) => {
       value: data?.client,
     },
     {
+      name: "هاتف العميل",
+      value: data?.phone_client,
+    },
+    {
       name: "البلد",
       value: data?.country,
     },
@@ -990,7 +971,7 @@ const InfoDialog = ({ open, onClose, data = {} }) => {
     },
     {
       name: "تاريخ الأنشاء",
-      value: "",
+      value: data?.created_at && format(data?.created_at),
     },
   ];
 
@@ -1093,7 +1074,8 @@ const InfoDialog = ({ open, onClose, data = {} }) => {
   البلد: ${data?.country ? data?.country : "لا يوجد"}
   المحافظة: ${data?.state ? data?.state : "لا يوجد"}
   المدينة: ${data?.city ? data?.city : "لا يوجد"}
-  رقم العمارة: ${data?.flat_number ? data?.flat_number : "لا يوجد"}\n`;
+  رقم العمارة: ${data?.flat_number ? data?.flat_number : "لا يوجد"}
+  للتواصل: ${data?.phone ? data?.phone : "لا يوجد"}\n`;
 
   //===End====== share logic ===========
 
