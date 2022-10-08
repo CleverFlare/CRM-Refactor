@@ -106,6 +106,11 @@ const AddUnits = () => {
       isRequired: false,
     },
     {
+      control: "countryCode",
+      value: "",
+      isRequired: false,
+    },
+    {
       control: "notes",
       value: "",
       isRequired: false,
@@ -142,7 +147,7 @@ const AddUnits = () => {
           area_size: controls.area,
           complete_type: controls.genre,
           sales_type: controls.sale,
-          phone_client: controls.phone,
+          phone_client: controls.countryCode + controls.phone,
           client: controls.client,
           country: controls.country,
           state: controls.governorate,
@@ -169,7 +174,7 @@ const AddUnits = () => {
               area_size: controls.area,
               complete_type: controls.genre,
               sales_type: controls.sale,
-              phone_client: controls.phone,
+              phone_client: controls.countryCode + controls.phone,
               client: controls.client,
               country: controls.country,
               state: controls.governorate,
@@ -246,25 +251,6 @@ const AddUnits = () => {
       },
       onSuccess: (res) => {
         setGovernoratesData(res.data.data);
-      },
-    });
-  };
-
-  const [citiesData, setCitiesData] = useState([]);
-
-  const [citiesGetRequest, citiesGetResponse] = useRequest({
-    path: STATE_CITIES,
-    method: "post",
-  });
-
-  const getCities = () => {
-    citiesGetRequest({
-      body: {
-        country: controls.country,
-        state: controls.governorate,
-      },
-      onSuccess: (res) => {
-        setCitiesData(res.data.data);
       },
     });
   };
@@ -482,6 +468,12 @@ const AddUnits = () => {
         <PhoneField
           label="هاتف العميل"
           placeholder="هاتف العميل"
+          selectProps={{
+            value: controls.countryCode,
+            onChange: (e) => {
+              setControl("countryCode", e.target.value);
+            },
+          }}
           requiredCode
           required={required.includes("phone")}
           value={controls.phone}

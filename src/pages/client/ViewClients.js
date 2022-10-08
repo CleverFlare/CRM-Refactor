@@ -323,7 +323,7 @@ const ViewClients = () => {
     const params = filter({
       obj: {
         name: controls.name,
-        agent: controls.employee,
+        agent: controls.employee === 0 ? "0" : controls.employee,
         job: controls.job,
         user__country_code: encodeURIComponent(controls.code),
         user__phone: controls.phone,
@@ -596,10 +596,16 @@ const ViewClients = () => {
                 setControl("employee", "");
             }
           }}
-          data={employeesStore.results.map((employee) => ({
-            label: `${employee.user.first_name} ${employee.user.last_name}`,
-            value: employee.id,
-          }))}
+          data={[
+            {
+              label: `أدمن`,
+              value: 0,
+            },
+            ...employeesStore.results.map((employee) => ({
+              label: `${employee.user.first_name} ${employee.user.last_name}`,
+              value: employee.id,
+            })),
+          ]}
         />
         <PhoneField
           label="الهاتف"

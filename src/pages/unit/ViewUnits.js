@@ -25,6 +25,7 @@ import Dialog, {
   DialogHeading,
   DialogInfoWindow,
   DialogInputField,
+  DialogPhoneField,
   DialogSelectField,
 } from "../../features/dialog";
 import useAfterEffect from "../../hooks/useAfterEffect";
@@ -289,25 +290,6 @@ const ViewUnits = () => {
       },
       onSuccess: (res) => {
         setGovernoratesData(res.data.data);
-      },
-    });
-  };
-
-  const [citiesData, setCitiesData] = useState([]);
-
-  const [citiesGetRequest, citiesGetResponse] = useRequest({
-    path: STATE_CITIES,
-    method: "post",
-  });
-
-  const getCities = () => {
-    citiesGetRequest({
-      body: {
-        country: controls.country,
-        state: controls.governorate,
-      },
-      onSuccess: (res) => {
-        setCitiesData(res.data.data);
       },
     });
   };
@@ -612,6 +594,16 @@ const EditDialog = ({ open = false, onClose = () => {}, data = {} }) => {
         isRequired: false,
       },
       {
+        control: "countryCode",
+        value: data?.country_code_phone_client,
+        isRequired: false,
+      },
+      {
+        control: "phone",
+        value: data?.phone_client,
+        isRequired: false,
+      },
+      {
         control: "notes",
         value: data?.comment,
         isRequired: false,
@@ -650,6 +642,8 @@ const EditDialog = ({ open = false, onClose = () => {}, data = {} }) => {
         [controls.genre, data.complete_type],
         [controls.price, data.price],
         [controls.client, data.client],
+        [controls.phone, data.phone_client],
+        [controls.countryCode, data.country_code_phone_client],
         [controls.notes, data.comment],
       ],
       true
@@ -673,6 +667,7 @@ const EditDialog = ({ open = false, onClose = () => {}, data = {} }) => {
           complete_type: controls.genre,
           price: controls.price,
           client: controls.client,
+          phone_client: controls.countryCode + controls.phone,
           comment: controls.notes,
         },
       });
@@ -722,26 +717,6 @@ const EditDialog = ({ open = false, onClose = () => {}, data = {} }) => {
       },
       onSuccess: (res) => {
         setGovernoratesData(res.data.data);
-      },
-    });
-  };
-
-  const [citiesData, setCitiesData] = useState([]);
-
-  const [citiesGetRequest, citiesGetResponse] = useRequest({
-    path: STATE_CITIES,
-    method: "post",
-  });
-
-  const getCities = () => {
-    if (citiesData.length) return;
-    citiesGetRequest({
-      body: {
-        country: controls.country,
-        state: controls.governorate,
-      },
-      onSuccess: (res) => {
-        setCitiesData(res.data.data);
       },
     });
   };
@@ -870,6 +845,16 @@ const EditDialog = ({ open = false, onClose = () => {}, data = {} }) => {
           value={controls.client}
           onChange={(e) => setControl("client", e.target.value)}
         />
+        <DialogPhoneField
+          placeholder="هاتف العميل"
+          label="هاتف العميل"
+          selectProps={{
+            value: controls.countryCode,
+            onChange: (e) => setControl("countryCode", e.target.value),
+          }}
+          value={controls.phone}
+          onChange={(e) => setControl("phone", e.target.value)}
+        />
         <DialogInputField
           placeholder="ملاحظات"
           label="ملاحظات"
@@ -884,7 +869,9 @@ const EditDialog = ({ open = false, onClose = () => {}, data = {} }) => {
         >
           حفظ
         </DialogButton>
-        <DialogButton variant="close">إلغاء</DialogButton>
+        <DialogButton variant="close" onClick={onClose}>
+          إلغاء
+        </DialogButton>
       </DialogButtonsGroup>
       {unitPatchResponse.failAlert}
     </Dialog>

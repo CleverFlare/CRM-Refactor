@@ -29,7 +29,7 @@ const AutocompleteField = ({
     <Autocomplete
       loading={isPending}
       loadingText="الرجاء الإنتظار..."
-      options={data}
+      options={!isPending ? data : []}
       onOpen={onOpen}
       onClose={onClose}
       onChange={onChange}

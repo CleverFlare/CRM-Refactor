@@ -11,6 +11,7 @@ import { EMPLOYEES, EXPORT_CLIENTS } from "../../data/APIs";
 import useAfterEffect from "../../hooks/useAfterEffect";
 import { SelectField } from "../../features/form";
 import filter from "../../utils/ClearNull";
+import { useSelector } from "react-redux";
 
 const ExportClients = () => {
   //----request hooks----
@@ -26,7 +27,9 @@ const ExportClients = () => {
 
   //----states----
   const uploadInputRef = useRef();
-  const [files, setFiles] = useState(null);
+  const fileProgress = useSelector(
+    (store) => store.exportClients.value.fileProgress
+  );
   const [selected, setSelected] = useState("");
   const [selectedEmployee, setSelectedEmployee] = useState("");
   const [employeesState, setEmployeesState] = useState([]);
@@ -51,14 +54,6 @@ const ExportClients = () => {
       body: requestBody,
     });
   }, [selected]);
-
-  useAfterEffect(() => {
-    const { loaded, total } = exportClientsGetResponse;
-    setFiles({
-      progress: Math.floor((loaded / total) * 100),
-      size: total,
-    });
-  }, [exportClientsGetResponse.loaded, exportClientsGetResponse.total]);
 
   const getEmployees = () => {
     if (employeesState.length) return;
@@ -118,11 +113,7 @@ const ExportClients = () => {
           ref={uploadInputRef}
         />
         <DropBox
-          files={
-            files && (
-              <ProgressCard progress={files.progress} size={files.size} />
-            )
-          }
+          files={fileProgress && <ProgressCard progress={fileProgress} />}
           isPending={exportClientsGetResponse.isPending}
           onClick={() => uploadInputRef.current.click()}
           onDrag={handleDragFile}

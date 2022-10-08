@@ -153,10 +153,26 @@ const App = () => {
 
     const ws = new WebSocket(`wss://crmsystem.cyparta.com/ws/?${token}`);
 
+    const handleNotifications = (data) => {
+      setNotifications((old) => [data.data, ...old]);
+    };
+
+    const handleImportProgress = (data) => {
+      dispatch({
+        type: "exportClients/setProgress",
+        payload: data.data.message,
+      });
+    };
+
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      if (data.action === "notifications") {
-        setNotifications((old) => [data.data, ...old]);
+      switch (data.action) {
+        case "notifications":
+          handleNotifications(data);
+          break;
+        case "import":
+          handleImportProgress(data);
+          break;
       }
     };
 
@@ -213,8 +229,6 @@ const App = () => {
   };
 
   //====End==== change avatar login ========
-
-  const location = useLocation();
 
   return (
     <Fragment>
