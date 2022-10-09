@@ -282,7 +282,6 @@ const EditDialog = ({
     if (!open) return;
     if (!Boolean(data?.parent)) {
       !allPermissions.length && getAllPermissions();
-      getJobPermissions();
       setToggles([...allPermissions]);
     } else {
       getParentPermissions();
