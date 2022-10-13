@@ -12,6 +12,8 @@ import { IconButton, TextField } from "@mui/material";
 import DownloadIcon from "@mui/icons-material/Download";
 import { InputField } from "../../features/form";
 import { Stack } from "@mui/system";
+import useIsPermitted from "../../features/permissions/hook/useIsPermitted";
+import useConfirmMessage from "../../hooks/useConfirmMessage";
 
 const ExportRegistry = () => {
   const exportRegistryStore = useSelector(
@@ -68,6 +70,37 @@ const ExportRegistry = () => {
     });
   }, [requestParams]);
 
+  //====start==== delete registry logic ============
+  const [deleteRegistryRequest, deleteRegistryResponse] = useRequest({
+    path: FILES_HISTORY,
+    method: "delete",
+    successMessage: "تم حذف السجل بنجاح",
+  });
+
+  const deleteRegistry = (e, row) => {
+    deleteRegistryRequest({
+      id: row.id,
+      params: {
+        type: 0,
+      },
+      onSuccess: () => {
+        dispatch({
+          type: "exportRegistry/deleteItem",
+          payload: { id: row.id },
+        });
+      },
+    });
+  };
+
+  const [handleDeleteRegistry, deleteRegistryConfirmMessage] =
+    useConfirmMessage({
+      onConfirm: deleteRegistry,
+      text: "هل انت متأكد من انك تريد حذف هذه السجل؟",
+    });
+
+  const isPermitted = useIsPermitted();
+  //====end==== delete registry logic ============
+
   return (
     <Wrapper>
       <Breadcrumbs path={["العملاء", "سجل الإستيراد"]} />
@@ -79,8 +112,15 @@ const ExportRegistry = () => {
         onPaginate={handlePaginate}
         onAmountChange={handleChangeAmount}
         onFilter={handleFilter}
+        onDelete={isPermitted(handleDeleteRegistry, [
+          "delete_aqarimportexportfiels",
+        ])}
         filters={filters}
       />
+      {deleteRegistryResponse.successAlert}
+      {deleteRegistryResponse.failAlert}
+
+      {deleteRegistryConfirmMessage}
     </Wrapper>
   );
 };

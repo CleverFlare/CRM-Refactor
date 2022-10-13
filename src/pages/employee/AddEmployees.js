@@ -37,12 +37,12 @@ const AddEmployees = () => {
     {
       control: "code",
       value: "",
-      isRequired: true,
+      isRequired: false,
     },
     {
       control: "phone",
       value: "",
-      isRequired: true,
+      isRequired: false,
     },
     {
       control: "job",

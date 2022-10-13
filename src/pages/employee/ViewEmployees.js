@@ -23,11 +23,12 @@ import Dialog, {
   DialogForm,
   DialogInputField,
   DialogContent,
+  DialogPhoneField,
 } from "../../features/dialog";
 import usePropState from "../../hooks/usePropState";
 import useControls from "../../hooks/useControls";
 import DialogSelectField from "../../features/dialog/components/DialogSelectField";
-import { MenuItem, TextField } from "@mui/material";
+import { Avatar, MenuItem, TextField } from "@mui/material";
 import useAfterEffect from "../../hooks/useAfterEffect";
 import { InputField, SelectField } from "../../features/form";
 import compare from "../../utils/Compare";
@@ -167,6 +168,11 @@ export default ViewEmployees;
 
 const columns = [
   {
+    field: "avatar",
+    headerName: "الصورة الشخصية",
+    customContent: (params) => <Avatar src={params.user.image} />,
+  },
+  {
     field: "name",
     headerName: "الأسم",
     customContent: (params) =>
@@ -185,6 +191,12 @@ const columns = [
     headerName: "اسم المستخدم",
     customContent: (params) =>
       params.user.username ? params.user.username : "غير معروف",
+  },
+  {
+    field: "phone",
+    headerName: "الهاتف",
+    customContent: (params) =>
+      `${params.user.country_code}${params.user.phone}`,
   },
   {
     field: "date",
@@ -293,6 +305,18 @@ const EditInfoDialog = ({ open = false, onClose = () => {}, data = {} }) => {
             message: "البريد غير صالح",
           },
         ],
+      },
+      {
+        control: "countryCode",
+        value: data?.user?.country_code,
+      },
+      {
+        control: "phone",
+        value: data?.user?.phone,
+      },
+      {
+        control: "username",
+        value: data?.user?.username,
       },
       {
         control: "job",
@@ -407,6 +431,9 @@ const EditInfoDialog = ({ open = false, onClose = () => {}, data = {} }) => {
         [controls.job, data.job.id],
         [controls.to, data.parent],
         [originalEmployeePermissions.current, employeePermissions],
+        [controls.phone, data?.user?.phone],
+        [controls.countryCode, data?.user?.country_code],
+        [controls.username, data?.user?.username],
       ],
       true
     );
@@ -420,6 +447,9 @@ const EditInfoDialog = ({ open = false, onClose = () => {}, data = {} }) => {
               first_name: controls.name.split(/(?<=^\S+)\s/)[0],
               last_name: controls.name.split(/(?<=^\S+)\s/)[1],
               email: controls.email,
+              username: controls.username,
+              phone: controls.phone,
+              country_code: controls.countryCode,
               user_permissions: employeePermissions.map((perm) => ({
                 codename: perm,
               })),
@@ -469,6 +499,28 @@ const EditInfoDialog = ({ open = false, onClose = () => {}, data = {} }) => {
           onChange={(e) => setControl("email", e.target.value)}
           error={Boolean(invalid.email)}
           helperText={invalid.email}
+        />
+        <DialogInputField
+          label="اسم المستخدم"
+          placeholder="اسم المستخدم"
+          value={controls.username}
+          onChange={(e) => setControl("username", e.target.value)}
+          error={Boolean(invalid.username)}
+          helperText={invalid.username}
+        />
+        <DialogPhoneField
+          label="الهاتف"
+          placeholder="الهاتف"
+          selectProps={{
+            value: controls.countryCode,
+            onChange: (e) => {
+              setControl("countryCode", e.target.value);
+            },
+          }}
+          value={controls.phone}
+          onChange={(e) => setControl("phone", e.target.value)}
+          error={Boolean(invalid.phone)}
+          helperText={invalid.phone}
         />
         <DialogSelectField
           label="الوظيفة"

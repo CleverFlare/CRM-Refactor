@@ -1188,6 +1188,10 @@ const InfoDialog = ({
       headerName: "الموظف",
     },
     {
+      field: "agent",
+      headerName: "تم التحويل بواسطة",
+    },
+    {
       field: "history_user",
       headerName: "المشروعات",
       customContent: ({ rowData }) =>
