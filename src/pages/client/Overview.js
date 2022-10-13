@@ -7,7 +7,7 @@ import StatisticsCard from "../../components/StatisticsCard";
 import DataTable from "../../components/DataTable";
 import { useDispatch, useSelector } from "react-redux";
 import useRequest from "../../hooks/useRequest";
-import { STATUS, SUMMARY } from "../../data/APIs";
+import { CHANNELS, STATUS, SUMMARY } from "../../data/APIs";
 import { useEffect } from "react";
 import { Avatar, MenuItem } from "@mui/material";
 import { useState } from "react";
@@ -19,6 +19,7 @@ const Overview = () => {
   //----store----
   const overviewStore = useSelector((state) => state.overview.value);
   const statusStore = useSelector((state) => state.status.value);
+  const channelsStore = useSelector((state) => state.channels.value);
 
   const dispatch = useDispatch();
 
@@ -28,11 +29,6 @@ const Overview = () => {
   //----request hooks----
   const [overviewGetRequest, overviewGetResponse] = useRequest({
     path: SUMMARY,
-    method: "get",
-  });
-
-  const [statusGetRequest, statusGetResponse] = useRequest({
-    path: STATUS,
     method: "get",
   });
 
@@ -49,6 +45,7 @@ const Overview = () => {
   const handleFilterChange = (filters) => {
     const params = {};
     filters.event && (params.event = filters.event);
+    filters.channel && (params.channel = filters.channel);
     overviewGetRequest({
       id: filters.period,
       params,
@@ -59,6 +56,12 @@ const Overview = () => {
     });
   };
 
+  //=====start===== status logic ===========
+  const [statusGetRequest, statusGetResponse] = useRequest({
+    path: STATUS,
+    method: "get",
+  });
+
   const getStatus = () => {
     if (statusStore.results.length) return;
     statusGetRequest({
@@ -67,6 +70,25 @@ const Overview = () => {
       },
     });
   };
+
+  //=====end===== status logic ===========
+
+  //=====start===== channels logic ===========
+  const [channelsGetRequest, channelsGetResponse] = useRequest({
+    path: CHANNELS,
+    method: "get",
+  });
+
+  const getChannels = () => {
+    if (channelsStore.results.length) return;
+    channelsGetRequest({
+      onSuccess: (res) => {
+        dispatch({ type: "channels/set", payload: res.data });
+      },
+    });
+  };
+
+  //=====end===== channels logic ===========
 
   return (
     <Box>
@@ -138,6 +160,12 @@ const Overview = () => {
                 }))}
                 isStatusPending={statusGetResponse.isPending}
                 onStatusOpen={getStatus}
+                channelsData={channelsStore.results.map((channel) => ({
+                  name: channel.name,
+                  value: channel.id,
+                }))}
+                isChannelPending={channelsGetResponse.isPending}
+                onChannelOpen={getChannels}
               />
             }
           />
@@ -152,15 +180,19 @@ export default Overview;
 const Filters = ({
   onChange = () => {},
   isStatusPending,
+  isChannelPending,
+  channelsData = [],
   statusData = [],
   onStatusOpen = () => {},
+  onChannelOpen = () => {},
 }) => {
   const [period, setPeriod] = useState("1");
   const [status, setStatus] = useState("");
+  const [channel, setChannel] = useState("");
 
   useAfterEffect(() => {
-    onChange({ period, event: status });
-  }, [period, status]);
+    onChange({ period, event: status, channel });
+  }, [period, status, channel]);
 
   const periods = [
     {
@@ -217,6 +249,28 @@ const Filters = ({
         {statusData.length &&
           statusData.map((item, index) => (
             <MenuItem value={item.value} key={`dataTableStatusFilter ${index}`}>
+              {item.name}
+            </MenuItem>
+          ))}
+      </SelectField>
+      <SelectField
+        value={channel}
+        onChange={(e) => setChannel(e.target.value)}
+        isPending={isChannelPending}
+        onOpen={onChannelOpen}
+        placeholder="القناة الإعلانية"
+        sx={{ maxWidth: 130, width: "100vmax", minWidth: 0 }}
+        renderValue={(selected) => {
+          return channelsData.find((channel) => channel.value === selected)
+            .name;
+        }}
+      >
+        {channelsData.length &&
+          channelsData.map((item, index) => (
+            <MenuItem
+              value={item.value}
+              key={`dataTableChannelFilter ${index}`}
+            >
               {item.name}
             </MenuItem>
           ))}
