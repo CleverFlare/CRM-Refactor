@@ -1189,7 +1189,7 @@ const InfoDialog = ({
     },
     {
       field: "agent",
-      headerName: "تم التحويل بواسطة",
+      headerName: "المحرر",
     },
     {
       field: "history_user",

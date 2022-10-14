@@ -104,7 +104,7 @@ const Topbar = ({
         );
         return (
           parent.path +
-          parent.subtabs.find((subtab) => subtab?.name === name)?.path
+          parent.subtabs?.find((subtab) => subtab?.name === name)?.path
         );
     }
   };
@@ -112,6 +112,7 @@ const Topbar = ({
   const typesAndPaths = {
     project: getPath("عرض المشاريع", true),
     unit: getPath("عرض الوحدات", true),
+    followup: getPath("جميع العملاء", true),
     other: "",
   };
 

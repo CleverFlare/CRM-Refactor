@@ -1061,8 +1061,7 @@ const InfoDialog = ({ open, onClose, data = {} }) => {
   البلد: ${data?.country ? data?.country : "لا يوجد"}
   المحافظة: ${data?.state ? data?.state : "لا يوجد"}
   المدينة: ${data?.city ? data?.city : "لا يوجد"}
-  رقم العمارة: ${data?.flat_number ? data?.flat_number : "لا يوجد"}
-  للتواصل: ${data?.phone ? data?.phone : "لا يوجد"}\n`;
+  رقم العمارة: ${data?.flat_number ? data?.flat_number : "لا يوجد"}\n`;
 
   //===End====== share logic ===========
 
