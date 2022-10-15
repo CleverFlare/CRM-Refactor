@@ -21,8 +21,8 @@ const PhoneField = ({
   const [country, setCountry] = useState("");
 
   useEffect(() => {
-    setCountry(rest?.value);
-  }, [rest?.value]);
+    setCountry(selectProps?.value);
+  }, [selectProps?.value]);
 
   return (
     <NumericFormat
