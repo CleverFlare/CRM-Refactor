@@ -164,8 +164,7 @@ const AddEmployees = () => {
               controls.username
             }@${userInfo?.organization?.name?.replace(/\s/gi, "")}.com`,
             email: controls.email,
-            country_code: controls.code,
-            phone: controls.phone,
+            phone: controls.code + controls.phone,
             password: controls.password,
             user_permissions: selectedPerms.map((perm) => ({
               codename: perm,
@@ -218,6 +217,11 @@ const AddEmployees = () => {
             disabled: employeePostResponse.isPending,
           },
           closeBtn: {
+            onClick: () => {
+              setSelectedPerms([]);
+              setPermissionsState([]);
+              resetControls();
+            },
             disabled: employeePostResponse.isPending,
           },
         }}

@@ -48,29 +48,49 @@ const useControls = (controls = [], dep = []) => {
           ? control?.convert(state[control.control])
           : state[control.control];
 
+      console.log(control, state[control.control]);
+
       if (value === "" && control?.isRequired) {
         output = { ...output, [control.control]: "هذا الحقل إلزامي" };
-      } else if (
-        Array.isArray(control?.validations) &&
-        state[control.control]
-      ) {
+      } else if (Array.isArray(control?.validations)) {
         control.validations.forEach((validation) => {
-          switch (typeof validation.test) {
-            case "function":
-              if (!validation.test(state).test(value)) {
-                output = {
-                  ...output,
-                  [control.control]: validation.message,
-                };
-              }
-              break;
-            default:
-              if (!validation.test.test(value)) {
-                output = {
-                  ...output,
-                  [control.control]: validation.message,
-                };
-              }
+          if (validation.hasOwnProperty("customValidation")) {
+            switch (typeof validation.customValidation) {
+              case "function":
+                if (!validation.customValidation(state)) {
+                  output = {
+                    ...output,
+                    [control.control]: validation.message,
+                  };
+                }
+                break;
+              default:
+                if (!validation.customValidation === true) {
+                  output = {
+                    ...output,
+                    [control.control]: validation.message,
+                  };
+                }
+            }
+          }
+          if (validation.hasOwnProperty("test") && state[control.control]) {
+            switch (typeof validation.test) {
+              case "function":
+                if (!validation.test(state).test(value)) {
+                  output = {
+                    ...output,
+                    [control.control]: validation.message,
+                  };
+                }
+                break;
+              default:
+                if (!validation.test.test(value)) {
+                  output = {
+                    ...output,
+                    [control.control]: validation.message,
+                  };
+                }
+            }
           }
         });
       }

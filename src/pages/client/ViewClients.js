@@ -1188,12 +1188,8 @@ const InfoDialog = ({
       headerName: "الموظف",
     },
     {
-      field: "agent",
-      headerName: "المحرر",
-    },
-    {
       field: "history_user",
-      headerName: "المشروعات",
+      headerName: "المحرر",
       customContent: ({ rowData }) =>
         rowData.history_user
           ? `${rowData.history_user.first_name} ${rowData.history_user.last_name}`
@@ -1761,8 +1757,7 @@ const EditDialog = ({ open, onClose, data }) => {
           user: {
             first_name: controls.name.split(/(?<=^\S+)\s/)[0],
             last_name: controls.name.split(/(?<=^\S+)\s/)?.[1],
-            phone: controls.phone,
-            country_code: controls.countryCode,
+            phone: controls.countryCode + controls.phone,
             email: controls.email,
           },
           ...(Boolean(controls.project.length) && {

@@ -188,7 +188,7 @@ const DataGrid = ({
         <Divider orientation="horizontal" />
         <Box
           sx={{
-            overflowX: isPending ? "hidden" : "auto",
+            overflow: isPending ? "hidden" : "auto",
           }}
         >
           <Stack
@@ -206,7 +206,6 @@ const DataGrid = ({
                 maxHeight: 600,
                 height: 600,
                 minHeight: 600,
-                overflowY: isPending ? "hidden" : "auto",
                 position: "relative",
               }}
             >

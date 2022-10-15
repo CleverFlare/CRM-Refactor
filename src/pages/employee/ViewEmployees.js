@@ -28,7 +28,7 @@ import Dialog, {
 import usePropState from "../../hooks/usePropState";
 import useControls from "../../hooks/useControls";
 import DialogSelectField from "../../features/dialog/components/DialogSelectField";
-import { Avatar, MenuItem, TextField } from "@mui/material";
+import { Avatar, InputAdornment, MenuItem, TextField } from "@mui/material";
 import useAfterEffect from "../../hooks/useAfterEffect";
 import { InputField, SelectField } from "../../features/form";
 import compare from "../../utils/Compare";
@@ -288,6 +288,8 @@ const filters = [
 ];
 
 const EditInfoDialog = ({ open = false, onClose = () => {}, data = {} }) => {
+  const userInfo = useSelector((state) => state.userInfo.value);
+
   const dispatch = useDispatch();
 
   const [{ controls, invalid }, { setControl, validate }] = useControls(
@@ -303,7 +305,7 @@ const EditInfoDialog = ({ open = false, onClose = () => {}, data = {} }) => {
           {
             test: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
             message: "البريد غير صالح",
-          },
+          },``
         ],
       },
       {
@@ -313,10 +315,16 @@ const EditInfoDialog = ({ open = false, onClose = () => {}, data = {} }) => {
       {
         control: "phone",
         value: data?.user?.phone,
+        validations: [
+          {
+            customValidation: ({ countryCode }) => countryCode !== "",
+            message: "انت تحاول إضافة كود دولة بدون رقم",
+          },
+        ],
       },
       {
         control: "username",
-        value: data?.user?.username,
+        value: data?.user?.username.split("@")[0],
       },
       {
         control: "job",
@@ -439,17 +447,30 @@ const EditInfoDialog = ({ open = false, onClose = () => {}, data = {} }) => {
     );
 
     if (isThereChange) {
-      validate().then(({ isOk }) => {
+      validate().then((output) => {
+        const { isOk } = output;
         if (!isOk) return;
+        console.log(output);
         const requestBody = filter({
           obj: {
             user: {
               first_name: controls.name.split(/(?<=^\S+)\s/)[0],
               last_name: controls.name.split(/(?<=^\S+)\s/)[1],
               email: controls.email,
-              username: controls.username,
-              phone: controls.phone,
-              country_code: controls.countryCode,
+              username:
+                !compare([
+                  [
+                    controls.username +
+                      `@${userInfo?.organization?.name?.replace(
+                        /\s/gi,
+                        ""
+                      )}.com`,
+                    data?.user?.username,
+                  ],
+                ]) &&
+                controls.username +
+                  `@${userInfo?.organization?.name?.replace(/\s/gi, "")}.com`,
+              phone: controls.countryCode + controls.phone,
               user_permissions: employeePermissions.map((perm) => ({
                 codename: perm,
               })),
@@ -503,6 +524,16 @@ const EditInfoDialog = ({ open = false, onClose = () => {}, data = {} }) => {
         <DialogInputField
           label="اسم المستخدم"
           placeholder="اسم المستخدم"
+          InputProps={{
+            startAdornment: (
+              <InputAdornment
+                position="start"
+                sx={{ direction: "rtl", paddingLeft: "10px" }}
+              >
+                @{userInfo?.organization?.name?.replace(/\s/gi, "")}.com
+              </InputAdornment>
+            ),
+          }}
           value={controls.username}
           onChange={(e) => setControl("username", e.target.value)}
           error={Boolean(invalid.username)}

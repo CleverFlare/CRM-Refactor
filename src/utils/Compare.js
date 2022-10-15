@@ -25,8 +25,6 @@ const compare = (array, complete) => {
     }
   });
 
-  console.log(array2);
-
   return array2[complete ? "every" : "some"](([item1, item2]) => {
     return _.isEqual(item1, item2);
   });
